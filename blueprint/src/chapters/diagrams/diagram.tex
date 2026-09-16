@@ -1,3 +1,4 @@
+% !TEX root = ../print.tex
 
 \ifplastex
   \includegraphics{chapters/diagrams/diagram.png}
@@ -9,11 +10,11 @@
     font=\tiny
   }
 ]
- 
+
 % Compact cochain complex style
 \def\colspacing{1.8}
 \def\rowspacing{1.4}
- 
+
 % ==========================================
 % ROW 1: i = ℓ (top row)
 % ==========================================
@@ -26,7 +27,7 @@
 \node (A0_5) at (5*\colspacing, 0) {$B_\ell^R$};
 \node (A0_6) at (6*\colspacing, 0) {$0$};
 \node (A0_7) at (7*\colspacing, 0) {$\cdots$};
- 
+
 % ==========================================
 % ROW 2: i = ℓ+1
 % ==========================================
@@ -39,7 +40,7 @@
 \node (A1_5) at (5*\colspacing, -\rowspacing) {$B_{\ell+1}^R$};
 \node (A1_6) at (6*\colspacing, -\rowspacing) {$0$};
 \node (A1_7) at (7*\colspacing, -\rowspacing) {$\cdots$};
- 
+
 % ==========================================
 % ROW 3: i = ℓ+2
 % ==========================================
@@ -52,7 +53,7 @@
 \node (A2_5) at (5*\colspacing, -2*\rowspacing) {$B_{\ell+2}^R$};
 \node (A2_6) at (6*\colspacing, -2*\rowspacing) {$0$};
 \node (A2_7) at (7*\colspacing, -2*\rowspacing) {$\cdots$};
- 
+
 % ==========================================
 % VERTICAL ELLIPSIS ROW (rows ℓ+3 through r-2)
 % ==========================================
@@ -65,7 +66,7 @@
 \node (vdots_5) at (5*\colspacing, -2.7*\rowspacing) {$\vdots$};
 \node (vdots_6) at (6*\colspacing, -2.7*\rowspacing) {$\vdots$};
 \node (vdots_7) at (7*\colspacing, -2.7*\rowspacing) {$\vdots$};
- 
+
 % ==========================================
 % ROW r-1
 % ==========================================
@@ -78,7 +79,7 @@
 \node (A3_5) at (5*\colspacing, -3.4*\rowspacing) {$B_{r-1}^R$};
 \node (A3_6) at (6*\colspacing, -3.4*\rowspacing) {$0$};
 \node (A3_7) at (7*\colspacing, -3.4*\rowspacing) {$\cdots$};
- 
+
 % ==========================================
 % ROW r (bottom row)
 % ==========================================
@@ -91,11 +92,11 @@
 \node (A4_5) at (5*\colspacing, -4.2*\rowspacing) {$B_r^R$};
 \node (A4_6) at (6*\colspacing, -4.2*\rowspacing) {$0$};
 \node (A4_7) at (7*\colspacing, -4.2*\rowspacing) {$\cdots$};
- 
+
 % ==========================================
 % HORIZONTAL MAPS (along rows) - compact arrows
 % ==========================================
- 
+
 % Row ℓ
 \draw[->] (A0_m1) -- (A0_0);
 \draw[->] (A0_0) -- (A0_1);
@@ -105,7 +106,7 @@
 \draw[->] (A0_4) -- (A0_5);
 \draw[->] (A0_5) -- (A0_6);
 \draw[->] (A0_6) -- (A0_7);
- 
+
 % Row ℓ+1
 \draw[->] (A1_m1) -- (A1_0);
 \draw[->] (A1_0) -- (A1_1);
@@ -115,7 +116,7 @@
 \draw[->] (A1_4) -- (A1_5);
 \draw[->] (A1_5) -- (A1_6);
 \draw[->] (A1_6) -- (A1_7);
- 
+
 % Row ℓ+2
 \draw[->] (A2_m1) -- (A2_0);
 \draw[->] (A2_0) -- (A2_1);
@@ -125,7 +126,7 @@
 \draw[->] (A2_4) -- (A2_5);
 \draw[->] (A2_5) -- (A2_6);
 \draw[->] (A2_6) -- (A2_7);
- 
+
 % Row r-1
 \draw[->] (A3_m1) -- (A3_0);
 \draw[->] (A3_0) -- (A3_1);
@@ -135,7 +136,7 @@
 \draw[->] (A3_4) -- (A3_5);
 \draw[->] (A3_5) -- (A3_6);
 \draw[->] (A3_6) -- (A3_7);
- 
+
 % Row r
 \draw[->] (A4_m1) -- (A4_0);
 \draw[->] (A4_0) -- (A4_1);
@@ -145,39 +146,39 @@
 \draw[->] (A4_4) -- (A4_5);
 \draw[->] (A4_5) -- (A4_6);
 \draw[->] (A4_6) -- (A4_7);
- 
+
 % ==========================================
 % VERTICAL MAPS (along columns)
 % ==========================================
- 
+
 % Column L (leftmost)
 \draw[->] (A0_1) -- (A1_1);
 \draw[->] (A1_1) -- (A2_1);
 \draw[->] (A2_1) -- (vdots_1);
 \draw[->] (vdots_1) -- (A3_1);
 \draw[->] (A3_1) -- (A4_1);
- 
+
 % Column L+1
 \draw[->] (A0_2) -- (A1_2);
 \draw[->] (A1_2) -- (A2_2);
 \draw[->] (A2_2) -- (vdots_2);
 \draw[->] (vdots_2) -- (A3_2);
 \draw[->] (A3_2) -- (A4_2);
- 
+
 % Column R-1
 \draw[->] (A0_4) -- (A1_4);
 \draw[->] (A1_4) -- (A2_4);
 \draw[->] (A2_4) -- (vdots_4);
 \draw[->] (vdots_4) -- (A3_4);
 \draw[->] (A3_4) -- (A4_4);
- 
+
 % Column R
 \draw[->] (A0_5) -- (A1_5);
 \draw[->] (A1_5) -- (A2_5);
 \draw[->] (A2_5) -- (vdots_5);
 \draw[->] (vdots_5) -- (A3_5);
 \draw[->] (A3_5) -- (A4_5);
- 
+
 % ==========================================
 % DIAGONAL MAPS: B_i^j → B_{i+2}^{j-1}
 % From all columns L+1, L+2, ..., R
@@ -185,7 +186,7 @@
 % Row ℓ+2 maps to ellipsis row
 % Ellipsis row maps to rows r-1 and r
 % ==========================================
- 
+
 % From row ℓ:
 % A0_2 (L+1) -> A2_1 (L)
 \draw[
@@ -194,7 +195,7 @@
   line width=0.5pt,
   color=blue!70
 ] (A0_2) to[bend left=8] (A2_1);
- 
+
 % A0_4 (R-1) -> A2_3 (R-2, the ellipsis)
 \draw[
   ->,
@@ -202,7 +203,7 @@
   line width=0.5pt,
   color=blue!70
 ] (A0_4) to[bend left=8] (A2_3);
- 
+
 % A0_5 (R) -> A2_4 (R-1)
 \draw[
   ->,
@@ -210,7 +211,7 @@
   line width=0.5pt,
   color=blue!70
 ] (A0_5) to[bend left=8] (A2_4);
- 
+
 % From row ℓ+1:
 % A1_2 (L+1) -> vdots_1 (L) in ellipsis row
 \draw[
@@ -219,7 +220,7 @@
   line width=0.5pt,
   color=blue!70
 ] (A1_2) to[bend left=8] (vdots_1);
- 
+
 % A1_4 (R-1) -> vdots_3 (R-2)
 \draw[
   ->,
@@ -227,7 +228,7 @@
   line width=0.5pt,
   color=blue!70
 ] (A1_4) to[bend left=8] (vdots_3);
- 
+
 % A1_5 (R) -> vdots_4 (R-1)
 \draw[
   ->,
@@ -235,7 +236,7 @@
   line width=0.5pt,
   color=blue!70
 ] (A1_5) to[bend left=8] (vdots_4);
- 
+
 % From row ℓ+2:
 % A2_2 (L+1) -> vdots_1 (L) in ellipsis row
 \draw[
@@ -244,7 +245,7 @@
   line width=0.5pt,
   color=blue!70
 ] (A2_2) to[bend left=8] (vdots_1);
- 
+
 % A2_4 (R-1) -> vdots_3 (R-2) in ellipsis row
 \draw[
   ->,
@@ -252,7 +253,7 @@
   line width=0.5pt,
   color=blue!70
 ] (A2_4) to[bend left=8] (vdots_3);
- 
+
 % A2_5 (R) -> vdots_4 (R-1) in ellipsis row
 \draw[
   ->,
@@ -260,7 +261,7 @@
   line width=0.5pt,
   color=blue!70
 ] (A2_5) to[bend left=8] (vdots_4);
- 
+
 % From ellipsis row to row r-1:
 % vdots_2 (L+1) -> A3_1 (L)
 \draw[
@@ -269,7 +270,7 @@
   line width=0.5pt,
   color=blue!70
 ] (vdots_2) to[bend left=8] (A3_1);
- 
+
 % vdots_4 (R-1) -> A3_3 (R-2, the ellipsis)
 \draw[
   ->,
@@ -277,7 +278,7 @@
   line width=0.5pt,
   color=blue!70
 ] (vdots_4) to[bend left=8] (A3_3);
- 
+
 % vdots_5 (R) -> A3_4 (R-1)
 \draw[
   ->,
@@ -285,7 +286,7 @@
   line width=0.5pt,
   color=blue!70
 ] (vdots_5) to[bend left=8] (A3_4);
- 
+
 % From ellipsis row to row r:
 % vdots_2 (L+1) -> A4_1 (L)
 \draw[
@@ -294,7 +295,7 @@
   line width=0.5pt,
   color=blue!70
 ] (vdots_2) to[bend left=8] (A4_1);
- 
+
 % vdots_4 (R-1) -> A4_3 (R-2, the ellipsis)
 \draw[
   ->,
@@ -302,7 +303,7 @@
   line width=0.5pt,
   color=blue!70
 ] (vdots_4) to[bend left=8] (A4_3);
- 
+
 % vdots_5 (R) -> A4_4 (R-1)
 \draw[
   ->,
@@ -310,6 +311,6 @@
   line width=0.5pt,
   color=blue!70
 ] (vdots_5) to[bend left=8] (A4_4);
- 
+
 \end{tikzpicture}
 \fi
