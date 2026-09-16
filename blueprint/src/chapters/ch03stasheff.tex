@@ -1,24 +1,26 @@
+% !TEX root = ../print.tex
+
 \chapter{Stasheff Data}
 
 \begin{definition}[Operation target degree]
 \lean{AInfinityTheory.operationTargetDeg}
 \label{AInfinityTheory.operationTargetDeg}
 \leanok
-\uses{AInfinityTheory.shift_ofInt}
+\uses{AInfinityTheory.shiftOfInt}
 Given input degrees $(d_0,\dots,d_{n-1})$, the output degree of the $n$-ary
 operation is
 \[
   \sum_i d_i + (2-n),
 \]
 where the final summand is interpreted using the grading shift
-\lean{AInfinityTheory.shift_ofInt}.
+\lean{AInfinityTheory.shiftOfInt}.
 \end{definition}
 
 \begin{definition}[Stasheff target degree]
 \lean{AInfinityTheory.stasheffTargetDeg}
 \label{AInfinityTheory.stasheffTargetDeg}
 \leanok
-\uses{AInfinityTheory.shift_ofInt}
+\uses{AInfinityTheory.shiftOfInt}
 The common degree of the arity-$n$ Stasheff relation is
 \[
   \sum_i d_i + (3-n)
@@ -27,12 +29,12 @@ in the grading index.
 \end{definition}
 
 \begin{definition}[Composable morphism type]
-%\lean{AInfinityTheory.composableHomType}
-\label{AInfinityTheory.composableHomType}
+%\lean{AInfinityTheory.ComposableHomType}
+\label{AInfinityTheory.ComposableHomType}
 %\leanok
 \uses{AInfinityTheory.GradedRModule}
 For a string of objects and prescribed degrees,
-\lean{AInfinityTheory.composableHomType} is the $i$-th graded hom-module in
+\lean{AInfinityTheory.ComposableHomType} is the $i$-th graded hom-module in
 that composable string.
 \end{definition}
 
@@ -40,7 +42,7 @@ that composable string.
 \lean{AInfinityTheory.operationTargetType}
 \label{AInfinityTheory.operationTargetType}
 \leanok
-\uses{AInfinityTheory.operationTargetDeg, AInfinityTheory.composableHomType}
+\uses{AInfinityTheory.operationTargetDeg, AInfinityTheory.ComposableHomType}
 For a composable string of objects and degrees, this is the graded hom-module in
 which the corresponding multilinear operation takes values.
 \end{definition}
@@ -49,7 +51,7 @@ which the corresponding multilinear operation takes values.
 \lean{AInfinityTheory.indexedStasheffTerm}
 \label{AInfinityTheory.indexedStasheffTerm}
 \leanok
-\uses{AInfinityTheory.composableHomType, AInfinityTheory.operationTargetType, AInfinityTheory.stasheffTargetDeg}
+\uses{AInfinityTheory.ComposableHomType, AInfinityTheory.operationTargetType, AInfinityTheory.stasheffTargetDeg}
 Fix object-indexed operations $m_n$. For valid indices $(r,s)$,
 \lean{AInfinityTheory.indexedStasheffTerm} is the term obtained by first applying the inner
 $s$-ary operation in positions $r,\dots,r+s-1$ and then applying the outer
@@ -60,12 +62,11 @@ operation to the collapsed string.
 \lean{AInfinityTheory.stasheffSignParity}
 \label{AInfinityTheory.stasheffSignParity}
 \leanok
-\uses{AInfinityTheory.Grading}
+\uses{AInfinityTheory.GradingIndex}
 For a valid pair $(r,s)$, this is the parity
 \[
-  |a_{r+s}| + \cdots + |a_{n-1}| - (n-r-s)
+  |a_{r+s}| + \cdots + |a_{n-1}| - (n-r-s).
 \]
-computed in \lean{AInfinityTheory.Parity}.
 \end{definition}
 
 \begin{definition}[Stasheff sign]
