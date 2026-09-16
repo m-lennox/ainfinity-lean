@@ -29,23 +29,16 @@ The distinguished unit is used to realize integer degree shifts via the canonica
 `ℤ →+ β`. -/
 public class GradingIndex (β : Type*) extends AddCommGroupWithOne β where
   /-- The parity of a degree. -/
-  protected parity : β →+ ZMod 2
+  parity : β →+ ZMod 2
   /-- The distinguished unit has odd parity. -/
-  protected parity_one : parity 1 = 1
+  parity_one : parity 1 = 1
 
-/-- The parity homomorphism attached to a grading index. -/
-public def parity {β : Type*} [GradingIndex β] : β →+ ZMod 2 :=
-  GradingIndex.parity
+export GradingIndex (parity parity_one)
 
 /-- The canonical additive homomorphism from `ℤ` into a grading index. -/
 @[expose]
 public def GradingIndex.ofInt {β : Type*} [GradingIndex β] : ℤ →+ β :=
   Int.castAddHom β
-
-/-- The parity of the distinguished unit is odd. -/
-@[simp]
-public theorem parity_one {β : Type*} [GradingIndex β] : parity (1 : β) = 1 :=
-  GradingIndex.parity_one
 
 /-- The parity map agrees with integer casts modulo `2`. -/
 @[simp]
