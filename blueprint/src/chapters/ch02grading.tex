@@ -1,16 +1,16 @@
+% !TEX root = ../print.tex
+
 \chapter{Gradings}
 
 \begin{definition}[Parity group]
-%\lean{AInfinityTheory.Parity}
 \label{AInfinityTheory.Parity}
-%\leanok
 The type of parities is $\mathbb{Z}/2\mathbb{Z}$, implemented as \texttt{ZMod 2}.
 \end{definition}
 
 \begin{definition}[Grading]
-%\lean{AInfinityTheory.Grading}
-\label{AInfinityTheory.Grading}
-%\leanok
+\lean{AInfinityTheory.GradingIndex}
+\label{AInfinityTheory.GradingIndex}
+\leanok
 \uses{AInfinityTheory.Parity}
 A grading on a type $\beta$ consists of an additive commutative group structure
 on $\beta$, together with homomorphisms
@@ -23,11 +23,11 @@ such that $\sigma(\phi(n))$ is the parity class of $n$ for every integer $n$.
 \end{definition}
 
 \begin{definition}[Integer shift]
-\lean{AInfinityTheory.shift_ofInt}
-\label{AInfinityTheory.shift_ofInt}
+\lean{AInfinityTheory.shiftOfInt}
+\label{AInfinityTheory.shiftOfInt}
 \leanok
-\uses{AInfinityTheory.Grading}
-For a grading index $\beta$, \lean{AInfinityTheory.shift_ofInt} is the image of
+\uses{AInfinityTheory.GradingIndex}
+For a grading index $\beta$, \lean{AInfinityTheory.shiftOfInt} is the image of
 $n \in \mathbb{Z}$ under the distinguished map $\phi : \mathbb{Z} \to \beta$.
 \end{definition}
 
@@ -35,14 +35,14 @@ $n \in \mathbb{Z}$ under the distinguished map $\phi : \mathbb{Z} \to \beta$.
 \lean{AInfinityTheory.GradedRModule}
 \label{AInfinityTheory.GradedRModule}
 \leanok
-\uses{AInfinityTheory.Grading}
+\uses{AInfinityTheory.GradingIndex}
 For a commutative ring $R$, a graded $R$-module is a $\beta$-indexed family of
 $R$-modules, implemented as a graded object in \texttt{ModuleCat R}.
 \end{definition}
 
 \begin{definition}[$R$-linear graded quiver]
-\lean{AInfinityTheory.RLinearGQuiver}
-\label{AInfinityTheory.RLinearGQuiver}
+\lean{AInfinityTheory.RLinearGradedQuiver}
+\label{AInfinityTheory.RLinearGradedQuiver}
 \leanok
 \uses{AInfinityTheory.GradedRModule}
 An $R$-linear graded quiver on an object type $\mathrm{Obj}$ assigns to each pair
