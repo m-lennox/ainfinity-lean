@@ -33,7 +33,7 @@ abbrev ValidStasheffIndices (n r s : ℕ) : Prop :=
 abbrev ComposableHomType
     {R : Type u} [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β R)
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -47,7 +47,7 @@ abbrev ComposableHomType
 abbrev operationTargetType
     {R : Type u} [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β R)
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β) : ModuleCat R :=
@@ -117,6 +117,23 @@ private lemma shift_ofInt_combine {n s : ℕ} (hsn : s ≤ n) :
   unfold shiftOfInt
   symm
   apply map_add
+
+private lemma shift_ofInt_combine_alt {n s : ℕ} (hsn : s ≤ n) :
+    ((2 - (s : ℤ)) : β) + (2 - ((n + 1 - s : ℕ) : ℤ)) =
+    (3 - (n : ℤ)) := by
+  have : 3 - (n : ℤ) = 2 - (s : ℤ) + 2 - ((n + 1 - s : ℕ) : ℤ) := by
+    have hle : s ≤ n + 1 := Nat.le_succ_of_le hsn
+    rw [Nat.cast_sub hle]
+    push_cast
+    omega
+  norm_cast
+  suffices
+    Int.subNatNat 2 s + Int.subNatNat 2 (n + 1 - s) = Int.subNatNat 3 n
+  by
+    rw [this]
+  simp only [Int.subNatNat_eq_coe, Nat.cast_ofNat, this]
+  symm
+  rw [Int.add_sub_assoc]
 
 /-- The finite ranges used in the Stasheff sum produce valid index pairs. -/
 lemma validStasheffIndices_of_mem_ranges
@@ -276,7 +293,7 @@ lemma multilinearFamily_eq_of_deg_eq
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -308,7 +325,7 @@ def indexedStasheffXIn
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -323,7 +340,7 @@ lemma indexedStasheffXIn_apply
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -339,7 +356,7 @@ def indexedStasheffInner
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -369,7 +386,7 @@ lemma indexedStasheffMiddleModuleEq
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -386,7 +403,7 @@ lemma indexedStasheffMiddleTypeEq
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -403,7 +420,7 @@ lemma indexedStasheffXOutTypeEq_of_lt
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -421,7 +438,7 @@ lemma indexedStasheffXOutTypeEq_of_eq
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -443,7 +460,7 @@ lemma indexedStasheffXOutTypeEq_of_gt
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -464,7 +481,7 @@ def indexedStasheffXOut
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -494,7 +511,7 @@ lemma indexedStasheffXOut_apply_of_lt
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -521,7 +538,7 @@ lemma indexedStasheffXOut_apply_of_gt
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -563,7 +580,7 @@ def indexedStasheffOuter
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -586,7 +603,7 @@ lemma indexedStasheffTargetModuleEq
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -622,7 +639,7 @@ lemma indexedStasheffTargetEq
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
@@ -638,7 +655,7 @@ def indexedStasheffTerm
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -660,7 +677,7 @@ lemma indexedStasheffXOut_middle_eq
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -687,7 +704,7 @@ lemma indexedStasheffXOut_middle_eq_zero_of_inner_eq_zero
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -713,7 +730,7 @@ lemma indexedStasheffOuter_eq_zero_of_map_eq_zero
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -737,7 +754,7 @@ lemma indexedStasheffOuter_eq_zero_of_inner_eq_zero
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -764,7 +781,7 @@ lemma indexedStasheffTerm_eq_zero_iff_outer_eq_zero
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -789,7 +806,7 @@ lemma indexedStasheffTerm_eq_zero_of_outer_map_eq_zero
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -814,7 +831,7 @@ lemma indexedStasheffTerm_eq_zero_of_inner_map_eq_zero
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -858,7 +875,7 @@ def indexedStasheffSum
     {R : Type u}
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R
@@ -883,7 +900,7 @@ def indexedSatisfiesStasheff
     (R : Type u)
     [CommRing R]
     {Obj : Type w}
-    (Hom : Obj → Obj → GradedRModule (β := β) (R := R))
+    (Hom : Obj → Obj → GradedRModule β (R := R))
     (m : {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → Obj) → (deg : Fin n → β) →
       MultilinearMap R

@@ -16,7 +16,7 @@ variable (β : Type v) [GradingIndex β]
 
 class AInfinityCategoryStruct
     (R : Type u) [CommRing R] (Obj : Type w)
-    extends RLinearGradedQuiver (β := β) R Obj where
+    extends RLinearGradedQuiver β R Obj where
   m :
     {n : ℕ} → [NeZero n] →
     (obj : Fin (n + 1) → Obj) →
@@ -42,16 +42,16 @@ def stasheffSum
 
 /-- The Stasheff identities as a property of the raw A∞ category data. -/
 def SatisfiesStasheff
-    [AInfinityCategoryStruct (β := β) R Obj] : Prop :=
+    [AInfinityCategoryStruct β R Obj] : Prop :=
   indexedSatisfiesStasheff β R (Obj := Obj) (gradedHom β R) m
 
 end AInfinityCategoryStruct
 
 class AInfinityCategory
     (R : Type u) [CommRing R] (Obj : Type w)
-    extends AInfinityCategoryStruct (β := β) R Obj where
+    extends AInfinityCategoryStruct β R Obj where
   satisfiesStasheff :
-    AInfinityCategoryStruct.SatisfiesStasheff (β := β) R Obj
+    AInfinityCategoryStruct.SatisfiesStasheff β R Obj
 
 namespace AInfinityCategory
 
