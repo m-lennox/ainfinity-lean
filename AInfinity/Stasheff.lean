@@ -101,23 +101,6 @@ def stasheffObjOut
       obj ⟨i.val + s - 1, by omega⟩
 
 /-- Combine the two operation-degree shifts in a nested Stasheff term. -/
--- private lemma shift_ofInt_combine {n s : ℕ} (hsn : s ≤ n) :
---     (2 - (s : ℤ)) + (2 - ((n + 1 - s : ℕ) : ℤ)) =
---     (3 - (n : ℤ)) := by
---   have : 3 - (n : ℤ) = 2 - (s : ℤ) + 2 - ((n + 1 - s : ℕ) : ℤ) := by
---     have hle : s ≤ n + 1 := Nat.le_succ_of_le hsn
---     rw [Nat.cast_sub hle]
---     push_cast
---     omega
---   rw [this]
---   conv =>
---     rhs
---     arg 1
---     rw [Int.add_sub_assoc (2 - (s : ℤ))]
---   unfold shiftOfInt
---   symm
---   apply map_add
-
 private lemma shift_ofInt_combine {n s : ℕ} (hsn : s ≤ n) :
     ((2 - (s : ℤ)) : β) + (2 - ((n + 1 - s : ℕ) : ℤ)) =
     (3 - (n : ℤ)) := by
@@ -194,7 +177,7 @@ lemma stasheffDegOut_sum_core
             ring_nf
             norm_cast
             simp only [← Int.coe_castAddHom, Int.subNatNat_eq_coe, Nat.cast_ofNat]
-            grind 
+            grind
           · exact fun i j h => by simpa [Fin.ext_iff] using h
           · exact fun i j h => by simpa [Fin.ext_iff] using h
           · exact fun i j h => by simpa [Fin.ext_iff] using h
