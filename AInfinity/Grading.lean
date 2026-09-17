@@ -29,36 +29,17 @@ The distinguished unit is used to realize integer degree shifts via the canonica
 `ℤ →+ β`. -/
 public class GradingIndex (β : Type*) extends AddCommGroupWithOne β where
   /-- The parity of a degree. -/
-  protected parity : β →+ ZMod 2
+  parity : β →+ ZMod 2
   /-- The distinguished unit has odd parity. -/
-  protected parity_one : parity 1 = 1
+  parity_one : parity 1 = 1
 
-/-- The parity homomorphism attached to a grading index. -/
-public def parity {β : Type*} [GradingIndex β] : β →+ ZMod 2 :=
-  GradingIndex.parity
-
-/-- The canonical additive homomorphism from `ℤ` into a grading index. -/
-@[expose]
-public def GradingIndex.ofInt {β : Type*} [GradingIndex β] : ℤ →+ β :=
-  Int.castAddHom β
-
-/-- The parity of the distinguished unit is odd. -/
-@[simp]
-public theorem parity_one {β : Type*} [GradingIndex β] : parity (1 : β) = 1 :=
-  GradingIndex.parity_one
+export GradingIndex (parity parity_one)
 
 /-- The parity map agrees with integer casts modulo `2`. -/
 @[simp]
 public theorem parity_intCast {β : Type*} [GradingIndex β] (n : ℤ) :
     parity (n : β) = (n : ZMod 2) := by
   rw [← zsmul_one n, map_zsmul, parity_one, zsmul_one]
-
-/-- The canonical degree shift by an integer.
-
-Keeping this wrapper makes degree formulas read naturally throughout the project. -/
-@[expose]
-public def shiftOfInt {β : Type*} [GradingIndex β] (n : ℤ) : β :=
-  GradingIndex.ofInt n
 
 /-- A graded `R`-module indexed by `β`. -/
 public abbrev GradedRModule (β : Type v) [GradingIndex β] (R : Type u) [CommRing R] :

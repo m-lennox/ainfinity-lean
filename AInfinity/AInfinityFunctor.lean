@@ -22,7 +22,7 @@ variable (β_B : Type w) [GradingIndex β_B]
 abbrev functorTargetDeg
     (deg_trans : β_A →+ β_B)
     {n : ℕ} (deg : Fin n → β_A) : β_B :=
-  (∑ i, deg_trans (deg i)) + shiftOfInt (1 - (n : ℤ))
+  (∑ i, deg_trans (deg i)) + (1 - (n : ℤ))
 
 /-- Target module of `φ_n` for a chain of objects and input degrees. -/
 abbrev functorTargetType
@@ -49,7 +49,7 @@ structure AInfinityFunctorData
   /-- Group homofunctor translating degrees from `β_A` to `β_B`. -/
   deg_trans : β_A →+ β_B
   /-- `deg_trans` is compatible with the integer embeddings. -/
-  deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n
+  deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n
   /-- `deg_trans` preserves parity. -/
   deg_trans_sign : ∀ b : β_A, parity (deg_trans b) = parity b
 
@@ -188,7 +188,7 @@ variable {ObjA : Type x} {ObjB : Type y}
 abbrev functorEqTargetDeg
     (deg_trans : β_A →+ β_B)
     {n : ℕ} (deg : Fin n → β_A) : β_B :=
-  (∑ i, deg_trans (deg i)) + shiftOfInt (2 - (n : ℤ))
+  (∑ i, deg_trans (deg i)) +  (2 - (n : ℤ))
 
 abbrev functorEqTargetType
     {R : Type u} [CommRing R]
@@ -217,16 +217,26 @@ section LHS
 lemma LHS_compatible_deg
     {n : ℕ}
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ k : ℤ, deg_trans (GradingIndex.ofInt k) = GradingIndex.ofInt k)
+    (deg_trans_ofInt : ∀ k : ℤ, deg_trans k = k)
     (deg : Fin n → β_A)
     (r s : ℕ)
     (hr : r + s ≤ n) :
     functorTargetDeg β_A β_B deg_trans (stasheffDegOut deg r s hr) =
     functorEqTargetDeg β_A β_B deg_trans deg := by
       unfold functorTargetDeg functorEqTargetDeg;
-      convert congr_arg ( fun x : β_A => deg_trans x + shiftOfInt ( 1 - ( n + 1 - s : ℤ ) ) ) ( stasheffDegOut_sum_core deg r s hr ) using 1;
+      convert congr_arg ( fun x : β_A => deg_trans x +  ( 1 - ( n + 1 - s : ℤ ) ) ) ( stasheffDegOut_sum_core deg r s hr ) using 1;
       · simp +decide [ Nat.cast_sub ( by linarith : s ≤ n + 1 ) ];
-      · simp +decide only [shiftOfInt, map_sub, map_add, map_sum, deg_trans_ofInt];
+      · norm_cast
+        simp only [← Int.coe_castAddHom, Int.subNatNat_eq_coe, Nat.cast_add, Nat.cast_ofNat]
+        simp +decide only [map_sub, map_add, map_sum, Int.coe_castAddHom, deg_trans_ofInt]
+        norm_cast
+        simp only [← Int.coe_castAddHom, Int.subNatNat_eq_coe, Nat.cast_add, Nat.cast_ofNat]
+        conv =>
+          rhs
+          rw [add_assoc]
+          arg 2
+          rw [← map_add]
+        suffices 2 - (n : ℤ) = 2 - s + (1 - (n + 1 - s)) by rw [this]; grind
         abel1
 
 /-- Transport from the outer LHS term target to the functor-equation target. -/
@@ -234,7 +244,7 @@ lemma functor_lhs_target_module_eq
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
     {n : ℕ}
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A)
@@ -261,7 +271,7 @@ lemma functor_lhs_target_eq
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
     {n : ℕ}
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A)
@@ -278,7 +288,7 @@ def functorLHSTerm
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
     (phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjA) →
@@ -312,7 +322,7 @@ def functorLHSSum
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
     (phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjA) →
@@ -466,21 +476,18 @@ lemma RHS_compatible_deg
     aesop
   have h_sum_target_deg :
       ∑ l : Fin c.length, functorTargetDeg β_A β_B deg_trans (compositionBlockDeg β_A deg c l) =
-        ∑ i : Fin n, deg_trans (deg i) + shiftOfInt (c.length - n : ℤ) := by
+        ∑ i : Fin n, deg_trans (deg i) +  (c.length - n : ℤ) := by
     have h_sum_target_deg :
         ∑ l : Fin c.length, functorTargetDeg β_A β_B deg_trans (compositionBlockDeg β_A deg c l) =
           (∑ l : Fin c.length, ∑ j : Fin (c.blocksFun l), deg_trans (deg (c.embedding l j))) +
-            (∑ l : Fin c.length, shiftOfInt (1 - (c.blocksFun l : ℤ))) := by
+            (∑ l : Fin c.length,  (1 - (c.blocksFun l : ℤ))) := by
       simp +decide [functorTargetDeg, compositionBlockDeg, Finset.sum_add_distrib]
     convert h_sum_target_deg using 2
     · aesop
     · rw [← h_sum_blocksFun]
-      exact map_sum (GradingIndex.ofInt) _ _
-  convert congr_arg (fun x : β_B => x + shiftOfInt (2 - (c.length : ℤ))) h_sum_target_deg using 1
+  convert congr_arg (fun x : β_B => x +  (2 - (c.length : ℤ))) h_sum_target_deg using 1
   unfold functorEqTargetDeg
-  simp +decide only [add_assoc, add_right_inj]
-  unfold shiftOfInt
-  simp +decide
+  simp +decide only [Int.cast_natCast, Int.cast_sub, add_assoc, sub_add_sub_cancel']
 
 /-- Transport from the outer RHS target to the functor-equation target. -/
 lemma functor_rhs_target_module_eq

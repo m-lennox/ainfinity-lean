@@ -30,7 +30,7 @@ recovers the target degree of the composite component. -/
 lemma comp_compatible_deg
     (F_deg_trans : β_A →+ β_B)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans n = n)
     {n : ℕ}
     (deg : Fin n → β_A)
     (c : Composition n) :
@@ -45,18 +45,23 @@ lemma comp_compatible_deg
           functorTargetDeg β_A β_C (G_deg_trans.comp F_deg_trans)
             (compositionBlockDeg β_A deg c l) := by
     intro l
-    simp [functorTargetDeg, shiftOfInt, AddMonoidHom.comp_apply, G_deg_trans_ofInt]
+    simp only [functorTargetDeg, Int.cast_natCast, map_add, map_sum, map_sub,
+      AddMonoidHom.comp_apply, add_right_inj]
+    rw [← Int.cast_natCast (R := β_B)]
+    have := G_deg_trans_ofInt 1
+    simp only [Int.cast_one] at this
+    simp only [this, G_deg_trans_ofInt]
+    rw [Int.cast_natCast]
   have h_sum_deg_comp :
       ∑ l : Fin c.length,
         G_deg_trans
           (functorTargetDeg β_A β_B F_deg_trans
             (compositionBlockDeg β_A deg c l)) =
         ∑ i : Fin n, (G_deg_trans.comp F_deg_trans) (deg i) +
-          ∑ l : Fin c.length, shiftOfInt (1 - (c.blocksFun l : ℤ)) := by
+          ∑ l : Fin c.length, (1 - (c.blocksFun l : β_C)) := by
     rw [Finset.sum_congr rfl fun l _ => h_deg_comp l]
     unfold functorTargetDeg
-    simp +decide only [AddMonoidHom.coe_comp, Function.comp_apply, Finset.sum_add_distrib,
-      add_left_inj]
+    simp +decide only [AddMonoidHom.coe_comp, Function.comp_apply, Finset.sum_add_distrib]
     have h_sum_deg_comp :
         ∑ x : Fin c.length, ∑ i : Fin (c.blocksFun x),
           (G_deg_trans.comp F_deg_trans) (deg (c.embedding x i)) =
@@ -82,20 +87,16 @@ lemma comp_compatible_deg
             have := Composition.embedding_ne_of_ne c hll' a x
             aesop
       aesop
+    simp [Int.cast_natCast, compositionBlockDeg]
     exact h_sum_deg_comp
   unfold functorCompositionOuterDeg functorTargetDeg
   rw [h_sum_deg_comp]
-  have h_shift_sum :
-      ∑ l : Fin c.length, (1 - (c.blocksFun l : ℤ)) + (1 - (c.length : ℤ)) =
-        1 - (n : ℤ) := by
-    simp +decide only [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
-      Int.nsmul_eq_mul, mul_one, sub_add_sub_cancel', sub_right_inj]
-    exact_mod_cast c.sum_blocksFun
   generalize_proofs at *
-  simp +decide only [AddMonoidHom.coe_comp, Function.comp_apply, shiftOfInt, map_sub,
-    Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin, add_assoc,
-    ← h_shift_sum, Int.nsmul_eq_mul, mul_one, sub_add_sub_cancel', map_sum, add_right_inj]
-  simp +decide [← map_nsmul]
+  simp +decide [AddMonoidHom.coe_comp, Function.comp_apply]
+  rw [add_assoc, add_left_cancel_iff]
+  norm_cast
+  simp only [Composition.sum_blocksFun, Int.cast_add, Int.cast_subNatNat, Nat.cast_one,
+    sub_add_sub_cancel']
 
 /-- Transport from the outer target of a composition term to the target of the
 composite functor component. -/
@@ -105,7 +106,7 @@ lemma comp_term_target_module_eq
     (F_deg_trans : β_A →+ β_B)
     (G_objMap : ObjB → ObjC)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans n = n)
     {n : ℕ}
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A)
@@ -199,7 +200,7 @@ def compTermMultilinearMap
         (functorTargetType β_A β_B BHom F_objMap F_deg_trans obj deg))
     (G_objMap : ObjB → ObjC)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans n = n)
     (G_phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjB) →
@@ -248,7 +249,7 @@ def compPhi
         (functorTargetType β_A β_B BHom F_objMap F_deg_trans obj deg))
     (G_objMap : ObjB → ObjC)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans n = n)
     (G_phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjB) →
@@ -1495,11 +1496,14 @@ private lemma comp_functor_G_equation_target_eq
     have hcomp :=
       AInfinityFunctorData.comp_compatible_deg β_A β_B β_C
         F.deg_trans G.deg_trans G.deg_trans_ofInt deg c
-    convert congrArg (fun d : β_C => d + shiftOfInt (β := β_C) 1) hcomp using 1 <;>
-      simp only [functorTargetDeg, AInfinityFunctorData.functorEqTargetDeg,
-        add_assoc, shiftOfInt, ← map_add] <;>
-      congr 2 <;>
-      omega
+    convert congrArg (fun d : β_C => d + 1) hcomp using 1 <;>
+    simp only [functorTargetDeg, AInfinityFunctorData.functorEqTargetDeg,
+      add_assoc] <;>
+    congr 2 <;>
+    abel_nf <;>
+    simp only [Int.reduceNeg, Int.cast_natCast, neg_smul, one_smul, zsmul_one, Int.cast_ofNat] <;>
+    rw [add_comm]
+
   dsimp [AInfinityFunctorData.functorEqTargetType]
   rw [hsource, htarget]
   exact congrArg
