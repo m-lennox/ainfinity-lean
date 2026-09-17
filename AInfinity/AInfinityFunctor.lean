@@ -49,7 +49,7 @@ structure AInfinityFunctorData
   /-- Group homofunctor translating degrees from `β_A` to `β_B`. -/
   deg_trans : β_A →+ β_B
   /-- `deg_trans` is compatible with the integer embeddings. -/
-  deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n
+  deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n
   /-- `deg_trans` preserves parity. -/
   deg_trans_sign : ∀ b : β_A, parity (deg_trans b) = parity b
 
@@ -244,7 +244,7 @@ lemma functor_lhs_target_module_eq
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
     {n : ℕ}
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A)
@@ -271,7 +271,7 @@ lemma functor_lhs_target_eq
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
     {n : ℕ}
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A)
@@ -288,7 +288,7 @@ def functorLHSTerm
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
     (phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjA) →
@@ -322,7 +322,7 @@ def functorLHSSum
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
     (phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjA) →

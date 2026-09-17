@@ -73,7 +73,7 @@ def concentratedAt0Map
           ext i
           fin_cases i <;> simp [h0, h1]
         subst hdeg
-        simpa [concentratedAt0, operationTargetDeg, shiftOfInt] using
+        simpa [concentratedAt0, operationTargetDeg] using
           degreeZeroMul (R := R) (S := S)
       · exact 0
     · exact 0
@@ -300,7 +300,7 @@ lemma concentratedAt0CategoryData_stasheffTerm_r0_s2_zero_degrees
       fin_cases i <;> rfl
     have hinnerDeg : stasheffInnerDeg (fun _ : Fin 3 => 0) 0 2 (by omega) = (0 : ℤ) := by
       rw [stasheffInnerDeg, hdegIn]
-      simp [operationTargetDeg, shiftOfInt]
+      simp [operationTargetDeg]
     ext i
     fin_cases i <;> simp [stasheffDegOut, hinnerDeg]
   let z : ∀ i : Fin 2, ModuleCat.of R S :=
@@ -419,7 +419,7 @@ lemma concentratedAt0CategoryData_stasheffTerm_r1_s2_zero_degrees
       fin_cases i <;> rfl
     have hinnerDeg : stasheffInnerDeg (fun _ : Fin 3 => 0) 1 2 (by omega) = (0 : ℤ) := by
       rw [stasheffInnerDeg, hdegIn]
-      simp [operationTargetDeg, shiftOfInt]
+      simp [operationTargetDeg]
     ext i
     fin_cases i <;> simp [stasheffDegOut, hinnerDeg]
   let z : ∀ i : Fin 2, ModuleCat.of R S :=
@@ -527,7 +527,7 @@ lemma concentratedAt0CategoryData_stasheffTerm_r0_s2_eq_zero_of_not_all_zero
         fin_cases i <;> simp [stasheffDegIn, h0, h1]
       have hinnerDeg : stasheffInnerDeg deg 0 2 (by omega) = (0 : ℤ) := by
         rw [stasheffInnerDeg, hdegIn]
-        simp [operationTargetDeg, shiftOfInt]
+        simp [operationTargetDeg]
       exact
         indexedStasheffTerm_eq_zero_of_outer_map_eq_zero
           (Hom := fun _ _ => concentratedAt0 (R := R) (S := S))

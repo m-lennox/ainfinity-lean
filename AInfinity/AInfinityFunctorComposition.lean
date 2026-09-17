@@ -116,7 +116,7 @@ lemma comp_term_target_module_eq
     (F_deg_trans : β_A →+ β_B)
     (G_objMap : ObjB → ObjC)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans n = n)
     {n : ℕ}
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A)
@@ -210,7 +210,7 @@ def compTermMultilinearMap
         (functorTargetType β_A β_B BHom F_objMap F_deg_trans obj deg))
     (G_objMap : ObjB → ObjC)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans n = n)
     (G_phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjB) →
@@ -259,7 +259,7 @@ def compPhi
         (functorTargetType β_A β_B BHom F_objMap F_deg_trans obj deg))
     (G_objMap : ObjB → ObjC)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans n = n)
     (G_phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjB) →

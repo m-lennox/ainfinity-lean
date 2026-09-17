@@ -35,23 +35,11 @@ public class GradingIndex (β : Type*) extends AddCommGroupWithOne β where
 
 export GradingIndex (parity parity_one)
 
-/-- The canonical additive homomorphism from `ℤ` into a grading index. -/
-@[expose]
-public def GradingIndex.ofInt {β : Type*} [GradingIndex β] : ℤ →+ β :=
-  Int.castAddHom β
-
 /-- The parity map agrees with integer casts modulo `2`. -/
 @[simp]
 public theorem parity_intCast {β : Type*} [GradingIndex β] (n : ℤ) :
     parity (n : β) = (n : ZMod 2) := by
   rw [← zsmul_one n, map_zsmul, parity_one, zsmul_one]
-
-/-- The canonical degree shift by an integer.
-
-Keeping this wrapper makes degree formulas read naturally throughout the project. -/
-@[expose]
-public def shiftOfInt {β : Type*} [GradingIndex β] (n : ℤ) : β :=
-  GradingIndex.ofInt n
 
 /-- A graded `R`-module indexed by `β`. -/
 public abbrev GradedRModule (β : Type v) [GradingIndex β] (R : Type u) [CommRing R] :
