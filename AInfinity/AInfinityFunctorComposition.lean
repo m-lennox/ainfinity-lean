@@ -91,22 +91,12 @@ lemma comp_compatible_deg
     exact h_sum_deg_comp
   unfold functorCompositionOuterDeg functorTargetDeg
   rw [h_sum_deg_comp]
-  -- have h_shift_sum :
-  --     ∑ l : Fin c.length, (1 - (c.blocksFun l : ℤ)) + (1 - (c.length : ℤ)) =
-  --       1 - (n : ℤ) := by
-  --   simp +decide only [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
-  --     Int.nsmul_eq_mul, mul_one, sub_add_sub_cancel', sub_right_inj]
-  --   exact_mod_cast c.sum_blocksFun
   generalize_proofs at *
   simp +decide [AddMonoidHom.coe_comp, Function.comp_apply]
   rw [add_assoc, add_left_cancel_iff]
   norm_cast
   simp only [Composition.sum_blocksFun, Int.cast_add, Int.cast_subNatNat, Nat.cast_one,
     sub_add_sub_cancel']
-  -- , map_sub,
-  --   Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin, add_assoc,
-  --   ← h_shift_sum, Int.nsmul_eq_mul, mul_one, sub_add_sub_cancel', map_sum, add_right_inj]
-  -- simp +decide [← map_nsmul]
 
 /-- Transport from the outer target of a composition term to the target of the
 composite functor component. -/
