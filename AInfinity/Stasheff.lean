@@ -18,12 +18,12 @@ variable {n : ℕ}
 /-- Target degree of the `n`-ary operation `m`. -/
 abbrev operationTargetDeg
     (deg : Fin n → β) : β :=
-  (∑ i, deg i) + shiftOfInt (2 - (n : ℤ))
+  (∑ i, deg i) + (2 - (n : ℤ))
 
 /-- Target degree of the arity-`n` Stasheff relation. -/
 abbrev stasheffTargetDeg
     (deg : Fin n → β) : β :=
-  (∑ i, deg i) + shiftOfInt (3 - (n : ℤ))
+  (∑ i, deg i) + (3 - (n : ℤ))
 
 /-- Valid index pairs for an arity-`n` Stasheff summand. -/
 abbrev ValidStasheffIndices (n r s : ℕ) : Prop :=
@@ -101,24 +101,24 @@ def stasheffObjOut
       obj ⟨i.val + s - 1, by omega⟩
 
 /-- Combine the two operation-degree shifts in a nested Stasheff term. -/
-private lemma shift_ofInt_combine {n s : ℕ} (hsn : s ≤ n) :
-    shiftOfInt (β := β) (2 - (s : ℤ)) + shiftOfInt (2 - ((n + 1 - s : ℕ) : ℤ)) =
-    shiftOfInt (3 - (n : ℤ)) := by
-  have : 3 - (n : ℤ) = 2 - (s : ℤ) + 2 - ((n + 1 - s : ℕ) : ℤ) := by
-    have hle : s ≤ n + 1 := Nat.le_succ_of_le hsn
-    rw [Nat.cast_sub hle]
-    push_cast
-    omega
-  rw [this]
-  conv =>
-    rhs
-    arg 1
-    rw [Int.add_sub_assoc (2 - (s : ℤ))]
-  unfold shiftOfInt
-  symm
-  apply map_add
+-- private lemma shift_ofInt_combine {n s : ℕ} (hsn : s ≤ n) :
+--     (2 - (s : ℤ)) + (2 - ((n + 1 - s : ℕ) : ℤ)) =
+--     (3 - (n : ℤ)) := by
+--   have : 3 - (n : ℤ) = 2 - (s : ℤ) + 2 - ((n + 1 - s : ℕ) : ℤ) := by
+--     have hle : s ≤ n + 1 := Nat.le_succ_of_le hsn
+--     rw [Nat.cast_sub hle]
+--     push_cast
+--     omega
+--   rw [this]
+--   conv =>
+--     rhs
+--     arg 1
+--     rw [Int.add_sub_assoc (2 - (s : ℤ))]
+--   unfold shiftOfInt
+--   symm
+--   apply map_add
 
-private lemma shift_ofInt_combine_alt {n s : ℕ} (hsn : s ≤ n) :
+private lemma shift_ofInt_combine {n s : ℕ} (hsn : s ≤ n) :
     ((2 - (s : ℤ)) : β) + (2 - ((n + 1 - s : ℕ) : ℤ)) =
     (3 - (n : ℤ)) := by
   have : 3 - (n : ℤ) = 2 - (s : ℤ) + 2 - ((n + 1 - s : ℕ) : ℤ) := by
@@ -152,7 +152,7 @@ lemma stasheffDegOut_sum_core
     (r s : ℕ)
     (hr : r + s ≤ n) :
     (∑ i : Fin (n + 1 - s), stasheffDegOut deg r s hr i) =
-    (∑ i : Fin n, deg i) + shiftOfInt (2 - (s : ℤ)) := by
+    (∑ i : Fin n, deg i) + (2 - (s : ℤ)) := by
   unfold stasheffDegOut
   rw [
     show (Finset.univ : Finset (Fin (n + 1 - s))) =
@@ -190,8 +190,11 @@ lemma stasheffDegOut_sum_core
         · rw [Finset.sum_image, Finset.sum_image, Finset.sum_image] <;> norm_num
           · unfold stasheffInnerDeg
             unfold stasheffDegIn
+            unfold operationTargetDeg
             ring_nf
-            grind
+            norm_cast
+            simp only [← Int.coe_castAddHom, Int.subNatNat_eq_coe, Nat.cast_ofNat]
+            grind 
           · exact fun i j h => by simpa [Fin.ext_iff] using h
           · exact fun i j h => by simpa [Fin.ext_iff] using h
           · exact fun i j h => by simpa [Fin.ext_iff] using h
@@ -255,7 +258,7 @@ lemma stasheffDegOut_sum
     (r s : ℕ)
     (hr : r + s ≤ n) :
     (∑ i : Fin (n + 1 - s), stasheffDegOut deg r s hr i) +
-      shiftOfInt (2 - ((n + 1 - s : ℕ) : ℤ)) =
+      (2 - ((n + 1 - s : ℕ) : ℤ)) =
     stasheffTargetDeg deg := by
   rw [stasheffDegOut_sum_core deg r s hr, add_assoc,
       shift_ofInt_combine (by omega : s ≤ n)]
