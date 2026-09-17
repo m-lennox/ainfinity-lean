@@ -227,9 +227,16 @@ lemma LHS_compatible_deg
       convert congr_arg ( fun x : β_A => deg_trans x +  ( 1 - ( n + 1 - s : ℤ ) ) ) ( stasheffDegOut_sum_core deg r s hr ) using 1;
       · simp +decide [ Nat.cast_sub ( by linarith : s ≤ n + 1 ) ];
       · norm_cast
-        simp only [← Int.coe_castAddHom]
-        simp +decide [← Int.coe_castAddHom, map_sub, map_add, map_sum, deg_trans_ofInt]
+        simp only [← Int.coe_castAddHom, Int.subNatNat_eq_coe, Nat.cast_add, Nat.cast_ofNat]
+        simp +decide only [map_sub, map_add, map_sum, Int.coe_castAddHom, deg_trans_ofInt]
         norm_cast
+        simp only [← Int.coe_castAddHom, Int.subNatNat_eq_coe, Nat.cast_add, Nat.cast_ofNat]
+        conv =>
+          rhs
+          rw [add_assoc]
+          arg 2
+          rw [← map_add]
+        suffices 2 - (n : ℤ) = 2 - s + (1 - (n + 1 - s)) by rw [this]; grind
         abel1
 
 /-- Transport from the outer LHS term target to the functor-equation target. -/
@@ -478,12 +485,9 @@ lemma RHS_compatible_deg
     convert h_sum_target_deg using 2
     · aesop
     · rw [← h_sum_blocksFun]
-      exact map_sum (GradingIndex.ofInt) _ _
   convert congr_arg (fun x : β_B => x +  (2 - (c.length : ℤ))) h_sum_target_deg using 1
   unfold functorEqTargetDeg
-  simp +decide only [add_assoc, add_right_inj]
-  unfold
-  simp +decide
+  simp +decide only [Int.cast_natCast, Int.cast_sub, add_assoc, sub_add_sub_cancel']
 
 /-- Transport from the outer RHS target to the functor-equation target. -/
 lemma functor_rhs_target_module_eq
