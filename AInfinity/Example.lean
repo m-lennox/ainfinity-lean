@@ -14,11 +14,11 @@ namespace Examples
 
 universe u
 
-local instance : GradingIndex ℤ where
-  toAddCommGroupWithOne := inferInstance
-  parity := Int.castAddHom (ZMod 2)
-  parity_one := by
-    simp
+/-- Mathlib supplies its Koszul-sign action for integer gradings. -/
+example : Module ℤ (Additive ℤˣ) := inferInstance
+
+/-- Mathlib supplies its Koszul-sign action for parity gradings. -/
+example : Module (ZMod 2) (Additive ℤˣ) := inferInstance
 
 variable (R : Type u) [CommRing R]
 variable (S : Type u) [CommRing S] [Algebra R S]
@@ -73,7 +73,7 @@ def concentratedAt0Map
           ext i
           fin_cases i <;> simp [h0, h1]
         subst hdeg
-        simpa [concentratedAt0, operationTargetDeg, shift_ofInt] using
+        simpa [concentratedAt0, operationTargetDeg] using
           degreeZeroMul (R := R) (S := S)
       · exact 0
     · exact 0
@@ -300,7 +300,7 @@ lemma concentratedAt0CategoryData_stasheffTerm_r0_s2_zero_degrees
       fin_cases i <;> rfl
     have hinnerDeg : stasheffInnerDeg (fun _ : Fin 3 => 0) 0 2 (by omega) = (0 : ℤ) := by
       rw [stasheffInnerDeg, hdegIn]
-      simp [operationTargetDeg, shift_ofInt]
+      simp [operationTargetDeg]
     ext i
     fin_cases i <;> simp [stasheffDegOut, hinnerDeg]
   let z : ∀ i : Fin 2, ModuleCat.of R S :=
@@ -419,7 +419,7 @@ lemma concentratedAt0CategoryData_stasheffTerm_r1_s2_zero_degrees
       fin_cases i <;> rfl
     have hinnerDeg : stasheffInnerDeg (fun _ : Fin 3 => 0) 1 2 (by omega) = (0 : ℤ) := by
       rw [stasheffInnerDeg, hdegIn]
-      simp [operationTargetDeg, shift_ofInt]
+      simp [operationTargetDeg]
     ext i
     fin_cases i <;> simp [stasheffDegOut, hinnerDeg]
   let z : ∀ i : Fin 2, ModuleCat.of R S :=
@@ -527,7 +527,7 @@ lemma concentratedAt0CategoryData_stasheffTerm_r0_s2_eq_zero_of_not_all_zero
         fin_cases i <;> simp [stasheffDegIn, h0, h1]
       have hinnerDeg : stasheffInnerDeg deg 0 2 (by omega) = (0 : ℤ) := by
         rw [stasheffInnerDeg, hdegIn]
-        simp [operationTargetDeg, shift_ofInt]
+        simp [operationTargetDeg]
       exact
         indexedStasheffTerm_eq_zero_of_outer_map_eq_zero
           (Hom := fun _ _ => concentratedAt0 (R := R) (S := S))
@@ -616,16 +616,16 @@ lemma concentratedAt0CategoryData_stasheffTerm_r1_s2_eq_zero_of_not_all_zero
 
 private lemma stasheffSign_zero_deg_0_2 :
     stasheffSign (fun _ : Fin 3 => (0 : ℤ)) 0 2 (by omega) = -1 := by
-  norm_num [stasheffSign, stasheffSignParity]
+  norm_num [stasheffSign, stasheffSignExponent, uzpow_neg]
 private lemma stasheffSign_zero_deg_1_2 :
     stasheffSign (fun _ : Fin 3 => (0 : ℤ)) 1 2 (by omega) = 1 := by
-  norm_num [stasheffSign, stasheffSignParity]
+  norm_num [stasheffSign, stasheffSignExponent]
 
 
 theorem concentratedAt0CategoryData_satisfiesStasheff
     (R : Type u) [CommRing R]
     (S : Type u) [CommRing S] [Algebra R S] :
-    @AInfinityCategoryStruct.SatisfiesStasheff ℤ _ R _ (OneObj S)
+    @AInfinityCategoryStruct.SatisfiesStasheff ℤ _ _ R _ (OneObj S)
       (concentratedAt0CategoryData (R := R) (S := S)) := by
   intro n _ obj deg x
   by_cases hn : n = 3

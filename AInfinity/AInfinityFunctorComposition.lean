@@ -14,9 +14,9 @@ namespace AInfinityTheory
 
 universe u v w x y z t
 
-variable (β_A : Type v) [GradingIndex β_A]
-variable (β_B : Type w) [GradingIndex β_B]
-variable (β_C : Type x) [GradingIndex β_C]
+variable (β_A : Type v) [CommRing β_A] [Module β_A (Additive ℤˣ)]
+variable (β_B : Type w) [CommRing β_B] [Module β_B (Additive ℤˣ)]
+variable (β_C : Type x) [CommRing β_C] [Module β_C (Additive ℤˣ)]
 
 namespace AInfinityFunctorData
 
@@ -25,12 +25,14 @@ variable {ObjA : Type y} {ObjB : Type z} {ObjC : Type t}
 
 /-! ## Raw A∞ functor composition -/
 
+omit [Module β_A (Additive ℤˣ)] [Module β_B (Additive ℤˣ)]
+  [Module β_C (Additive ℤˣ)] in
 /-- Applying the outer degree translation to the block outputs of `F`
 recovers the target degree of the composite component. -/
 lemma comp_compatible_deg
     (F_deg_trans : β_A →+ β_B)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (n : β_B) = (n : β_C))
     {n : ℕ}
     (deg : Fin n → β_A)
     (c : Composition n) :
@@ -45,14 +47,15 @@ lemma comp_compatible_deg
           functorTargetDeg β_A β_C (G_deg_trans.comp F_deg_trans)
             (compositionBlockDeg β_A deg c l) := by
     intro l
-    simp [functorTargetDeg, shift_ofInt, AddMonoidHom.comp_apply, G_deg_trans_ofInt]
+    simp only [functorTargetDeg, map_add, map_sum, AddMonoidHom.comp_apply]
+    rw [G_deg_trans_ofInt]
   have h_sum_deg_comp :
       ∑ l : Fin c.length,
         G_deg_trans
           (functorTargetDeg β_A β_B F_deg_trans
             (compositionBlockDeg β_A deg c l)) =
         ∑ i : Fin n, (G_deg_trans.comp F_deg_trans) (deg i) +
-          ∑ l : Fin c.length, shift_ofInt (1 - (c.blocksFun l : ℤ)) := by
+          ∑ l : Fin c.length, ((1 - (c.blocksFun l : ℤ) : ℤ) : β_C) := by
     rw [Finset.sum_congr rfl fun l _ => h_deg_comp l]
     unfold functorTargetDeg
     simp +decide only [AddMonoidHom.coe_comp, Function.comp_apply, Finset.sum_add_distrib,
@@ -92,11 +95,13 @@ lemma comp_compatible_deg
       Int.nsmul_eq_mul, mul_one, sub_add_sub_cancel', sub_right_inj]
     exact_mod_cast c.sum_blocksFun
   generalize_proofs at *
-  simp +decide only [AddMonoidHom.coe_comp, Function.comp_apply, shift_ofInt, map_sub,
+  simp +decide only [AddMonoidHom.coe_comp, Function.comp_apply,
     Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin, add_assoc,
-    ← h_shift_sum, Int.nsmul_eq_mul, mul_one, sub_add_sub_cancel', map_sum, add_right_inj]
-  simp +decide [← map_nsmul]
+    ← h_shift_sum, Int.nsmul_eq_mul, mul_one, sub_add_sub_cancel', add_right_inj]
+  simp +decide
 
+omit [Module β_A (Additive ℤˣ)] [Module β_B (Additive ℤˣ)]
+  [Module β_C (Additive ℤˣ)] in
 /-- Transport from the outer target of a composition term to the target of the
 composite functor component. -/
 lemma comp_term_target_module_eq
@@ -105,7 +110,7 @@ lemma comp_term_target_module_eq
     (F_deg_trans : β_A →+ β_B)
     (G_objMap : ObjB → ObjC)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (n : β_B) = (n : β_C))
     {n : ℕ}
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A)
@@ -128,6 +133,7 @@ lemma comp_term_target_module_eq
     (comp_compatible_deg β_A β_B β_C
       F_deg_trans G_deg_trans G_deg_trans_ofInt deg c)
 
+omit [Module β_A (Additive ℤˣ)] [Module β_B (Additive ℤˣ)] in
 /-- Transport from an `F`-block output to the corresponding input of the outer
 `G`-component in a composition term. -/
 lemma comp_term_block_module_eq
@@ -199,7 +205,7 @@ def compTermMultilinearMap
         (functorTargetType β_A β_B BHom F_objMap F_deg_trans obj deg))
     (G_objMap : ObjB → ObjC)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (n : β_B) = (n : β_C))
     (G_phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjB) →
@@ -248,7 +254,7 @@ def compPhi
         (functorTargetType β_A β_B BHom F_objMap F_deg_trans obj deg))
     (G_objMap : ObjB → ObjC)
     (G_deg_trans : β_B →+ β_C)
-    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (GradingIndex.ofInt n) = GradingIndex.ofInt n)
+    (G_deg_trans_ofInt : ∀ n : ℤ, G_deg_trans (n : β_B) = (n : β_C))
     (G_phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjB) →
@@ -283,9 +289,9 @@ end AInfinityFunctorData
 /-- Composition of raw `A∞` functor data, written in mathlib order so
 `G.comp F` is the composite `G ∘ F`. -/
 protected abbrev AInfinityFunctorData.comp
-    {β_A : Type v} [GradingIndex β_A]
-    {β_B : Type w} [GradingIndex β_B]
-    {β_C : Type x} [GradingIndex β_C]
+    {β_A : Type v} [CommRing β_A] [Module β_A (Additive ℤˣ)]
+    {β_B : Type w} [CommRing β_B] [Module β_B (Additive ℤˣ)]
+    {β_C : Type x} [CommRing β_C] [Module β_C (Additive ℤˣ)]
     {R : Type u} [CommRing R]
     {ObjA : Type y} {ObjB : Type z} {ObjC : Type t}
     [RLinearGQuiver β_A R ObjA]
@@ -313,10 +319,10 @@ namespace AInfinityFunctorData
 
 section BasicProperties
 
-variable {β_A : Type v} [GradingIndex β_A]
-variable {β_B : Type w} [GradingIndex β_B]
-variable {β_C : Type x} [GradingIndex β_C]
-variable {β_D : Type*} [GradingIndex β_D]
+variable {β_A : Type v} [CommRing β_A] [Module β_A (Additive ℤˣ)]
+variable {β_B : Type w} [CommRing β_B] [Module β_B (Additive ℤˣ)]
+variable {β_C : Type x} [CommRing β_C] [Module β_C (Additive ℤˣ)]
+variable {β_D : Type*} [CommRing β_D] [Module β_D (Additive ℤˣ)]
 variable {R : Type u} [CommRing R]
 variable {ObjA : Type y} {ObjB : Type z} {ObjC : Type t} {ObjD : Type*}
 variable [RLinearGQuiver β_A R ObjA]
@@ -424,7 +430,7 @@ private lemma comp_assoc_deg_trans_ofInt
 /-- Transport lemma for the `deg_trans_sign` field in `comp_assoc`.
 
 This should follow the same pattern as `comp_assoc_deg_trans_ofInt`: first use
-`comp_assoc_deg_trans`, then prove pointwise equality of the parity formulas. -/
+`comp_assoc_deg_trans`, then prove pointwise equality of the Koszul-sign formulas. -/
 private lemma comp_assoc_deg_trans_sign
     (F : AInfinityFunctorData (β_A := β_A) (β_B := β_B) R ObjA ObjB)
     (G : AInfinityFunctorData (β_A := β_B) (β_B := β_C) R ObjB ObjC)
@@ -517,12 +523,15 @@ private lemma phi_heq_of_arity_eq
     (X₁ : ∀ i, ComposableHomType (GHom β_A R) O₁ D₁ i)
     (X₂ : ∀ i, ComposableHomType (GHom β_A R) O₂ D₂ i)
     (hX : HEq X₁ X₂) :
-    HEq (@AInfinityFunctorData.phi β_A _ β_B _ R _ ObjA ObjB _ _ F n₁ inst₁ O₁ D₁ X₁)
-      (@AInfinityFunctorData.phi β_A _ β_B _ R _ ObjA ObjB _ _ F n₂ inst₂ O₂ D₂ X₂) := by
+    HEq (@AInfinityFunctorData.phi β_A _ β_B _ _ _ R _ ObjA ObjB _ _
+      F n₁ inst₁ O₁ D₁ X₁)
+      (@AInfinityFunctorData.phi β_A _ β_B _ _ _ R _ ObjA ObjB _ _
+        F n₂ inst₂ O₂ D₂ X₂) := by
   cases inst₁
   cases inst₂
   aesop
 
+omit [Module β_A (Additive ℤˣ)] [Module β_B (Additive ℤˣ)] in
 /-- Transport `functorTargetDeg` across equal arities and heterogeneously equal
 degree strings. -/
 private lemma functorTargetDeg_heq_of_arity_eq
@@ -662,6 +671,7 @@ private lemma comp_assoc_inner_outer_obj_heq
   rw [hpval]
   exact (comp_assoc_sizeUpTo_boundary_eq a b j q).symm
 
+omit [Module β_A (Additive ℤˣ)] [Module β_B (Additive ℤˣ)] in
 /-- The degree string for the `j`-th gathered block agrees with the block of
 the degree string produced by the first composition `a`. -/
 private lemma comp_assoc_inner_outer_deg_heq
@@ -1318,9 +1328,9 @@ namespace AInfinityFunctor
 
 section BasicProperties
 
-variable {β_A : Type v} [GradingIndex β_A]
-variable {β_B : Type w} [GradingIndex β_B]
-variable {β_C : Type x} [GradingIndex β_C]
+variable {β_A : Type v} [CommRing β_A] [Module β_A (Additive ℤˣ)]
+variable {β_B : Type w} [CommRing β_B] [Module β_B (Additive ℤˣ)]
+variable {β_C : Type x} [CommRing β_C] [Module β_C (Additive ℤˣ)]
 variable {R : Type u} [CommRing R]
 variable {ObjA : Type y} {ObjB : Type z} {ObjC : Type t}
 variable [AInfinityCategory β_A R ObjA]
@@ -1495,11 +1505,22 @@ private lemma comp_functor_G_equation_target_eq
     have hcomp :=
       AInfinityFunctorData.comp_compatible_deg β_A β_B β_C
         F.deg_trans G.deg_trans G.deg_trans_ofInt deg c
-    convert congrArg (fun d : β_C => d + shift_ofInt (β := β_C) 1) hcomp using 1 <;>
-      simp only [functorTargetDeg, AInfinityFunctorData.functorEqTargetDeg,
-        add_assoc, shift_ofInt, ← map_add] <;>
-      congr 2 <;>
-      omega
+    calc
+      AInfinityFunctorData.functorEqTargetDeg β_B β_C G.deg_trans
+          (AInfinityFunctorData.functorCompositionOuterDeg β_A β_B F.deg_trans deg c) =
+        functorTargetDeg β_B β_C G.deg_trans
+            (AInfinityFunctorData.functorCompositionOuterDeg β_A β_B F.deg_trans deg c) +
+          (1 : β_C) := by
+            simp only [functorTargetDeg, AInfinityFunctorData.functorEqTargetDeg,
+              Int.cast_sub, Int.cast_ofNat, Int.cast_natCast]
+            ring
+      _ = functorTargetDeg β_A β_C (G.deg_trans.comp F.deg_trans) deg +
+          (1 : β_C) := congrArg (fun d : β_C => d + (1 : β_C)) hcomp
+      _ = AInfinityFunctorData.functorEqTargetDeg β_A β_C
+          (G.deg_trans.comp F.deg_trans) deg := by
+            simp only [functorTargetDeg, AInfinityFunctorData.functorEqTargetDeg,
+              Int.cast_sub, Int.cast_ofNat, Int.cast_natCast]
+            ring
   dsimp [AInfinityFunctorData.functorEqTargetType]
   rw [hsource, htarget]
   exact congrArg
@@ -1834,9 +1855,9 @@ end AInfinityFunctor
 /-- Composition of `A∞` functors, written in mathlib order so
 `G.comp F` is the composite `G ∘ F`. -/
 protected abbrev AInfinityFunctor.comp
-    {β_A : Type v} [GradingIndex β_A]
-    {β_B : Type w} [GradingIndex β_B]
-    {β_C : Type x} [GradingIndex β_C]
+    {β_A : Type v} [CommRing β_A] [Module β_A (Additive ℤˣ)]
+    {β_B : Type w} [CommRing β_B] [Module β_B (Additive ℤˣ)]
+    {β_C : Type x} [CommRing β_C] [Module β_C (Additive ℤˣ)]
     {R : Type u} [CommRing R]
     {ObjA : Type y} {ObjB : Type z} {ObjC : Type t}
     [AInfinityCategory β_A R ObjA]

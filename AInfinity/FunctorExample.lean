@@ -14,7 +14,7 @@ namespace FunctorExamples
 
 universe u v w
 
-variable (β : Type v) [GradingIndex β]
+variable (β : Type v) [CommRing β] [Module β (Additive ℤˣ)]
 variable (R : Type u) [CommRing R]
 variable (Obj : Type w)
 
@@ -26,13 +26,14 @@ section Data
 
 variable [AInfinityCategoryStruct β R Obj]
 
+omit [Module β (Additive ℤˣ)] in
 /-- The target module of the arity-one identity component is the original Hom-space. -/
 lemma identityPhiOneTargetModuleEq
     (obj : Fin 2 → Obj)
     (deg : Fin 1 → β) :
     ComposableHomType (GHom β R) obj deg 0 =
       functorTargetType β β (GHom β R) id (identityDegTrans β) obj deg := by
-  simp [functorTargetType, functorTargetDeg, ComposableHomType, identityDegTrans, shift_ofInt]
+  simp [functorTargetType, functorTargetDeg, ComposableHomType, identityDegTrans]
 
 /-- The arity-one structure map of the identity A∞ functor. -/
 def identityPhiOne
@@ -86,6 +87,7 @@ def identityFunctorData :
   deg_trans_sign _b := rfl
   phi := identityPhi (β := β) (R := R) (Obj := Obj)
 
+omit [Module β (Additive ℤˣ)] in
 @[simp]
 lemma identityPhi_eq_zero_of_ne_one
     {n : ℕ} [NeZero n]
@@ -123,6 +125,7 @@ private lemma multilinearMap_eqRec_apply
     (h ▸ f) x = cast (congrArg (fun M : ModuleCat R => (M : Type u)) h) (f x) := by
   subst h; rfl
 
+omit [Module β (Additive ℤˣ)] in
 private lemma identityPhiOne_apply
     (obj : Fin 2 → Obj)
     (deg : Fin 1 → β)
@@ -137,6 +140,7 @@ private lemma identityPhiOne_apply
   exact multilinearMap_eqRec_apply (R := R)
     (identityPhiOneTargetModuleEq (β := β) (R := R) (Obj := Obj) obj deg) _ x
 
+omit [Module β (Additive ℤˣ)] in
 private lemma identity_functorLHSTerm_eq_zero_of_ne_one
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
@@ -202,6 +206,7 @@ private lemma identity_functorLHSTerm_eq_zero_of_ne_one
   simp only [houter_zero, outer, degOut, xOut, objOut]
   simpa [eqRec_eq_cast] using cast_zero_of_module_eq (R := R) hdeg
 
+omit [Module β (Additive ℤˣ)] in
 /-- When the arity k equals 1, identityPhi acts as identity (up to HEq). -/
 private lemma identityPhi_heq_of_eq_one {k : ℕ} [NeZero k] (hk : k = 1)
     (obj' : Fin (k + 1) → Obj) (deg' : Fin k → β)
@@ -211,6 +216,7 @@ private lemma identityPhi_heq_of_eq_one {k : ℕ} [NeZero k] (hk : k = 1)
   subst hk
   simp [identityPhi, identityPhiOne_apply (β := β) (R := R) (Obj := Obj)]
 
+omit [Module β (Additive ℤˣ)] in
 /-- If obj and deg are propositionally equal, then m gives HEq results.
     Allows different `NeZero` instances on the two sides. -/
 private lemma m_heq_of_obj_deg_eq
@@ -226,6 +232,7 @@ private lemma m_heq_of_obj_deg_eq
   cases Subsingleton.elim inst₁ inst₂
   subst hO; subst hD; exact heq_of_eq (congrArg _ (eq_of_heq hX))
 
+omit [Module β (Additive ℤˣ)] in
 /-- The indexedStasheffXIn with r=0 is HEq to the original inputs.
     We generalize over the target obj/deg to enable subst. -/
 private lemma m_xIn_heq_x_aux
@@ -241,6 +248,7 @@ private lemma m_xIn_heq_x_aux
   exact heq_of_eq (funext (fun i => eq_of_heq (hX i)))
 
 
+omit [Module β (Additive ℤˣ)] in
 private lemma identity_functorLHSTerm_eq_main
     {n : ℕ} [NeZero n]
     (obj : Fin (n + 1) → Obj)
@@ -354,6 +362,7 @@ private lemma multilinearMap_cast_apply
 The `functorRHSTermMap` is the zero multilinear map whenever one of the inner
     phi-maps is zero (which happens for the identity functor at any block of size > 1).
 -/
+omit [Module β (Additive ℤˣ)] in
 private lemma functorRHSTermMap_eq_zero_of_block_phi_zero
     {n : ℕ} [NeZero n]
     (obj : Fin (n + 1) → Obj)
@@ -451,6 +460,7 @@ private lemma composition_exists_block_gt_one_of_ne_ones
   obtain ⟨l, rfl⟩ := hi
   exact ⟨l, hi_gt⟩
 
+omit [Module β (Additive ℤˣ)] in
 private lemma identity_functorRHSTerm_eq_zero_of_ne_ones
     {n : ℕ} [NeZero n]
     (obj : Fin (n + 1) → Obj)
@@ -483,6 +493,7 @@ private lemma identity_functorRHSTerm_eq_zero_of_ne_ones
       obj deg c) x = 0
   simp [hmap]
 
+omit [Module β (Additive ℤˣ)] in
 /-- Generalized HEq for `m` across arity, object, degree, and input changes. -/
 private lemma m_heq_of_arity_eq
     {n₁ n₂ : ℕ} {inst₁ : NeZero n₁} {inst₂ : NeZero n₂}
@@ -513,6 +524,7 @@ private lemma multilinearMap_eqRec_apply_heq
   subst h; rfl
 
 
+omit [Module β (Additive ℤˣ)] in
 private lemma identity_functorRHSTerm_eq_main
     {n : ℕ} [NeZero n]
     (obj : Fin (n + 1) → Obj)
@@ -569,14 +581,14 @@ private lemma identity_functorRHSTerm_eq_main
       (Fin.heq_ext_iff (by simp [Composition.ones_length])).mp hl
     dsimp [AInfinityFunctorData.functorCompositionOuterDeg,
       AInfinityFunctorData.compositionBlockDeg]
-    dsimp [functorTargetDeg, identityDegTrans, shift_ofInt]
+    dsimp [functorTargetDeg, identityDegTrans]
     have hblock : (Composition.ones n).blocksFun l₁ = 1 := Composition.ones_blocksFun n l₁
-    simp only [hblock, Nat.cast_one, sub_self, map_zero, add_zero]
+    simp only [hblock, Nat.cast_one, sub_self, Int.cast_zero, add_zero]
     haveI : Subsingleton (Fin ((Composition.ones n).blocksFun l₁)) := by
       rw [hblock]; exact inferInstance
     rw [Fintype.sum_subsingleton _ ⟨0, by rw [hblock]; exact Nat.one_pos⟩]
     have hemb := Composition.ones_embedding l₁ (by rw [hblock]; exact Nat.one_pos)
-    exact heq_of_eq (congrArg deg (by rw [Fin.ext_iff] at hemb ⊢; simpa using hemb.trans hl_eq))
+    exact heq_of_eq (congrArg deg (hemb.trans (Fin.ext hl_eq)))
   · -- phi outputs ≅ x
     apply Function.hfunext (by simp [Composition.ones_length])
     intro l₁ l₂ hl
@@ -627,7 +639,7 @@ theorem identitySatisfiesFunctorEquations :
       · have hsign : stasheffSign deg 0 n (by simp) = 1 := by
           haveI : IsEmpty (Fin (n - 0 - n)) := by
             simpa using (inferInstance : IsEmpty (Fin 0))
-          simp [stasheffSign, stasheffSignParity]
+          simp [stasheffSign, stasheffSignExponent]
         rw [hsign, one_smul]
         exact identity_functorLHSTerm_eq_main
           (β := β) (R := R) (Obj := Obj) obj deg x
@@ -709,8 +721,8 @@ end Functor
 
 section Composition
 
-variable {β_A : Type*} [GradingIndex β_A]
-variable {β_B : Type*} [GradingIndex β_B]
+variable {β_A : Type*} [CommRing β_A] [Module β_A (Additive ℤˣ)]
+variable {β_B : Type*} [CommRing β_B] [Module β_B (Additive ℤˣ)]
 variable {ObjA : Type*} {ObjB : Type*}
 variable [AInfinityCategory β_A R ObjA]
 variable [AInfinityCategory β_B R ObjB]
@@ -837,31 +849,10 @@ private lemma compTermMultilinearMap_outer_identity_eq_zero_of_length_ne_one
   unfold AInfinityFunctorData.MultilinearMap.compComposition; simp +decide only [Function.id_comp,
     ne_eq, hlen, not_false_eq_true, identityFunctorData_phi_eq_zero_of_ne_one] ;
   apply cast_multilinearMap_zero;
-  unfold functorTargetType; simp +decide only [identityFunctorData,
-    AInfinityFunctorData.functorCompositionOuterObj, Composition.boundary_zero, id_eq,
-    Composition.boundary_last, AddMonoidHom.id_comp] ;
-  unfold functorTargetDeg; simp +decide only [AInfinityFunctorData.functorCompositionOuterDeg,
-    AddMonoidHom.id_apply] ;
-  unfold functorTargetDeg; simp +decide only [AInfinityFunctorData.compositionBlockDeg] ;
-  have h_sum : ∑ x : Fin c.length, ∑ x_1 : Fin (c.blocksFun x), F.deg_trans (deg ((c.embedding x) x_1)) = ∑ i : Fin n, F.deg_trans (deg i) := by
-    have h_sum : ∑ x : Fin c.length, ∑ x_1 : Fin (c.blocksFun x), F.deg_trans (deg ((c.embedding x) x_1)) = ∑ x ∈ Finset.univ.biUnion (fun x : Fin c.length => Finset.image (fun x_1 : Fin (c.blocksFun x) => (c.embedding x) x_1) Finset.univ), F.deg_trans (deg x) := by
-      rw [ Finset.sum_biUnion ];
-      · exact Finset.sum_congr rfl fun _ _ => by rw [ Finset.sum_image <| by simp +decide [ Function.Injective ] ] ;
-      · intro x _ y _ hxy; simp +decide only [disjoint_left, mem_image, mem_univ, true_and,
-        not_exists, forall_exists_index, forall_apply_eq_imp_iff] ;
-        grind +suggestions;
-    convert h_sum using 2;
-    ext x; simp only [mem_univ, Composition.embedding, RelEmbedding.coe_trans, Function.comp_apply,
-      Fin.natAddOrderEmb_apply, Fin.castLEOrderEmb_apply, mem_biUnion, mem_image, true_and,
-      true_iff];
-    have := c.mem_range_embedding x; aesop;
-  simp +decide only [shift_ofInt, map_sub, sum_add_distrib, h_sum, sum_sub_distrib, sum_const,
-    card_univ, Fintype.card_fin];
-  simp +decide only [GradingIndex.ofInt, Int.coe_castAddHom, Int.cast_one, nsmul_one,
-    Int.cast_natCast];
-  simp +decide only [add_assoc, sub_add_sub_cancel'];
-  norm_cast;
-  simp +decide [ Composition.blocksFun ]
+  exact
+    AInfinityFunctorData.comp_term_target_module_eq β_A β_B β_B
+      (GHom β_B R) F.objMap F.deg_trans id (identityDegTrans β_B)
+      (by intro k; rfl) obj deg c
 
 
 /-- Unfolding of the raw right-identity `phi`-field. -/
@@ -1027,14 +1018,14 @@ private lemma comp_identityFunctorData_phi_term_eq_main
       (Fin.heq_ext_iff (by simp [Composition.ones_length])).mp hl
     dsimp [AInfinityFunctorData.functorCompositionOuterDeg,
       AInfinityFunctorData.compositionBlockDeg]
-    dsimp [functorTargetDeg, identityDegTrans, shift_ofInt]
+    dsimp [functorTargetDeg, identityDegTrans]
     have hblock : (Composition.ones n).blocksFun l₁ = 1 := Composition.ones_blocksFun n l₁
-    simp only [hblock, Nat.cast_one, sub_self, map_zero, add_zero]
+    simp only [hblock, Nat.cast_one, sub_self, Int.cast_zero, add_zero]
     haveI : Subsingleton (Fin ((Composition.ones n).blocksFun l₁)) := by
       rw [hblock]; exact inferInstance
     rw [Fintype.sum_subsingleton _ ⟨0, by rw [hblock]; exact Nat.one_pos⟩]
     have hemb := Composition.ones_embedding l₁ (by rw [hblock]; exact Nat.one_pos)
-    exact heq_of_eq (congrArg deg (by rw [Fin.ext_iff] at hemb ⊢; simpa using hemb.trans hl_eq))
+    exact heq_of_eq (congrArg deg (hemb.trans (Fin.ext hl_eq)))
   ·
     apply Function.hfunext (by simp [Composition.ones_length])
     intro l₁ l₂ hl
