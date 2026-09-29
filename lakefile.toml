@@ -1,5 +1,5 @@
 name = "ainfinity"
-defaultTargets = ["AInfinity"]
+defaultTargets = ["Util", "ComputableCochainComplex", "AInfinity", "KLRW"]
 
 [leanOptions]
 pp.unicode.fun = true
@@ -21,5 +21,19 @@ rev = "v4.30.0-rc1"
 name = "mathlib"
 scope = "leanprover-community"
 
+# General-purpose utilities (LaTeX rendering of terms via `#texify`).
+[[lean_lib]]
+name = "Util"
+
+# Computable categorical constructions: biproducts, additive completion,
+# and bounded cochain complexes.
+[[lean_lib]]
+name = "ComputableCochainComplex"
+
+# A∞-categories, functors, and the Stasheff identities.
 [[lean_lib]]
 name = "AInfinity"
+
+# The KLRW category, the braiding functor, and examples.
+[[lean_lib]]
+name = "KLRW"

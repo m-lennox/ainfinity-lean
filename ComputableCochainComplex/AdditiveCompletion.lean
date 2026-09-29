@@ -1,8 +1,8 @@
 module
 
 public import Mathlib
-public import AInfinity.ComputableCategories
-public import AInfinity.Texify
+public import ComputableCochainComplex.ComputableCategories
+public import Util.Texify
 
 @[expose] public section
 
