@@ -1,33 +1,61 @@
+/-
+Copyright (c) 2026 Justin Mu. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Justin Mu, Annie Yao, Niels Voss, Marco David
+-/
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Category.ModuleCat.Basic
+public import Mathlib.CategoryTheory.GradedObject
+public import Mathlib.Data.ZMod.Basic
 
-@[expose] public section
+/-! # Grading indices for A-infinity categories
 
-open ChainComplex CategoryTheory DirectSum GradedMonoid GradedObject
+This file introduces the grading data used for the first definitions of graded hom
+spaces in `R`-linear A-infinity categories.
+
+The parity map records the degree modulo `2`, which is needed for signs in the
+A-infinity identities.
+-/
 
 namespace AInfinityTheory
 
 universe u v w
 
-abbrev Parity := ZMod 2
+/-- A grading index is an additive commutative group with a distinguished unit element,
+together with a parity map to `ZMod 2`.
 
-class Grading (β : Type u) extends AddCommGroup β where
-  ofInt : ℤ →+ β
-  sign : β →+ Parity
-  sign_ofInt: ∀ n : ℤ, sign (ofInt n) = (n : Parity)
+The distinguished unit is used to realize integer degree shifts via the canonical map
+`ℤ →+ β`. -/
+public class GradingIndex (β : Type*) extends AddCommGroupWithOne β where
+  /-- The parity of a degree. -/
+  parity : β →+ ZMod 2
+  /-- The distinguished unit has odd parity. -/
+  parity_one : parity 1 = 1
 
+export GradingIndex (parity parity_one)
 
-def shift_ofInt {β} [Grading β] (n : ℤ) : β :=
-  Grading.ofInt n
+/-- The parity map agrees with integer casts modulo `2`. -/
+@[simp]
+public theorem parity_intCast {β : Type*} [GradingIndex β] (n : ℤ) :
+    parity (n : β) = (n : ZMod 2) := by
+  rw [← zsmul_one n, map_zsmul, parity_one, zsmul_one]
 
-variable {β : Type v} [Grading β]
+/-- A graded `R`-module indexed by `β`. -/
+public abbrev GradedRModule (β : Type v) [GradingIndex β] (R : Type u) [CommRing R] :
+    Type (max v (u + 1)) :=
+  CategoryTheory.GradedObject β (ModuleCat.{u} R)
 
-abbrev GradedRModule (R : Type u) [CommRing R] :=
-  GradedObject β (ModuleCat.{u} R)
+/-- An `R`-linear graded quiver. -/
+public class RLinearGradedQuiver (β : Type v) [GradingIndex β] (R : Type u) [CommRing R]
+    (Obj : Type w) where
+  /-- The graded `R`-module of morphisms from `X` to `Y`. -/
+  protected gradedHom' : Obj → Obj → GradedRModule β R
 
 /-- The graded `R`-module of morphisms between two objects. -/
-class RLinearGQuiver (R : Type u) [CommRing R] (Obj : Type w) where
-  Hom : Obj → Obj → GradedRModule (β := β) (R := R)
+@[expose]
+public def gradedHom (β : Type v) [GradingIndex β] (R : Type u) [CommRing R]
+    {Obj : Type w} [RLinearGradedQuiver β R Obj] (X Y : Obj) : GradedRModule β R :=
+  RLinearGradedQuiver.gradedHom' X Y
 
 end AInfinityTheory

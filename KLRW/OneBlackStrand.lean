@@ -1,10 +1,10 @@
 module
 
 public import Mathlib
-public import AInfinity.Texify
-public meta import AInfinity.Texify
-public import AInfinity.AdditiveCompletion
-public import AInfinity.BoundedCochainComplex
+public import Util.Texify
+public meta import Util.Texify
+public import ComputableCochainComplex.AdditiveCompletion
+public import ComputableCochainComplex.BoundedCochainComplex
 
 @[expose] public section
 

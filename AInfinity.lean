@@ -1,11 +1,7 @@
-import AInfinity.AInfinityAlgebra
 import AInfinity.AInfinityCategory
-import AInfinity.AdditiveCompletion
-import AInfinity.BoundedCochainComplex
-import AInfinity.Braiding
-import AInfinity.ComputableCategories
-import AInfinity.Examples
+import AInfinity.AInfinityFunctor
+import AInfinity.AInfinityFunctorComposition
+import AInfinity.Example
+import AInfinity.FunctorExample
 import AInfinity.Grading
-import AInfinity.KLRW
 import AInfinity.Stasheff
-import AInfinity.Texify
