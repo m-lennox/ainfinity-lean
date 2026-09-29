@@ -1,8 +1,8 @@
 module
 
 public import Mathlib
-public import AInfinity.KLRW
-public import AInfinity.AdditiveCompletion
+public import KLRW.OneBlackStrand
+public import ComputableCochainComplex.AdditiveCompletion
 
 @[expose] public section
 

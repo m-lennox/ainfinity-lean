@@ -44,8 +44,8 @@ variable [Module β_A (Additive ℤˣ)] [Module β_B (Additive ℤˣ)]
 structure AInfinityFunctorData
     (R : Type u) [CommRing R]
     (ObjA : Type x) (ObjB : Type y)
-    [RLinearGQuiver β_A R ObjA]
-    [RLinearGQuiver β_B R ObjB] where
+    [RLinearGradedQuiver β_A R ObjA]
+    [RLinearGradedQuiver β_B R ObjB] where
   /-- The action on objects. -/
   objMap : ObjA → ObjB
   /-- Group homofunctor translating degrees from `β_A` to `β_B`. -/
@@ -60,8 +60,8 @@ structure AInfinityFunctorData
     (obj : Fin (n + 1) → ObjA) →
     (deg : Fin n → β_A) →
     MultilinearMap R
-      (fun i : Fin n => ComposableHomType (GHom β_A R) obj deg i)
-      (functorTargetType β_A β_B (GHom β_B R) objMap deg_trans obj deg)
+      (fun i : Fin n => ComposableHomType (gradedHom β_A R) obj deg i)
+      (functorTargetType β_A β_B (gradedHom β_B R) objMap deg_trans obj deg)
 
 
 
@@ -695,14 +695,14 @@ def SatisfiesFunctorEquations
     [AInfinityCategoryStruct β_B R ObjB]
     (F : AInfinityFunctorData (β_A := β_A) (β_B := β_B) R ObjA ObjB) : Prop :=
   ∀ (n : ℕ) [NeZero n] (obj : Fin (n + 1) → ObjA) (deg : Fin n → β_A)
-    (x : ∀ i : Fin n, ComposableHomType (GHom β_A R) obj deg i),
+    (x : ∀ i : Fin n, ComposableHomType (gradedHom β_A R) obj deg i),
     functorLHSSum β_A β_B
-      (GHom β_A R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_B R)
       F.objMap F.deg_trans F.deg_trans_ofInt F.phi
       (AInfinityCategoryStruct.m (β := β_A) (R := R) (Obj := ObjA))
       obj deg x =
     functorRHSSum β_A β_B
-      (GHom β_A R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_B R)
       F.objMap F.deg_trans F.phi
       (AInfinityCategoryStruct.m (β := β_B) (R := R) (Obj := ObjB))
       obj deg x

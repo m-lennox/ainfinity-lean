@@ -31,8 +31,8 @@ omit [Module β (Additive ℤˣ)] in
 lemma identityPhiOneTargetModuleEq
     (obj : Fin 2 → Obj)
     (deg : Fin 1 → β) :
-    ComposableHomType (GHom β R) obj deg 0 =
-      functorTargetType β β (GHom β R) id (identityDegTrans β) obj deg := by
+    ComposableHomType (gradedHom β R) obj deg 0 =
+      functorTargetType β β (gradedHom β R) id (identityDegTrans β) obj deg := by
   simp [functorTargetType, functorTargetDeg, ComposableHomType, identityDegTrans]
 
 /-- The arity-one structure map of the identity A∞ functor. -/
@@ -40,18 +40,18 @@ def identityPhiOne
     (obj : Fin 2 → Obj)
     (deg : Fin 1 → β) :
     MultilinearMap R
-      (fun i : Fin 1 => ComposableHomType (GHom β R) obj deg i)
-      (functorTargetType β β (GHom β R) id (identityDegTrans β) obj deg) := by
+      (fun i : Fin 1 => ComposableHomType (gradedHom β R) obj deg i)
+      (functorTargetType β β (gradedHom β R) id (identityDegTrans β) obj deg) := by
   classical
   let f :
       MultilinearMap R
-        (fun i : Fin 1 => ComposableHomType (GHom β R) obj deg i)
-        (ComposableHomType (GHom β R) obj deg 0) :=
+        (fun i : Fin 1 => ComposableHomType (gradedHom β R) obj deg i)
+        (ComposableHomType (gradedHom β R) obj deg 0) :=
     MultilinearMap.mk'
       (R := R)
       (ι := Fin 1)
-      (M₁ := fun i : Fin 1 => ComposableHomType (GHom β R) obj deg i)
-      (M₂ := ComposableHomType (GHom β R) obj deg 0)
+      (M₁ := fun i : Fin 1 => ComposableHomType (gradedHom β R) obj deg i)
+      (M₂ := ComposableHomType (gradedHom β R) obj deg 0)
       (fun x => x 0)
       (by
         intro m i x y
@@ -61,7 +61,7 @@ def identityPhiOne
         intro m i c x
         fin_cases i
         rfl)
-  exact (identityPhiOneTargetModuleEq (β := β) (R := R) (Obj := Obj) obj deg) ▸ f
+  exact (identityPhiOneTargetModuleEq β (R := R) (Obj := Obj) obj deg) ▸ f
 
 /-- The structure maps of the identity A∞ functor: arity one is the identity, and all
 higher arities vanish. -/
@@ -70,12 +70,12 @@ def identityPhi
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β) :
     MultilinearMap R
-      (fun i : Fin n => ComposableHomType (GHom β R) obj deg i)
-      (functorTargetType β β (GHom β R) id (identityDegTrans β) obj deg) := by
+      (fun i : Fin n => ComposableHomType (gradedHom β R) obj deg i)
+      (functorTargetType β β (gradedHom β R) id (identityDegTrans β) obj deg) := by
   classical
   by_cases hn : n = 1
   · subst hn
-    exact identityPhiOne (β := β) (R := R) (Obj := Obj) obj deg
+    exact identityPhiOne β (R := R) (Obj := Obj) obj deg
   · exact 0
 
 /-- The raw A∞ functor data of the identity functor on an A∞ category structure. -/
@@ -85,7 +85,7 @@ def identityFunctorData :
   deg_trans := identityDegTrans β
   deg_trans_ofInt _n := rfl
   deg_trans_sign _b := rfl
-  phi := identityPhi (β := β) (R := R) (Obj := Obj)
+  phi := identityPhi β (R := R) (Obj := Obj)
 
 omit [Module β (Additive ℤˣ)] in
 @[simp]
@@ -94,7 +94,7 @@ lemma identityPhi_eq_zero_of_ne_one
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
     (hn : n ≠ 1) :
-    identityPhi (β := β) (R := R) (Obj := Obj) obj deg = 0 := by
+    identityPhi β (R := R) (Obj := Obj) obj deg = 0 := by
   classical
   simp [identityPhi, hn]
 
@@ -104,10 +104,10 @@ lemma identityFunctorData_phi_eq_zero_of_ne_one
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
     (hn : n ≠ 1) :
-    (identityFunctorData (β := β) (R := R) (Obj := Obj)).phi obj deg = 0 := by
+    (identityFunctorData β (R := R) (Obj := Obj)).phi obj deg = 0 := by
   classical
   simpa [identityFunctorData] using
-    (identityPhi_eq_zero_of_ne_one (β := β) (R := R) (Obj := Obj) obj deg hn)
+    (identityPhi_eq_zero_of_ne_one β (R := R) (Obj := Obj) obj deg hn)
 
 end Data
 
@@ -129,55 +129,55 @@ omit [Module β (Additive ℤˣ)] in
 private lemma identityPhiOne_apply
     (obj : Fin 2 → Obj)
     (deg : Fin 1 → β)
-    (x : ∀ i : Fin 1, ComposableHomType (GHom β R) obj deg i) :
-    identityPhiOne (β := β) (R := R) (Obj := Obj) obj deg x =
+    (x : ∀ i : Fin 1, ComposableHomType (gradedHom β R) obj deg i) :
+    identityPhiOne β (R := R) (Obj := Obj) obj deg x =
       cast
         (congrArg
           (fun M : ModuleCat R => (M : Type u))
-          (identityPhiOneTargetModuleEq (β := β) (R := R) (Obj := Obj) obj deg))
+          (identityPhiOneTargetModuleEq β (R := R) (Obj := Obj) obj deg))
         (x 0) := by
   unfold identityPhiOne
   exact multilinearMap_eqRec_apply (R := R)
-    (identityPhiOneTargetModuleEq (β := β) (R := R) (Obj := Obj) obj deg) _ x
+    (identityPhiOneTargetModuleEq β (R := R) (Obj := Obj) obj deg) _ x
 
 omit [Module β (Additive ℤˣ)] in
 private lemma identity_functorLHSTerm_eq_zero_of_ne_one
     {n : ℕ}
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
-    (x : ∀ i : Fin n, ComposableHomType (GHom β R) obj deg i)
+    (x : ∀ i : Fin n, ComposableHomType (gradedHom β R) obj deg i)
     (r s : ℕ)
     (hs : 1 ≤ s)
     (hr : r + s ≤ n)
     (houter : n + 1 - s ≠ 1) :
     AInfinityFunctorData.functorLHSTerm
       β β
-      (GHom β R) (GHom β R)
+      (gradedHom β R) (gradedHom β R)
       id (identityDegTrans β)
       (by intro n; rfl)
-      (identityPhi (β := β) (R := R) (Obj := Obj))
-      (AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj))
+      (identityPhi β (R := R) (Obj := Obj))
+      AInfinityCategoryStruct.m
       obj deg x r s hs hr = 0 := by
   classical
   let outerN := n + 1 - s
   let degOut := stasheffDegOut deg r s hr
   let objOut := stasheffObjOut obj r s hr
-  let xOut : ∀ i : Fin outerN, ComposableHomType (GHom β R) objOut degOut i :=
+  let xOut : ∀ i : Fin outerN, ComposableHomType (gradedHom β R) objOut degOut i :=
     indexedStasheffXOut
-      (GHom β R)
-      (AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj))
+      (gradedHom β R)
+      AInfinityCategoryStruct.m
       obj deg x r s hs hr
   have houterN : 0 < outerN := by
     dsimp [outerN]
     exact indexedStasheffOuterArity_pos r s hr
   letI : NeZero outerN := ⟨Nat.ne_of_gt houterN⟩
   let outer :=
-    identityPhi (β := β) (R := R) (Obj := Obj) objOut degOut xOut
+    identityPhi β (R := R) (Obj := Obj) objOut degOut xOut
   have houter_zero : outer = 0 := by
     have hmap :
-        identityPhi (β := β) (R := R) (Obj := Obj) objOut degOut = 0 :=
+        identityPhi β (R := R) (Obj := Obj) objOut degOut = 0 :=
       identityPhi_eq_zero_of_ne_one
-        (β := β) (R := R) (Obj := Obj)
+        β (R := R) (Obj := Obj)
         objOut degOut houter
     dsimp [outer]
     simp [hmap]
@@ -191,8 +191,8 @@ private lemma identity_functorLHSTerm_eq_zero_of_ne_one
     congr
     omega
   have hdeg :
-      functorTargetType β β (GHom β R) id (identityDegTrans β) objOut degOut =
-        AInfinityFunctorData.functorEqTargetType β β (GHom β R) id
+      functorTargetType β β (gradedHom β R) id (identityDegTrans β) objOut degOut =
+        AInfinityFunctorData.functorEqTargetType β β (gradedHom β R) id
           (identityDegTrans β) obj deg := by
     dsimp [functorTargetType, AInfinityFunctorData.functorEqTargetType]
     rw [hsource, htarget]
@@ -210,11 +210,11 @@ omit [Module β (Additive ℤˣ)] in
 /-- When the arity k equals 1, identityPhi acts as identity (up to HEq). -/
 private lemma identityPhi_heq_of_eq_one {k : ℕ} [NeZero k] (hk : k = 1)
     (obj' : Fin (k + 1) → Obj) (deg' : Fin k → β)
-    (x' : ∀ i : Fin k, ComposableHomType (GHom β R) obj' deg' i) :
-    HEq (identityPhi (β := β) (R := R) (Obj := Obj) obj' deg' x')
+    (x' : ∀ i : Fin k, ComposableHomType (gradedHom β R) obj' deg' i) :
+    HEq (identityPhi β (R := R) (Obj := Obj) obj' deg' x')
          (x' ⟨0, by omega⟩) := by
   subst hk
-  simp [identityPhi, identityPhiOne_apply (β := β) (R := R) (Obj := Obj)]
+  simp [identityPhi, identityPhiOne_apply β (R := R) (Obj := Obj)]
 
 omit [Module β (Additive ℤˣ)] in
 /-- If obj and deg are propositionally equal, then m gives HEq results.
@@ -224,8 +224,8 @@ private lemma m_heq_of_obj_deg_eq
     {O₁ O₂ : Fin (n + 1) → Obj}
     {D₁ D₂ : Fin n → β}
     (hO : O₁ = O₂) (hD : D₁ = D₂)
-    (X₁ : ∀ i, ComposableHomType (GHom β R) O₁ D₁ i)
-    (X₂ : ∀ i, ComposableHomType (GHom β R) O₂ D₂ i)
+    (X₁ : ∀ i, ComposableHomType (gradedHom β R) O₁ D₁ i)
+    (X₂ : ∀ i, ComposableHomType (gradedHom β R) O₂ D₂ i)
     (hX : HEq X₁ X₂) :
     HEq (@AInfinityCategoryStruct.m _ _ _ _ _ _ n inst₁ O₁ D₁ X₁)
          (@AInfinityCategoryStruct.m _ _ _ _ _ _ n inst₂ O₂ D₂ X₂) := by
@@ -239,8 +239,8 @@ private lemma m_xIn_heq_x_aux
     {n : ℕ} [NeZero n]
     {O₁ : Fin (n + 1) → Obj} {D₁ : Fin n → β}
     {O₂ : Fin (n + 1) → Obj} {D₂ : Fin n → β}
-    (X₁ : ∀ i : Fin n, ComposableHomType (GHom β R) O₁ D₁ i)
-    (X₂ : ∀ i : Fin n, ComposableHomType (GHom β R) O₂ D₂ i)
+    (X₁ : ∀ i : Fin n, ComposableHomType (gradedHom β R) O₁ D₁ i)
+    (X₂ : ∀ i : Fin n, ComposableHomType (gradedHom β R) O₂ D₂ i)
     (hO : O₁ = O₂) (hD : D₁ = D₂)
     (hX : ∀ i, HEq (X₁ i) (X₂ i)) :
     HEq X₁ X₂ := by
@@ -253,14 +253,14 @@ private lemma identity_functorLHSTerm_eq_main
     {n : ℕ} [NeZero n]
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
-    (x : ∀ i : Fin n, ComposableHomType (GHom β R) obj deg i) :
+    (x : ∀ i : Fin n, ComposableHomType (gradedHom β R) obj deg i) :
     AInfinityFunctorData.functorLHSTerm
       β β
-      (GHom β R) (GHom β R)
+      (gradedHom β R) (gradedHom β R)
       id (identityDegTrans β)
       (by intro k; rfl)
-      (identityPhi (β := β) (R := R) (Obj := Obj))
-      (AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj))
+      (identityPhi β (R := R) (Obj := Obj))
+      AInfinityCategoryStruct.m
       obj deg x 0 n
       (Nat.succ_le_of_lt (Nat.pos_of_ne_zero (NeZero.ne n)))
       (by simp) =
@@ -279,7 +279,7 @@ private lemma identity_functorLHSTerm_eq_main
   refine HEq.trans (cast_heq _ _) ?_
   -- Step 2: identityPhi at outerN = 1 gives HEq to (xOut 0)
   haveI : NeZero (n + 1 - n) := ⟨by omega⟩
-  refine HEq.trans (identityPhi_heq_of_eq_one (β := β) (R := R) (Obj := Obj) hOuterN _ _ _) ?_
+  refine HEq.trans (identityPhi_heq_of_eq_one β (R := R) (Obj := Obj) hOuterN _ _ _) ?_
   -- Step 3: xOut 0 at middle index is cast of indexedStasheffInner
   simp only [indexedStasheffXOut]
   simp only [show (0 < 0) = False from by decide, dif_neg (not_false), dif_pos trivial]
@@ -291,14 +291,14 @@ private lemma identity_functorLHSTerm_eq_main
   -- All three equalities hold propositionally
   have hobj : stasheffObjIn obj 0 n hr = obj := by ext i; simp [stasheffObjIn]
   have hdeg : stasheffDegIn deg 0 n hr = deg := by ext i; simp [stasheffDegIn]
-  have hxin : HEq (indexedStasheffXIn (GHom β R) obj deg x 0 n hr) x := by
+  have hxin : HEq (indexedStasheffXIn (gradedHom β R) obj deg x 0 n hr) x := by
     apply Function.hfunext rfl
     intro i₁ i₂ hi
     have hi_eq : i₁ = i₂ := eq_of_heq hi
     subst hi_eq
     rw [indexedStasheffXIn_apply]
     exact congr_arg_heq x (Fin.ext (Nat.zero_add i₁.val))
-  exact m_heq_of_obj_deg_eq (β := β) (R := R) (Obj := Obj) hobj hdeg _ _ hxin
+  exact m_heq_of_obj_deg_eq β (R := R) (Obj := Obj) hobj hdeg _ _ hxin
 
 /-
 If one of the inner multilinear maps in a composition is zero,
@@ -370,32 +370,32 @@ private lemma functorRHSTermMap_eq_zero_of_block_phi_zero
     (c : Composition n)
     (l0 : Fin c.length)
     [NeZero (c.blocksFun l0)]
-    (hphi_zero : identityPhi (β := β) (R := R) (Obj := Obj)
+    (hphi_zero : identityPhi β (R := R) (Obj := Obj)
       (AInfinityFunctorData.compositionBlockObj obj c l0)
       (AInfinityFunctorData.compositionBlockDeg β deg c l0) = 0) :
     AInfinityFunctorData.functorRHSTermMap
       β β
-      (GHom β R) (GHom β R)
+      (gradedHom β R) (gradedHom β R)
       id (identityDegTrans β)
-      (identityPhi (β := β) (R := R) (Obj := Obj))
-      (AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj))
+      (identityPhi β (R := R) (Obj := Obj))
+      AInfinityCategoryStruct.m
       obj deg c = 0 := by
   have hblock_zero :
       AInfinityFunctorData.functorRHSBlock
         β β
-        (GHom β R) (GHom β R)
+        (gradedHom β R) (gradedHom β R)
         id (identityDegTrans β)
-        (identityPhi (β := β) (R := R) (Obj := Obj))
+        (identityPhi β (R := R) (Obj := Obj))
         obj deg c l0 = 0 := by
     unfold AInfinityFunctorData.functorRHSBlock
     simpa [hphi_zero] using
       (cast_multilinearMap_zero (R := R)
       (ι := Fin (c.blocksFun l0))
-      (M₁ := fun j => ComposableHomType (GHom β R) obj deg (c.embedding l0 j))
+      (M₁ := fun j => ComposableHomType (gradedHom β R) obj deg (c.embedding l0 j))
       (AInfinityFunctorData.functor_rhs_block_module_eq
         (β_A := β) (β_B := β)
         (R := R)
-        (BHom := GHom β R)
+        (BHom := gradedHom β R)
         (objMap := id)
         (deg_trans := identityDegTrans β)
         obj deg c l0))
@@ -404,24 +404,24 @@ private lemma functorRHSTermMap_eq_zero_of_block_phi_zero
   let f :
       (l : Fin c.length) →
         MultilinearMap R
-          (fun j => ComposableHomType (GHom β R) obj deg (c.embedding l j))
-          (ComposableHomType (GHom β R)
+          (fun j => ComposableHomType (gradedHom β R) obj deg (c.embedding l j))
+          (ComposableHomType (gradedHom β R)
             (AInfinityFunctorData.functorCompositionOuterObj id obj c)
             (AInfinityFunctorData.functorCompositionOuterDeg β β (identityDegTrans β) deg c) l) :=
     fun l =>
       AInfinityFunctorData.functorRHSBlock
         β β
-        (GHom β R) (GHom β R)
+        (gradedHom β R) (gradedHom β R)
         id (identityDegTrans β)
-        (identityPhi (β := β) (R := R) (Obj := Obj))
+        (identityPhi β (R := R) (Obj := Obj))
         obj deg c l
   have hf_zero : f l0 = 0 := by
     simpa [f] using hblock_zero
   let comp :
       MultilinearMap R
-        (fun i => ComposableHomType (GHom β R) obj deg i)
+        (fun i => ComposableHomType (gradedHom β R) obj deg i)
         (operationTargetType
-          (GHom β R)
+          (gradedHom β R)
           (AInfinityFunctorData.functorCompositionOuterObj id obj c)
           (AInfinityFunctorData.functorCompositionOuterDeg β β (identityDegTrans β) deg c)) :=
     AInfinityFunctorData.MultilinearMap.compComposition c
@@ -441,11 +441,11 @@ private lemma functorRHSTermMap_eq_zero_of_block_phi_zero
   simpa [f, comp, hcomp_zero] using
     (cast_multilinearMap_zero (R := R)
     (ι := Fin n)
-    (M₁ := fun i => ComposableHomType (GHom β R) obj deg i)
+    (M₁ := fun i => ComposableHomType (gradedHom β R) obj deg i)
     (AInfinityFunctorData.functor_rhs_target_module_eq
       (β_A := β) (β_B := β)
       (R := R)
-      (BHom := GHom β R)
+      (BHom := gradedHom β R)
       (objMap := id)
       (deg_trans := identityDegTrans β)
       obj deg c))
@@ -465,31 +465,30 @@ private lemma identity_functorRHSTerm_eq_zero_of_ne_ones
     {n : ℕ} [NeZero n]
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
-    (x : ∀ i : Fin n, ComposableHomType (GHom β R) obj deg i)
+    (x : ∀ i : Fin n, ComposableHomType (gradedHom β R) obj deg i)
     (c : Composition n)
     (hc : c ≠ Composition.ones n) :
     AInfinityFunctorData.functorRHSTerm
       β β
-      (GHom β R) (GHom β R)
+      (gradedHom β R) (gradedHom β R)
       id (identityDegTrans β)
-      (identityPhi (β := β) (R := R) (Obj := Obj))
-      (AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj))
-      obj deg x c = 0 := by
+      (identityPhi β (R := R) (Obj := Obj))
+      AInfinityCategoryStruct.m obj deg x c = 0 := by
   classical
   obtain ⟨l0, hl0⟩ := composition_exists_block_gt_one_of_ne_ones (c := c) hc
   letI : NeZero (c.blocksFun l0) :=
     ⟨Nat.ne_of_gt (lt_of_lt_of_le Nat.zero_lt_one (c.one_le_blocksFun l0))⟩
-  have hphi_zero : identityPhi (β := β) (R := R) (Obj := Obj)
+  have hphi_zero : identityPhi β (R := R) (Obj := Obj)
       (AInfinityFunctorData.compositionBlockObj obj c l0)
       (AInfinityFunctorData.compositionBlockDeg β deg c l0) = 0 :=
-    identityPhi_eq_zero_of_ne_one (β := β) (R := R) (Obj := Obj) _ _ (by
+    identityPhi_eq_zero_of_ne_one β (R := R) (Obj := Obj) _ _ (by
       exact Nat.ne_of_gt hl0)
   have hmap := functorRHSTermMap_eq_zero_of_block_phi_zero
-    (β := β) (R := R) (Obj := Obj) obj deg c l0 hphi_zero
+    β (R := R) (Obj := Obj) obj deg c l0 hphi_zero
   show (AInfinityFunctorData.functorRHSTermMap
-      β β (GHom β R) (GHom β R) id (identityDegTrans β)
-      (identityPhi (β := β) (R := R) (Obj := Obj))
-      (AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj))
+      β β (gradedHom β R) (gradedHom β R) id (identityDegTrans β)
+      (identityPhi β (R := R) (Obj := Obj))
+      (AInfinityCategoryStruct.m)
       obj deg c) x = 0
   simp [hmap]
 
@@ -501,8 +500,8 @@ private lemma m_heq_of_arity_eq
     {O₁ : Fin (n₁ + 1) → Obj} {O₂ : Fin (n₂ + 1) → Obj}
     {D₁ : Fin n₁ → β} {D₂ : Fin n₂ → β}
     (hO : HEq O₁ O₂) (hD : HEq D₁ D₂)
-    (X₁ : ∀ i, ComposableHomType (GHom β R) O₁ D₁ i)
-    (X₂ : ∀ i, ComposableHomType (GHom β R) O₂ D₂ i)
+    (X₁ : ∀ i, ComposableHomType (gradedHom β R) O₁ D₁ i)
+    (X₂ : ∀ i, ComposableHomType (gradedHom β R) O₂ D₂ i)
     (hX : HEq X₁ X₂) :
     HEq (@AInfinityCategoryStruct.m _ _ _ _ _ _ n₁ inst₁ O₁ D₁ X₁)
          (@AInfinityCategoryStruct.m _ _ _ _ _ _ n₂ inst₂ O₂ D₂ X₂) := by
@@ -529,15 +528,14 @@ private lemma identity_functorRHSTerm_eq_main
     {n : ℕ} [NeZero n]
     (obj : Fin (n + 1) → Obj)
     (deg : Fin n → β)
-    (x : ∀ i : Fin n, ComposableHomType (GHom β R) obj deg i) :
+    (x : ∀ i : Fin n, ComposableHomType (gradedHom β R) obj deg i) :
     AInfinityFunctorData.functorRHSTerm
       β β
-      (GHom β R) (GHom β R)
+      (gradedHom β R) (gradedHom β R)
       id (identityDegTrans β)
-      (identityPhi (β := β) (R := R) (Obj := Obj))
-      (AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj))
-      obj deg x (Composition.ones n) =
-      AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj) obj deg x := by
+      (identityPhi β (R := R) (Obj := Obj))
+      AInfinityCategoryStruct.m obj deg x (Composition.ones n) =
+      AInfinityCategoryStruct.m obj deg x := by
   classical
   unfold AInfinityFunctorData.functorRHSTerm
   unfold AInfinityFunctorData.functorRHSTermMap
@@ -545,7 +543,7 @@ private lemma identity_functorRHSTerm_eq_main
       (h := AInfinityFunctorData.functor_rhs_target_module_eq
         (β_A := β) (β_B := β)
         (R := R)
-        (BHom := GHom β R)
+        (BHom := gradedHom β R)
         (objMap := id)
         (deg_trans := identityDegTrans β)
         obj deg (Composition.ones n))]
@@ -561,7 +559,7 @@ private lemma identity_functorRHSTerm_eq_main
   -- Unfold compComposition to get m applied to phi outputs
   simp only [AInfinityFunctorData.MultilinearMap.compComposition]
   -- Use m_heq_of_arity_eq to match the two sides
-  refine m_heq_of_arity_eq (β := β) (R := R) (Obj := Obj) (Composition.ones_length n) ?_ ?_ _ _ ?_
+  refine m_heq_of_arity_eq β (R := R) (Obj := Obj) (Composition.ones_length n) ?_ ?_ _ _ ?_
   · -- outerObj ≅ obj
     apply Function.hfunext (by simp [Composition.ones_length])
     intro l₁ l₂ hl
@@ -576,6 +574,8 @@ private lemma identity_functorRHSTerm_eq_main
     exact heq_of_eq (congrArg obj (Fin.ext (show min l₁.val n = l₂.val by omega)))
   · -- outerDeg ≅ deg
     apply Function.hfunext (by simp [Composition.ones_length])
+    -- have := Composition.ones_length n
+    -- simp [this]
     intro l₁ l₂ hl
     have hl_eq : l₁.val = l₂.val :=
       (Fin.heq_ext_iff (by simp [Composition.ones_length])).mp hl
@@ -603,13 +603,13 @@ private lemma identity_functorRHSTerm_eq_main
           (h := AInfinityFunctorData.functor_rhs_block_module_eq
             (β_A := β) (β_B := β)
             (R := R)
-            (BHom := GHom β R)
+            (BHom := gradedHom β R)
             (objMap := id)
             (deg_trans := identityDegTrans β)
             obj deg (Composition.ones n) l₁)
           _ _) ?_
     refine HEq.trans (cast_heq _ _) ?_
-    refine HEq.trans (identityPhi_heq_of_eq_one (β := β) (R := R) (Obj := Obj) hblock _ _ _) ?_
+    refine HEq.trans (identityPhi_heq_of_eq_one β (R := R) (Obj := Obj) hblock _ _ _) ?_
     have hemb := Composition.ones_embedding l₁ (by rw [hblock]; exact Nat.one_pos)
     exact HEq.trans (congr_arg_heq x hemb) (congr_arg_heq x (Fin.ext hl_eq))
 
@@ -618,18 +618,17 @@ private lemma identity_functorRHSTerm_eq_main
 theorem identitySatisfiesFunctorEquations :
     AInfinityFunctorData.SatisfiesFunctorEquations
       (β_A := β) (β_B := β) R Obj Obj
-      (identityFunctorData (β := β) (R := R) (Obj := Obj)) := by
+      (identityFunctorData β (R := R) (Obj := Obj)) := by
   intro n _ obj deg x
   have hLHS :
       AInfinityFunctorData.functorLHSSum
         β β
-        (GHom β R) (GHom β R)
+        (gradedHom β R) (gradedHom β R)
         id (identityDegTrans β)
         (by intro k; rfl)
-        (identityPhi (β := β) (R := R) (Obj := Obj))
-        (AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj))
-        obj deg x =
-      AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj) obj deg x := by
+        (identityPhi β (R := R) (Obj := Obj))
+        AInfinityCategoryStruct.m obj deg x =
+      AInfinityCategoryStruct.m obj deg x := by
     classical
     unfold AInfinityFunctorData.functorLHSSum
     rw [Finset.sum_eq_single ⟨0, by simp⟩]
@@ -642,7 +641,7 @@ theorem identitySatisfiesFunctorEquations :
           simp [stasheffSign, stasheffSignExponent]
         rw [hsign, one_smul]
         exact identity_functorLHSTerm_eq_main
-          (β := β) (R := R) (Obj := Obj) obj deg x
+          β (R := R) (Obj := Obj) obj deg x
       · intro s hs hsne
         have hslt : s.1 < n := by
           have hsmem : s.1 ∈ Finset.Ico 1 (n + 1) := by
@@ -660,7 +659,7 @@ theorem identitySatisfiesFunctorEquations :
         have hvalid : ValidStasheffIndices n 0 s.1 := by
           exact validStasheffIndices_of_mem_ranges (n := n) (by simp) s.2
         simp [identity_functorLHSTerm_eq_zero_of_ne_one
-          (β := β) (R := R) (Obj := Obj)
+          β (R := R) (Obj := Obj)
           obj deg x 0 s.1 hvalid.1 hvalid.2 houter]
       · intro hs
         simp at hs
@@ -679,27 +678,27 @@ theorem identitySatisfiesFunctorEquations :
       have houter : n + 1 - s.1 ≠ 1 := by
         omega
       simp [identity_functorLHSTerm_eq_zero_of_ne_one
-        (β := β) (R := R) (Obj := Obj)
+        β (R := R) (Obj := Obj)
         obj deg x r.1 s.1 hvalid.1 hvalid.2 houter]
     · intro hr
       simp at hr
   have hRHS :
       AInfinityFunctorData.functorRHSSum
         β β
-        (GHom β R) (GHom β R)
+        (gradedHom β R) (gradedHom β R)
         id (identityDegTrans β)
-        (identityPhi (β := β) (R := R) (Obj := Obj))
-        (AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj))
+        (identityPhi β (R := R) (Obj := Obj))
+        AInfinityCategoryStruct.m
         obj deg x =
-      AInfinityCategoryStruct.m (β := β) (R := R) (Obj := Obj) obj deg x := by
+      AInfinityCategoryStruct.m obj deg x := by
     classical
     unfold AInfinityFunctorData.functorRHSSum
     rw [Finset.sum_eq_single (Composition.ones n)]
     · simpa using identity_functorRHSTerm_eq_main
-        (β := β) (R := R) (Obj := Obj) obj deg x
+        β (R := R) (Obj := Obj) obj deg x
     · intro c _ hc
       simp [identity_functorRHSTerm_eq_zero_of_ne_ones
-        (β := β) (R := R) (Obj := Obj) obj deg x c hc]
+        β (R := R) (Obj := Obj) obj deg x c hc]
     · intro hc
       simp at hc
   simpa [identityFunctorData] using hLHS.trans hRHS.symm
@@ -713,9 +712,9 @@ variable [AInfinityCategory β R Obj]
 /-- The identity A∞ functor on an A∞ category. -/
 def identityFunctor :
     AInfinityFunctor (β_A := β) (β_B := β) R Obj Obj where
-  toAInfinityFunctorData := identityFunctorData (β := β) (R := R) (Obj := Obj)
+  toAInfinityFunctorData := identityFunctorData β (R := R) (Obj := Obj)
   satisfiesFunctorEquations := identitySatisfiesFunctorEquations
-    (β := β) (R := R) (Obj := Obj)
+    β (R := R) (Obj := Obj)
 
 end Functor
 
@@ -734,8 +733,8 @@ private abbrev compIdentityFunctorPhiExpanded
       (obj : Fin (n + 1) → ObjA) →
       (deg : Fin n → β_A) →
       MultilinearMap R
-        (fun i : Fin n => ComposableHomType (GHom β_A R) obj deg i)
-        (functorTargetType β_A β_B (GHom β_B R)
+        (fun i : Fin n => ComposableHomType (gradedHom β_A R) obj deg i)
+        (functorTargetType β_A β_B (gradedHom β_B R)
           (F.objMap ∘ id)
           (F.deg_trans.comp (identityDegTrans β_A))
           obj deg) :=
@@ -743,7 +742,7 @@ private abbrev compIdentityFunctorPhiExpanded
       (obj : Fin (n + 1) → ObjA)
       (deg : Fin n → β_A) =>
     AInfinityFunctorData.compPhi β_A β_A β_B
-      (GHom β_A R) (GHom β_A R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_A R) (gradedHom β_B R)
       id
       (identityDegTrans β_A)
       (identityFunctorData (β := β_A) (R := R) (Obj := ObjA)).phi
@@ -760,8 +759,8 @@ private abbrev identityFunctorCompPhiExpanded
       (obj : Fin (n + 1) → ObjA) →
       (deg : Fin n → β_A) →
       MultilinearMap R
-        (fun i : Fin n => ComposableHomType (GHom β_A R) obj deg i)
-        (functorTargetType β_A β_B (GHom β_B R)
+        (fun i : Fin n => ComposableHomType (gradedHom β_A R) obj deg i)
+        (functorTargetType β_A β_B (gradedHom β_B R)
           (id ∘ F.objMap)
           ((identityDegTrans β_B).comp F.deg_trans)
           obj deg) :=
@@ -769,7 +768,7 @@ private abbrev identityFunctorCompPhiExpanded
       (obj : Fin (n + 1) → ObjA)
       (deg : Fin n → β_A) =>
     AInfinityFunctorData.compPhi β_A β_B β_B
-      (GHom β_A R) (GHom β_B R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_B R) (gradedHom β_B R)
       F.objMap
       F.deg_trans
       F.phi
@@ -819,7 +818,7 @@ private lemma compTermBlock_eq_zero_of_phi_zero
       (AInfinityFunctorData.compositionBlockObj obj c l)
       (AInfinityFunctorData.compositionBlockDeg β_A deg c l) = 0) :
     AInfinityFunctorData.compTermBlock β_A β_A
-      (GHom β_A R) (GHom β_A R)
+      (gradedHom β_A R) (gradedHom β_A R)
       id (identityDegTrans β_A)
       (identityFunctorData (β := β_A) (R := R) (Obj := ObjA)).phi
       obj deg c l = 0 := by
@@ -827,7 +826,7 @@ private lemma compTermBlock_eq_zero_of_phi_zero
   apply cast_multilinearMap_zero;
   nontriviality;
   exact
-    AInfinityFunctorData.functor_rhs_block_module_eq β_A β_A (GHom β_A R)
+    AInfinityFunctorData.functor_rhs_block_module_eq β_A β_A (gradedHom β_A R)
       (identityFunctorData β_A R ObjA).objMap (identityFunctorData β_A R ObjA).deg_trans obj deg c l
 
 /-- A left outer identity summand vanishes when the composition length is not one. -/
@@ -839,7 +838,7 @@ private lemma compTermMultilinearMap_outer_identity_eq_zero_of_length_ne_one
     (c : Composition n)
     (hlen : c.length ≠ 1) :
     AInfinityFunctorData.compTermMultilinearMap β_A β_B β_B
-      (GHom β_A R) (GHom β_B R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_B R) (gradedHom β_B R)
       F.objMap F.deg_trans F.phi
       id (identityDegTrans β_B)
       (by intro k; rfl)
@@ -851,7 +850,7 @@ private lemma compTermMultilinearMap_outer_identity_eq_zero_of_length_ne_one
   apply cast_multilinearMap_zero;
   exact
     AInfinityFunctorData.comp_term_target_module_eq β_A β_B β_B
-      (GHom β_B R) F.objMap F.deg_trans id (identityDegTrans β_B)
+      (gradedHom β_B R) F.objMap F.deg_trans id (identityDegTrans β_B)
       (by intro k; rfl) obj deg c
 
 
@@ -873,12 +872,12 @@ private lemma compTermMultilinearMap_eq_zero_of_block_zero
     (c : Composition n)
     (l0 : Fin c.length)
     (hblock : AInfinityFunctorData.compTermBlock β_A β_A
-      (GHom β_A R) (GHom β_A R)
+      (gradedHom β_A R) (gradedHom β_A R)
       id (identityDegTrans β_A)
       (identityFunctorData (β := β_A) (R := R) (Obj := ObjA)).phi
       obj deg c l0 = 0) :
     AInfinityFunctorData.compTermMultilinearMap β_A β_A β_B
-      (GHom β_A R) (GHom β_A R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_A R) (gradedHom β_B R)
       id (identityDegTrans β_A)
       (identityFunctorData (β := β_A) (R := R) (Obj := ObjA)).phi
       F.objMap F.deg_trans F.deg_trans_ofInt F.phi
@@ -889,13 +888,13 @@ private lemma compTermMultilinearMap_eq_zero_of_block_zero
   let blocks :
       (l : Fin c.length) →
         MultilinearMap R
-          (fun j => ComposableHomType (GHom β_A R) obj deg (c.embedding l j))
-          (ComposableHomType (GHom β_A R)
+          (fun j => ComposableHomType (gradedHom β_A R) obj deg (c.embedding l j))
+          (ComposableHomType (gradedHom β_A R)
             (AInfinityFunctorData.functorCompositionOuterObj id obj c)
             (AInfinityFunctorData.functorCompositionOuterDeg β_A β_A (identityDegTrans β_A) deg c) l) :=
     fun l =>
       AInfinityFunctorData.compTermBlock β_A β_A
-        (GHom β_A R) (GHom β_A R)
+        (gradedHom β_A R) (gradedHom β_A R)
         id (identityDegTrans β_A)
         (identityFunctorData (β := β_A) (R := R) (Obj := ObjA)).phi
         obj deg c l
@@ -903,9 +902,9 @@ private lemma compTermMultilinearMap_eq_zero_of_block_zero
     simpa [blocks] using hblock
   have hinner_zero :
       AInfinityFunctorData.MultilinearMap.compComposition (R := R)
-        (M := fun i : Fin n => ComposableHomType (GHom β_A R) obj deg i)
+        (M := fun i : Fin n => ComposableHomType (gradedHom β_A R) obj deg i)
         (N := fun l : Fin c.length =>
-          ComposableHomType (GHom β_A R)
+          ComposableHomType (gradedHom β_A R)
             (AInfinityFunctorData.functorCompositionOuterObj id obj c)
             (AInfinityFunctorData.functorCompositionOuterDeg β_A β_A (identityDegTrans β_A) deg c) l)
         c
@@ -925,9 +924,9 @@ private lemma compTermMultilinearMap_eq_zero_of_block_zero
   exact
     (cast_multilinearMap_zero (R := R)
     (ι := Fin n)
-    (M₁ := fun i => ComposableHomType (GHom β_A R) obj deg i)
+    (M₁ := fun i => ComposableHomType (gradedHom β_A R) obj deg i)
     (AInfinityFunctorData.comp_term_target_module_eq β_A β_A β_B
-      (GHom β_B R) id (identityDegTrans β_A) F.objMap F.deg_trans F.deg_trans_ofInt obj deg c))
+      (gradedHom β_B R) id (identityDegTrans β_A) F.objMap F.deg_trans F.deg_trans_ofInt obj deg c))
 
 
 /-- Non-`ones` summands vanish in the raw right-identity `phi` sum. -/
@@ -939,7 +938,7 @@ private lemma comp_identityFunctorData_phi_term_eq_zero_of_ne_ones
     (c : Composition n)
     (hc : c ≠ Composition.ones n) :
     AInfinityFunctorData.compTermMultilinearMap β_A β_A β_B
-      (GHom β_A R) (GHom β_A R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_A R) (gradedHom β_B R)
       id
       (identityDegTrans β_A)
       (identityFunctorData (β := β_A) (R := R) (Obj := ObjA)).phi
@@ -954,10 +953,13 @@ private lemma comp_identityFunctorData_phi_term_eq_zero_of_ne_ones
   apply compTermMultilinearMap_eq_zero_of_block_zero;
   convert compTermBlock_eq_zero_of_phi_zero _ _ _ _ _ _;
   exact l;
-  exact ⟨ by linarith ⟩;
-  grind +suggestions
-
-
+  exact ⟨ by linarith ⟩
+  simp only [identityFunctorData, identityPhi]
+  unfold AInfinityFunctorData.compositionBlockObj
+  unfold AInfinityFunctorData.compositionBlockDeg
+  split
+  · grind
+  · rfl
 
 /-- Transport `F.phi` across equal arities, objects, degrees, and inputs. -/
 private lemma phi_heq_of_arity_eq
@@ -967,8 +969,8 @@ private lemma phi_heq_of_arity_eq
     {O₁ : Fin (n₁ + 1) → ObjA} {O₂ : Fin (n₂ + 1) → ObjA}
     {D₁ : Fin n₁ → β_A} {D₂ : Fin n₂ → β_A}
     (hO : HEq O₁ O₂) (hD : HEq D₁ D₂)
-    (X₁ : ∀ i, ComposableHomType (GHom β_A R) O₁ D₁ i)
-    (X₂ : ∀ i, ComposableHomType (GHom β_A R) O₂ D₂ i)
+    (X₁ : ∀ i, ComposableHomType (gradedHom β_A R) O₁ D₁ i)
+    (X₂ : ∀ i, ComposableHomType (gradedHom β_A R) O₂ D₂ i)
     (hX : HEq X₁ X₂) :
     HEq (F.phi O₁ D₁ X₁) (F.phi O₂ D₂ X₂) := by
   cases inst₁ ; cases inst₂ ; aesop
@@ -979,7 +981,7 @@ private lemma comp_identityFunctorData_phi_term_eq_main
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A) :
     AInfinityFunctorData.compTermMultilinearMap β_A β_A β_B
-      (GHom β_A R) (GHom β_A R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_A R) (gradedHom β_B R)
       id
       (identityDegTrans β_A)
       (identityFunctorData (β := β_A) (R := R) (Obj := ObjA)).phi
@@ -993,7 +995,7 @@ private lemma comp_identityFunctorData_phi_term_eq_main
   unfold AInfinityFunctorData.compTermMultilinearMap
   rw [multilinearMap_cast_apply (R := R)
       (h := AInfinityFunctorData.comp_term_target_module_eq β_A β_A β_B
-        (GHom β_B R) id (identityDegTrans β_A) F.objMap F.deg_trans F.deg_trans_ofInt obj deg
+        (gradedHom β_B R) id (identityDegTrans β_A) F.objMap F.deg_trans F.deg_trans_ofInt obj deg
         (Composition.ones n))]
   apply eq_of_heq
   refine HEq.trans (cast_heq _ _) ?_
@@ -1038,7 +1040,7 @@ private lemma comp_identityFunctorData_phi_term_eq_main
       (heq_of_eq <|
         multilinearMap_cast_apply (R := R)
           (h := AInfinityFunctorData.comp_term_block_module_eq β_A β_A
-            (GHom β_A R) id (identityDegTrans β_A)
+            (gradedHom β_A R) id (identityDegTrans β_A)
             obj deg (Composition.ones n) l₁)
           _ _) ?_
     refine HEq.trans (cast_heq _ _) ?_
@@ -1106,7 +1108,7 @@ private lemma identityFunctor_compData_phi_expand
       identityFunctorCompPhiExpanded (R := R) F obj deg := by
   exact Eq.symm
     (AInfinityFunctorData.compPhi.congr_simp β_A β_B β_B
-      (GHom β_A R) (GHom β_B R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_B R) (gradedHom β_B R)
       F.objMap F.deg_trans
       (fun {n} [NeZero n] => F.phi)
       (fun {n} [NeZero n] => F.phi)
@@ -1125,7 +1127,7 @@ private lemma identityFunctor_compData_phi_term_eq_zero_of_ne_single
     (c : Composition n)
     (hc : c ≠ Composition.single n (Nat.pos_of_ne_zero (NeZero.ne n))) :
     AInfinityFunctorData.compTermMultilinearMap β_A β_B β_B
-      (GHom β_A R) (GHom β_B R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_B R) (gradedHom β_B R)
       F.objMap
       F.deg_trans
       F.phi
@@ -1149,7 +1151,7 @@ private lemma identityFunctor_compData_phi_term_eq_main
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A) :
     AInfinityFunctorData.compTermMultilinearMap β_A β_B β_B
-      (GHom β_A R) (GHom β_B R) (GHom β_B R)
+      (gradedHom β_A R) (gradedHom β_B R) (gradedHom β_B R)
       F.objMap
       F.deg_trans
       F.phi
@@ -1163,7 +1165,7 @@ private lemma identityFunctor_compData_phi_term_eq_main
   unfold AInfinityFunctorData.compTermMultilinearMap
   rw [multilinearMap_cast_apply (R := R)
       (h := AInfinityFunctorData.comp_term_target_module_eq β_A β_B β_B
-        (GHom β_B R) F.objMap F.deg_trans id (identityDegTrans β_B) (by intro k; rfl) obj deg
+        (gradedHom β_B R) F.objMap F.deg_trans id (identityDegTrans β_B) (by intro k; rfl) obj deg
         (Composition.single n (Nat.pos_of_ne_zero (NeZero.ne n))))]
   apply eq_of_heq
   refine HEq.trans (cast_heq _ _) ?_
@@ -1182,7 +1184,7 @@ private lemma identityFunctor_compData_phi_term_eq_main
     (heq_of_eq <|
       multilinearMap_cast_apply (R := R)
         (h := AInfinityFunctorData.comp_term_block_module_eq β_A β_B
-          (GHom β_B R) F.objMap F.deg_trans
+          (gradedHom β_B R) F.objMap F.deg_trans
           obj deg (Composition.single n _) ⟨0, by rw [hsingle_len]; exact Nat.one_pos⟩)
         _ _) ?_
   refine HEq.trans (cast_heq _ _) ?_
