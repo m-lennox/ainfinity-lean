@@ -12,7 +12,7 @@ noncomputable section
 namespace AInfinityTheory
 
 universe u v w
-variable (β : Type v) [CommRing β]
+variable (β : Type v) [AddCommGroup β] [GradingIndex β]
 
 class AInfinityCategoryStruct
     (R : Type u) [CommRing R] (Obj : Type w)
@@ -24,8 +24,6 @@ class AInfinityCategoryStruct
     MultilinearMap R
       (fun i : Fin n => ComposableHomType (gradedHom β R) obj deg i)
       (operationTargetType (gradedHom β R) obj deg)
-
-variable [Module β (Additive ℤˣ)]
 
 namespace AInfinityCategoryStruct
 

@@ -6,22 +6,24 @@
 \lean{AInfinityTheory.operationTargetDeg}
 \label{AInfinityTheory.operationTargetDeg}
 \leanok
-Given input degrees $(d_0,\dots,d_{n-1})$, the output degree of the $n$-ary
-operation is
+\uses{AInfinityTheory.GradingIndex}
+Given input degrees $(d_0,\dots,d_{n-1})$ in a grading index $\beta$, the
+output degree of the $n$-ary operation is
 \[
-  \sum_i d_i + (2-n),
+  \sum_i d_i + \operatorname{shift}(2-n),
 \]
-where the final summand is interpreted using the canonical integer cast into
-the grading ring.
+where the final summand is the image of the integer $2-n$ under the shift
+homomorphism $\mathbb{Z} \to \beta$.
 \end{definition}
 
 \begin{definition}[Stasheff target degree]
 \lean{AInfinityTheory.stasheffTargetDeg}
 \label{AInfinityTheory.stasheffTargetDeg}
 \leanok
+\uses{AInfinityTheory.GradingIndex}
 The common degree of the arity-$n$ Stasheff relation is
 \[
-  \sum_i d_i + (3-n)
+  \sum_i d_i + \operatorname{shift}(3-n)
 \]
 in the grading index.
 \end{definition}
@@ -60,21 +62,23 @@ operation to the collapsed string.
 \lean{AInfinityTheory.stasheffSignExponent}
 \label{AInfinityTheory.stasheffSignExponent}
 \leanok
+\uses{AInfinityTheory.GradingIndex}
 For a valid pair $(r,s)$, this is the degree
 \[
-  |a_{r+s}| + \cdots + |a_{n-1}| - (n-r-s).
+  |a_{r+s}| + \cdots + |a_{n-1}| - \operatorname{shift}(n-r-s)
 \]
-computed in the grading ring.
+in the grading index, the integer $n-r-s$ being embedded by the shift
+homomorphism.
 \end{definition}
 
 \begin{definition}[Stasheff sign]
 \lean{AInfinityTheory.stasheffSign}
 \label{AInfinityTheory.stasheffSign}
 \leanok
-\uses{AInfinityTheory.stasheffSignExponent}
-The integer unit attached to $(r,s)$ is $(-1)$ raised to
-\lean{AInfinityTheory.stasheffSignExponent}, using Mathlib's generalized power
-on $\mathbb{Z}^{\times}$.
+\uses{AInfinityTheory.stasheffSignExponent, AInfinityTheory.GradingIndex}
+The sign $\pm 1$ attached to $(r,s)$ is the Koszul sign $(-1)^e$ of the
+Stasheff sign exponent $e$, that is, the sign character of the grading index
+applied to $e$.
 \end{definition}
 
 \begin{definition}[Indexed Stasheff sum]

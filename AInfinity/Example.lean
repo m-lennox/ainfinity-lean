@@ -14,11 +14,55 @@ namespace Examples
 
 universe u
 
-/-- Mathlib supplies its Koszul-sign action for integer gradings. -/
-example : Module ℤ (Additive ℤˣ) := inferInstance
+/-! ### Gradings
 
-/-- Mathlib supplies its Koszul-sign action for parity gradings. -/
-example : Module (ZMod 2) (Additive ℤˣ) := inferInstance
+The `A∞` definitions only ask for a `GradingIndex`, so they can be instantiated at the
+cohomological grading `ℤ`, at the parity grading `ZMod 2`, or at bigradings such as
+`ℤ × ZMod 2`. -/
+
+section Gradings
+
+/-- The integers carry their standard grading. -/
+example : GradingIndex ℤ := inferInstance
+
+/-- The parities carry their standard grading. -/
+example : GradingIndex (ZMod 2) := inferInstance
+
+/-- In the parity grading the differential is odd. -/
+example (p : ZMod 2) : operationTargetDeg (fun _ : Fin 1 => p) = p + 1 := by
+  simp [operationTargetDeg]
+
+/-- In the parity grading `m₂` preserves parity. -/
+example (p q : ZMod 2) : operationTargetDeg ![p, q] = p + q := by
+  simp [operationTargetDeg, Fin.sum_univ_two]
+
+/-- The Koszul sign of an odd parity is `-1`. -/
+example : negOnePow (1 : ZMod 2) = -1 := by
+  rw [negOnePow_zmod_two, uzpow_one]
+
+/- Bigrading by a cohomological degree and a parity, with the total sign. -/
+attribute [local instance] GradingIndex.prodTotal
+
+/-- Integer shifts only affect the cohomological degree, so `mₙ` has degree `(2 - n, 0)`
+rather than `(2 - n, 2 - n)`. -/
+example (n : ℤ) : (shift n : ℤ × ZMod 2) = (n, 0) := rfl
+
+/-- The differential raises the cohomological degree by one and preserves the parity. -/
+example (d : ℤ) (p : ZMod 2) :
+    operationTargetDeg (fun _ : Fin 1 => ((d, p) : ℤ × ZMod 2)) = (d + 1, p) := by
+  simp [operationTargetDeg]
+
+/-- The total sign is the product of the two Koszul signs. -/
+example (d : ℤ) (p : ZMod 2) :
+    negOnePow ((d, p) : ℤ × ZMod 2) = Int.negOnePow d * (-1 : ℤˣ) ^ p := rfl
+
+/-- A morphism of even cohomological degree and odd parity is odd. -/
+example : negOnePow ((0, 1) : ℤ × ZMod 2) = -1 := by decide
+
+/-- A morphism of odd cohomological degree and odd parity is even. -/
+example : negOnePow ((1, 1) : ℤ × ZMod 2) = 1 := by decide
+
+end Gradings
 
 variable (R : Type u) [CommRing R]
 variable (S : Type u) [CommRing S] [Algebra R S]
@@ -616,10 +660,10 @@ lemma concentratedAt0CategoryData_stasheffTerm_r1_s2_eq_zero_of_not_all_zero
 
 private lemma stasheffSign_zero_deg_0_2 :
     stasheffSign (fun _ : Fin 3 => (0 : ℤ)) 0 2 (by omega) = -1 := by
-  norm_num [stasheffSign, stasheffSignExponent, uzpow_neg]
+  simp [stasheffSign, stasheffSignExponent]
 private lemma stasheffSign_zero_deg_1_2 :
     stasheffSign (fun _ : Fin 3 => (0 : ℤ)) 1 2 (by omega) = 1 := by
-  norm_num [stasheffSign, stasheffSignExponent]
+  simp [stasheffSign, stasheffSignExponent]
 
 
 theorem concentratedAt0CategoryData_satisfiesStasheff
