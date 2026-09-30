@@ -8,6 +8,7 @@ import AInfinity.ComputableCategories
 import AInfinity.Example
 import AInfinity.Examples
 import AInfinity.FunctorExample
+import AInfinity.GradedLinearAlgebra
 import AInfinity.Grading
 import AInfinity.KLRW
 import AInfinity.Stasheff
