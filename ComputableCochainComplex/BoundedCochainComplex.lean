@@ -1,7 +1,7 @@
 module
 
 public import Mathlib
-public import AInfinity.AdditiveCompletion
+public import ComputableCochainComplex.AdditiveCompletion
 
 @[expose] public section
 
