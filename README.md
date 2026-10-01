@@ -1,8 +1,10 @@
-## A∞-categories in Lean
+## A<sub>∞</sub> Categories in Lean
 
-*Marco David, Jason Dong, Hallvard Hareide, Jasper van de Kreeke, Justin Mu, Niels Voss, Annie Yao*
+*Marco David, Jason Dong, Hallvard Hareide, Jasper van de Kreeke, Lillian Liu, Justin Mu, Niels Voss, Annie Yao*
 
-Repository for the URAP formalization project at UC Berkeley.
+Repository for the formalization of $$A_\infty$$ category theory in Lean, a research project run at UC Berkeley.
+
+Check out the [**blueprint homepage**](https://marcodavid.net/A∞/) for this project.
 
 ### Repository structure
 
@@ -13,10 +15,10 @@ and checked in CI, so rerun that command after adding a file.
 
 | Folder | Contents |
 | --- | --- |
-| `Util/` | General-purpose utilities: the `Texify` class and the `#texify` command for rendering terms as LaTeX. |
+| `Util/` | Contains a `Texify` class and the `#texify` command for rendering terms as LaTeX. |
 | `ComputableCochainComplex/` | Computable categorical constructions: explicit biproducts and zero objects, the computable additive completion `CMat_`, and bounded cochain complexes. |
-| `AInfinity/` | Grading types, the Stasheff identities, A∞-categories, A∞-functors and their composition, and examples. |
-| `KLRW/` | The KLRW category of one black strand and `n` red strands, the braiding functor data, and examples. |
+| `AInfinity/` | Grading indices, the Stasheff identities, A∞-categories, A∞-functors and their composition, and examples. |
+| `KLRW/` | KLRW algebras and categories: the general quiver-parametrised KLRW algebra and its $$R$$-linear category, and a computable special case with one black strand and $$n$$ red strands. | |
 
 The blueprint sources live in `blueprint/src/` and the API documentation is built from
 `docbuild/`.
