@@ -15,8 +15,8 @@ namespace AInfinityTheory
 universe u v w x y z t
 
 variable (β_A : Type v) [AddCommGroup β_A]
-variable (β_B : Type w) [AddCommGroup β_B] [GradingIndex β_B]
-variable (β_C : Type x) [AddCommGroup β_C] [GradingIndex β_C]
+variable (β_B : Type w) [AddCommGroup β_B] [GradingType β_B]
+variable (β_C : Type x) [AddCommGroup β_C] [GradingType β_C]
 
 namespace AInfinityFunctorData
 
@@ -280,9 +280,9 @@ end AInfinityFunctorData
 /-- Composition of raw `A∞` functor data, written in mathlib order so
 `G.comp F` is the composite `G ∘ F`. -/
 protected abbrev AInfinityFunctorData.comp
-    {β_A : Type v} [AddCommGroup β_A] [GradingIndex β_A]
-    {β_B : Type w} [AddCommGroup β_B] [GradingIndex β_B]
-    {β_C : Type x} [AddCommGroup β_C] [GradingIndex β_C]
+    {β_A : Type v} [AddCommGroup β_A] [GradingType β_A]
+    {β_B : Type w} [AddCommGroup β_B] [GradingType β_B]
+    {β_C : Type x} [AddCommGroup β_C] [GradingType β_C]
     {R : Type u} [CommRing R]
     {ObjA : Type y} {ObjB : Type z} {ObjC : Type t}
     [RLinearGradedQuiver β_A R ObjA]
@@ -310,10 +310,10 @@ namespace AInfinityFunctorData
 
 section BasicProperties
 
-variable {β_A : Type v} [AddCommGroup β_A] [GradingIndex β_A]
-variable {β_B : Type w} [AddCommGroup β_B] [GradingIndex β_B]
-variable {β_C : Type x} [AddCommGroup β_C] [GradingIndex β_C]
-variable {β_D : Type*} [AddCommGroup β_D] [GradingIndex β_D]
+variable {β_A : Type v} [AddCommGroup β_A] [GradingType β_A]
+variable {β_B : Type w} [AddCommGroup β_B] [GradingType β_B]
+variable {β_C : Type x} [AddCommGroup β_C] [GradingType β_C]
+variable {β_D : Type*} [AddCommGroup β_D] [GradingType β_D]
 variable {R : Type u} [CommRing R]
 variable {ObjA : Type y} {ObjB : Type z} {ObjC : Type t} {ObjD : Type*}
 variable [RLinearGradedQuiver β_A R ObjA]
@@ -522,7 +522,7 @@ private lemma phi_heq_of_arity_eq
   cases inst₂
   aesop
 
-omit [GradingIndex β_A] in
+omit [GradingType β_A] in
 /-- Transport `functorTargetDeg` across equal arities and heterogeneously equal
 degree strings. -/
 private lemma functorTargetDeg_heq_of_arity_eq
@@ -662,7 +662,7 @@ private lemma comp_assoc_inner_outer_obj_heq
   rw [hpval]
   exact (comp_assoc_sizeUpTo_boundary_eq a b j q).symm
 
-omit [GradingIndex β_A] in
+omit [GradingType β_A] in
 /-- The degree string for the `j`-th gathered block agrees with the block of
 the degree string produced by the first composition `a`. -/
 private lemma comp_assoc_inner_outer_deg_heq
@@ -1319,9 +1319,9 @@ namespace AInfinityFunctor
 
 section BasicProperties
 
-variable {β_A : Type v} [AddCommGroup β_A] [GradingIndex β_A]
-variable {β_B : Type w} [AddCommGroup β_B] [GradingIndex β_B]
-variable {β_C : Type x} [AddCommGroup β_C] [GradingIndex β_C]
+variable {β_A : Type v} [AddCommGroup β_A] [GradingType β_A]
+variable {β_B : Type w} [AddCommGroup β_B] [GradingType β_B]
+variable {β_C : Type x} [AddCommGroup β_C] [GradingType β_C]
 variable {R : Type u} [CommRing R]
 variable {ObjA : Type y} {ObjB : Type z} {ObjC : Type t}
 variable [AInfinityCategory β_A R ObjA]
@@ -1831,9 +1831,9 @@ end AInfinityFunctor
 /-- Composition of `A∞` functors, written in mathlib order so
 `G.comp F` is the composite `G ∘ F`. -/
 protected abbrev AInfinityFunctor.comp
-    {β_A : Type v} [AddCommGroup β_A] [GradingIndex β_A]
-    {β_B : Type w} [AddCommGroup β_B] [GradingIndex β_B]
-    {β_C : Type x} [AddCommGroup β_C] [GradingIndex β_C]
+    {β_A : Type v} [AddCommGroup β_A] [GradingType β_A]
+    {β_B : Type w} [AddCommGroup β_B] [GradingType β_B]
+    {β_C : Type x} [AddCommGroup β_C] [GradingType β_C]
     {R : Type u} [CommRing R]
     {ObjA : Type y} {ObjB : Type z} {ObjC : Type t}
     [AInfinityCategory β_A R ObjA]

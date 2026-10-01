@@ -14,7 +14,7 @@ namespace FunctorExamples
 
 universe u v w
 
-variable (β : Type v) [AddCommGroup β] [GradingIndex β]
+variable (β : Type v) [AddCommGroup β] [GradingType β]
 variable (R : Type u) [CommRing R]
 variable (Obj : Type w)
 
@@ -626,7 +626,8 @@ theorem identitySatisfiesFunctorEquations :
       · have hsign : stasheffSign deg 0 n (by simp) = 1 := by
           haveI : IsEmpty (Fin (n - 0 - n)) := by
             simpa using (inferInstance : IsEmpty (Fin 0))
-          simp [stasheffSign, stasheffSignExponent]
+          change Additive.toMul (sign (stasheffSignExponent deg 0 n _)) = 1
+          simp [stasheffSignExponent]
         rw [hsign, one_smul]
         exact identity_functorLHSTerm_eq_main
           β (R := R) (Obj := Obj) obj deg x
@@ -708,8 +709,8 @@ end Functor
 
 section Composition
 
-variable {β_A : Type*} [AddCommGroup β_A] [GradingIndex β_A]
-variable {β_B : Type*} [AddCommGroup β_B] [GradingIndex β_B]
+variable {β_A : Type*} [AddCommGroup β_A] [GradingType β_A]
+variable {β_B : Type*} [AddCommGroup β_B] [GradingType β_B]
 variable {ObjA : Type*} {ObjB : Type*}
 variable [AInfinityCategory β_A R ObjA]
 variable [AInfinityCategory β_B R ObjB]

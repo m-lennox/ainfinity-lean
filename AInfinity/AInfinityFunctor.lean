@@ -14,7 +14,7 @@ namespace AInfinityTheory
 
 universe u v w x y
 variable (β_A : Type v) [AddCommGroup β_A]
-variable (β_B : Type w) [AddCommGroup β_B] [GradingIndex β_B]
+variable (β_B : Type w) [AddCommGroup β_B] [GradingType β_B]
 
 /-- Target degree of `φ_n` applied to inputs of the given degrees.
     `φ_n` has degree `1 − n`, so the output lives in
@@ -38,7 +38,7 @@ abbrev functorTargetType
   (BHom (objMap (obj 0)) (objMap (obj (Fin.last n))))
     (functorTargetDeg β_A β_B deg_trans deg)
 
-variable [GradingIndex β_A] in
+variable [GradingType β_A] in
 /-- Raw data for an A∞ functor between graded `R`-linear quivers. -/
 structure AInfinityFunctorData
     (R : Type u) [CommRing R]
@@ -52,7 +52,7 @@ structure AInfinityFunctorData
   /-- `deg_trans` is compatible with the integer degree shifts. -/
   deg_trans_ofInt : ∀ n : ℤ, deg_trans (shift n) = shift n
   /-- `deg_trans` preserves the Koszul sign determined by a degree. -/
-  deg_trans_sign : ∀ b : β_A, negOnePow (deg_trans b) = negOnePow b
+  deg_trans_sign : ∀ b : β_A, sign (deg_trans b) = sign b
 
   phi :
     {n : ℕ} → [NeZero n] →
@@ -225,7 +225,7 @@ Structurally this is the same as the Stasheff term, except the *outer* operation
 section LHS
 
 /- The left-hand side inserts `m^A` and so uses the integer shifts of the source grading. -/
-variable [GradingIndex β_A]
+variable [GradingType β_A]
 
 /-- The outer `φ` in a left-hand-side term of the functor equation lands in the target degree
 of the functor equation. -/
@@ -689,7 +689,7 @@ def functorRHSSum
 end RHS
 
 
-variable [GradingIndex β_A] in
+variable [GradingType β_A] in
 /-- The A∞ functor equations as a property of raw functor data between raw A∞ category
     structures. -/
 def SatisfiesFunctorEquations
@@ -714,7 +714,7 @@ def SatisfiesFunctorEquations
 
 end AInfinityFunctorData
 
-variable [GradingIndex β_A] in
+variable [GradingType β_A] in
 /-- An A∞ functor between A∞ categories is raw functor data satisfying the functor
     equations. -/
 structure AInfinityFunctor

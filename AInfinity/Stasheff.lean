@@ -12,7 +12,7 @@ noncomputable section
 namespace AInfinityTheory
 
 universe u v w
-variable {β : Type v} [AddCommGroup β] [GradingIndex β]
+variable {β : Type v} [AddCommGroup β] [GradingType β]
 variable {n : ℕ}
 
 /-- Target degree of the `n`-ary operation `m`. -/
@@ -102,7 +102,7 @@ def stasheffObjOut
 
 /-- The degree shifts of the inner `s`-ary and outer `(n + 1 - s)`-ary operations of a
 Stasheff term add up to the degree shift `3 - n` of the arity-`n` Stasheff relation. -/
-lemma GradingIndex.shift_inner_add_shift_outer {n s : ℕ} (hs : s ≤ n + 1) :
+lemma GradingType.shift_inner_add_shift_outer {n s : ℕ} (hs : s ≤ n + 1) :
     (shift (2 - (s : ℤ)) : β) + shift (2 - ((n + 1 - s : ℕ) : ℤ)) =
       shift (3 - (n : ℤ)) := by
   rw [← map_add]
@@ -232,7 +232,7 @@ lemma stasheffDegOut_sum
       shift (2 - ((n + 1 - s : ℕ) : ℤ)) =
     stasheffTargetDeg deg := by
   rw [stasheffDegOut_sum_core deg r s hr, add_assoc,
-    GradingIndex.shift_inner_add_shift_outer (by omega : s ≤ n + 1)]
+    GradingType.shift_inner_add_shift_outer (by omega : s ≤ n + 1)]
 
 /-- Transporting zero across an equality of `ModuleCat` objects still gives zero. -/
 lemma cast_zero_of_module_eq
@@ -309,7 +309,7 @@ def indexedStasheffXIn
     ∀ i : Fin s, ComposableHomType Hom (stasheffObjIn obj r s hr) (stasheffDegIn deg r s hr) i :=
   fun i => x ⟨r + i.val, by omega⟩
 
-omit [AddCommGroup β] [GradingIndex β] in
+omit [AddCommGroup β] [GradingType β] in
 /-- Evaluating the inner input tuple just picks out the corresponding original input. -/
 lemma indexedStasheffXIn_apply
     {R : Type u}
@@ -843,7 +843,7 @@ def stasheffSign
     (deg : Fin n → β)
     (r s : ℕ)
     (hr : r + s ≤ n) : ℤˣ :=
-  negOnePow (stasheffSignExponent deg r s hr)
+  sign (stasheffSignExponent deg r s hr)
 
 /-- The full Stasheff sum in arity `n`, with Koszul signs. -/
 def indexedStasheffSum
@@ -872,7 +872,7 @@ def indexedStasheffSum
 def indexedSatisfiesStasheff
     (β : Type v)
     [AddCommGroup β]
-    [GradingIndex β]
+    [GradingType β]
     (R : Type u)
     [CommRing R]
     {Obj : Type w}

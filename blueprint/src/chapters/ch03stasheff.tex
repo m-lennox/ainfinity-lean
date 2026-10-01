@@ -6,8 +6,8 @@
 \lean{AInfinityTheory.operationTargetDeg}
 \label{AInfinityTheory.operationTargetDeg}
 \leanok
-\uses{AInfinityTheory.GradingIndex}
-Given input degrees $(d_0,\dots,d_{n-1})$ in a grading index $\beta$, the
+\uses{AInfinityTheory.GradingType}
+Given input degrees $(d_0,\dots,d_{n-1})$ in a grading type $\beta$, the
 output degree of the $n$-ary operation is
 \[
   \sum_i d_i + \operatorname{shift}(2-n),
@@ -20,12 +20,12 @@ homomorphism $\mathbb{Z} \to \beta$.
 \lean{AInfinityTheory.stasheffTargetDeg}
 \label{AInfinityTheory.stasheffTargetDeg}
 \leanok
-\uses{AInfinityTheory.GradingIndex}
+\uses{AInfinityTheory.GradingType}
 The common degree of the arity-$n$ Stasheff relation is
 \[
   \sum_i d_i + \operatorname{shift}(3-n)
 \]
-in the grading index.
+in the grading type.
 \end{definition}
 
 \begin{definition}[Composable morphism type]
@@ -62,12 +62,12 @@ operation to the collapsed string.
 \lean{AInfinityTheory.stasheffSignExponent}
 \label{AInfinityTheory.stasheffSignExponent}
 \leanok
-\uses{AInfinityTheory.GradingIndex}
+\uses{AInfinityTheory.GradingType}
 For a valid pair $(r,s)$, this is the degree
 \[
   |a_{r+s}| + \cdots + |a_{n-1}| - \operatorname{shift}(n-r-s)
 \]
-in the grading index, the integer $n-r-s$ being embedded by the shift
+in the grading type, the integer $n-r-s$ being embedded by the shift
 homomorphism.
 \end{definition}
 
@@ -75,9 +75,9 @@ homomorphism.
 \lean{AInfinityTheory.stasheffSign}
 \label{AInfinityTheory.stasheffSign}
 \leanok
-\uses{AInfinityTheory.stasheffSignExponent, AInfinityTheory.GradingIndex}
+\uses{AInfinityTheory.stasheffSignExponent, AInfinityTheory.GradingType}
 The sign $\pm 1$ attached to $(r,s)$ is the Koszul sign $(-1)^e$ of the
-Stasheff sign exponent $e$, that is, the sign character of the grading index
+Stasheff sign exponent $e$, that is, the sign character of the grading type
 applied to $e$.
 \end{definition}
 

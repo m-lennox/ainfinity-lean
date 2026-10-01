@@ -53,11 +53,11 @@ public def gradedHom (R : Type u) [CommRing R]
     {Obj : Type w} [RLinearGradedQuiver β R Obj] (X Y : Obj) : GradedRModule β R :=
   RLinearGradedQuiver.gradedHom' X Y
 
-/-- A grading index is an abelian group of degrees `β` together with a homomorphism
+/-- A grading type is an abelian group of degrees `β` together with a homomorphism
 `shift : ℤ →+ β` realising integer degree shifts (the `n`-ary operation `mₙ` has degree
 `shift (2 - n)`) and a Koszul sign character `sign : β →+ Additive ℤˣ`, such that the
 differential, of degree `shift 1`, is odd. -/
-public class GradingIndex (β : Type*) [AddCommGroup β] where
+public class GradingType (β : Type*) [AddCommGroup β] where
   /-- The integer degree shifts: `mₙ` has degree `shift (2 - n)`. -/
   shift : ℤ →+ β
   /-- The Koszul sign character, written additively. -/
@@ -65,39 +65,13 @@ public class GradingIndex (β : Type*) [AddCommGroup β] where
   /-- The differential has odd degree. -/
   sign_shift_one : sign (shift 1) = Additive.ofMul (-1)
 
-export GradingIndex (shift)
+export GradingType (shift sign)
 
 variable {β}
 
-section GradingIndex
+section GradingType
 
-variable [AddCommGroup β] [GradingIndex β]
-
-/-- The Koszul sign `(-1) ^ d ∈ ℤˣ` attached to a degree `d : β`. -/
-@[expose]
-public def negOnePow (d : β) : ℤˣ :=
-  Additive.toMul (GradingIndex.sign d)
-
-@[simp]
-public lemma negOnePow_zero : negOnePow (0 : β) = 1 := by
-  simp only [negOnePow, map_zero, toMul_zero]
-
-@[simp]
-public lemma negOnePow_add (a b : β) : negOnePow (a + b) = negOnePow a * negOnePow b := by
-  simp only [negOnePow, map_add, toMul_add]
-
-@[simp]
-public lemma negOnePow_neg (a : β) : negOnePow (-a) = negOnePow a := by
-  simp only [negOnePow, map_neg, toMul_neg, Int.units_inv_eq_self]
-
-@[simp]
-public lemma negOnePow_sub (a b : β) : negOnePow (a - b) = negOnePow a * negOnePow b := by
-  rw [sub_eq_add_neg, negOnePow_add, negOnePow_neg]
-
-@[simp]
-public lemma negOnePow_sum {ι : Type*} (s : Finset ι) (f : ι → β) :
-    negOnePow (∑ i ∈ s, f i) = ∏ i ∈ s, negOnePow (f i) := by
-  simp only [negOnePow, map_sum, toMul_sum]
+variable [AddCommGroup β] [GradingType β]
 
 /-- An integer degree shift is written `n • shift 1`. -/
 public lemma shift_eq_zsmul_shift_one (n : ℤ) : (shift n : β) = n • shift (1 : ℤ) := by
@@ -105,18 +79,18 @@ public lemma shift_eq_zsmul_shift_one (n : ℤ) : (shift n : β) = n • shift (
 
 /-- The sign of an integer degree shift is Mathlib's `Int.negOnePow`. -/
 @[simp]
-public lemma negOnePow_shift (n : ℤ) : negOnePow (shift n : β) = Int.negOnePow n := by
-  rw [negOnePow, shift_eq_zsmul_shift_one, map_zsmul, GradingIndex.sign_shift_one,
-    ← ofMul_zpow, toMul_ofMul, Int.negOnePow_def]
+public lemma sign_shift (n : ℤ) : sign (shift n : β) = Int.negOnePow n := by
+  rw [shift_eq_zsmul_shift_one, map_zsmul, GradingType.sign_shift_one,
+    ← ofMul_zpow, Int.negOnePow_def]
   rfl
 
 /-- The differential is odd. -/
-public lemma negOnePow_shift_one : negOnePow (shift (1 : ℤ) : β) = -1 := by
-  rw [negOnePow_shift, Int.negOnePow_one]
+public lemma sign_shift_one : sign (shift (1 : ℤ) : β) = (-1 : ℤˣ) := by
+  rw [sign_shift, Int.negOnePow_one]
 
-end GradingIndex
+end GradingType
 
-namespace GradingIndex
+namespace GradingType
 
 /-! ### Instances
 
@@ -126,7 +100,7 @@ activated locally, since both are reasonable choices on the same product type. -
 
 /-- The integers, graded by themselves: the shift is the identity and the sign of `n` is
 `(-1) ^ n`. -/
-public instance int : GradingIndex ℤ where
+public instance int : GradingType ℤ where
   shift := AddMonoidHom.id ℤ
   sign := zmultiplesHom (Additive ℤˣ) (Additive.ofMul (-1))
   sign_shift_one := by
@@ -137,7 +111,7 @@ public lemma shift_int (n : ℤ) : shift n = n := rfl
 
 /-- The parity grading `ZMod 2`: the shift is reduction modulo `2` and the sign of a parity
 `p` is `(-1) ^ p`, using Mathlib's power operation on `ℤˣ` by `ZMod 2`. -/
-public instance zmodTwo : GradingIndex (ZMod 2) where
+public instance zmodTwo : GradingType (ZMod 2) where
   shift := Int.castAddHom (ZMod 2)
   sign := (smulAddHom (ZMod 2) (Additive ℤˣ)).flip (Additive.ofMul (-1))
   sign_shift_one := by
@@ -153,7 +127,7 @@ variable (β : Type*) [AddCommGroup β] (γ : Type*) [AddCommGroup γ]
 
 /-- The product grading on `β × γ` whose shifts land in the first factor and whose sign is
 read off the first factor alone. -/
-public abbrev prodFst [GradingIndex β] : GradingIndex (β × γ) where
+public abbrev prodFst [GradingType β] : GradingType (β × γ) where
   shift := (AddMonoidHom.inl β γ).comp shift
   sign := sign.comp (AddMonoidHom.fst β γ)
   sign_shift_one := by
@@ -161,12 +135,12 @@ public abbrev prodFst [GradingIndex β] : GradingIndex (β × γ) where
       AddMonoidHom.inl_apply, sign_shift_one]
 
 @[simp]
-public lemma prodFst_shift [GradingIndex β] (n : ℤ) :
+public lemma prodFst_shift [GradingType β] (n : ℤ) :
     (prodFst β γ).shift n = (shift n, 0) := rfl
 
 /-- The product grading on `β × γ` whose shifts land in the first factor and whose sign is
 the product of the signs of both factors (the *total* sign). -/
-public abbrev prodTotal [GradingIndex β] [GradingIndex γ] : GradingIndex (β × γ) where
+public abbrev prodTotal [GradingType β] [GradingType γ] : GradingType (β × γ) where
   shift := (AddMonoidHom.inl β γ).comp shift
   sign := AddMonoidHom.coprod sign sign
   sign_shift_one := by
@@ -174,36 +148,37 @@ public abbrev prodTotal [GradingIndex β] [GradingIndex γ] : GradingIndex (β �
       AddMonoidHom.coprod_apply, sign_shift_one, map_zero, add_zero]
 
 @[simp]
-public lemma prodTotal_shift [GradingIndex β] [GradingIndex γ] (n : ℤ) :
+public lemma prodTotal_shift [GradingType β] [GradingType γ] (n : ℤ) :
     (prodTotal β γ).shift n = (shift n, 0) := rfl
 
 end Prod
 
-end GradingIndex
+end GradingType
 
 /-! ### Koszul signs in the standard gradings -/
 
 @[simp]
-public lemma negOnePow_int (n : ℤ) : negOnePow n = Int.negOnePow n := rfl
+public lemma sign_int (n : ℤ) : sign n = Int.negOnePow n := rfl
 
-/-- In the parity grading, `negOnePow` is Mathlib's power operation on `ℤˣ` by `ZMod 2`. -/
-public lemma negOnePow_zmod_two (p : ZMod 2) : negOnePow p = (-1 : ℤˣ) ^ p := rfl
+/-- In the parity grading, `sign` is Mathlib's power operation on `ℤˣ` by `ZMod 2`. -/
+public lemma sign_zmod_two (p : ZMod 2) : sign p = (-1 : ℤˣ) ^ p := rfl
 
 @[simp]
-public lemma negOnePow_intCast_zmod_two (n : ℤ) : negOnePow (n : ZMod 2) = Int.negOnePow n :=
-  negOnePow_shift n
+public lemma sign_intCast_zmod_two (n : ℤ) :
+    sign (n : ZMod 2) = Int.negOnePow n :=
+  sign_shift n
 
 section Prod
 
 variable (β : Type*) [AddCommGroup β] (γ : Type*) [AddCommGroup γ]
 
 @[simp]
-public lemma negOnePow_prodFst [GradingIndex β] (d : β × γ) :
-    @negOnePow (β × γ) _ (GradingIndex.prodFst β γ) d = negOnePow d.1 := rfl
+public lemma sign_prodFst [GradingType β] (d : β × γ) :
+    @sign (β × γ) _ (GradingType.prodFst β γ) d = sign d.1 := rfl
 
 @[simp]
-public lemma negOnePow_prodTotal [GradingIndex β] [GradingIndex γ] (d : β × γ) :
-    @negOnePow (β × γ) _ (GradingIndex.prodTotal β γ) d = negOnePow d.1 * negOnePow d.2 := rfl
+public lemma sign_prodTotal [GradingType β] [GradingType γ] (d : β × γ) :
+    @sign (β × γ) _ (GradingType.prodTotal β γ) d = sign d.1 + sign d.2 := rfl
 
 end Prod
 

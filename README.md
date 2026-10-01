@@ -15,7 +15,7 @@ and checked in CI, so rerun that command after adding a file.
 | --- | --- |
 | `Util/` | General-purpose utilities: the `Texify` class and the `#texify` command for rendering terms as LaTeX. |
 | `ComputableCochainComplex/` | Computable categorical constructions: explicit biproducts and zero objects, the computable additive completion `CMat_`, and bounded cochain complexes. |
-| `AInfinity/` | Grading indices, the Stasheff identities, A∞-categories, A∞-functors and their composition, and examples. |
+| `AInfinity/` | Grading types, the Stasheff identities, A∞-categories, A∞-functors and their composition, and examples. |
 | `KLRW/` | The KLRW category of one black strand and `n` red strands, the braiding functor data, and examples. |
 
 The blueprint sources live in `blueprint/src/` and the API documentation is built from

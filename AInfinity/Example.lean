@@ -10,23 +10,24 @@ open CategoryTheory Finset AInfinityTheory
 noncomputable section
 
 namespace AInfinityTheory
+
 namespace Examples
 
 universe u
 
 /-! ### Gradings
 
-The `A∞` definitions only ask for a `GradingIndex`, so they can be instantiated at the
+The `A∞` definitions only ask for a `GradingType`, so they can be instantiated at the
 cohomological grading `ℤ`, at the parity grading `ZMod 2`, or at bigradings such as
 `ℤ × ZMod 2`. -/
 
 section Gradings
 
 /-- The integers carry their standard grading. -/
-example : GradingIndex ℤ := inferInstance
+example : GradingType ℤ := inferInstance
 
 /-- The parities carry their standard grading. -/
-example : GradingIndex (ZMod 2) := inferInstance
+example : GradingType (ZMod 2) := inferInstance
 
 /-- In the parity grading the differential is odd. -/
 example (p : ZMod 2) : operationTargetDeg (fun _ : Fin 1 => p) = p + 1 := by
@@ -37,11 +38,11 @@ example (p q : ZMod 2) : operationTargetDeg ![p, q] = p + q := by
   simp [operationTargetDeg, Fin.sum_univ_two]
 
 /-- The Koszul sign of an odd parity is `-1`. -/
-example : negOnePow (1 : ZMod 2) = -1 := by
-  rw [negOnePow_zmod_two, uzpow_one]
+example : sign (1 : ZMod 2) = (-1 : ℤˣ) := by
+  rw [sign_zmod_two, uzpow_one]
 
 /- Bigrading by a cohomological degree and a parity, with the total sign. -/
-attribute [local instance] GradingIndex.prodTotal
+attribute [local instance] GradingType.prodTotal
 
 /-- Integer shifts only affect the cohomological degree, so `mₙ` has degree `(2 - n, 0)`
 rather than `(2 - n, 2 - n)`. -/
@@ -54,13 +55,13 @@ example (d : ℤ) (p : ZMod 2) :
 
 /-- The total sign is the product of the two Koszul signs. -/
 example (d : ℤ) (p : ZMod 2) :
-    negOnePow ((d, p) : ℤ × ZMod 2) = Int.negOnePow d * (-1 : ℤˣ) ^ p := rfl
+    sign ((d, p) : ℤ × ZMod 2) = Int.negOnePow d * (-1 : ℤˣ) ^ p := rfl
 
 /-- A morphism of even cohomological degree and odd parity is odd. -/
-example : negOnePow ((0, 1) : ℤ × ZMod 2) = -1 := by decide
+example : sign ((0, 1) : ℤ × ZMod 2) = (-1 : ℤˣ) := by decide
 
 /-- A morphism of odd cohomological degree and odd parity is even. -/
-example : negOnePow ((1, 1) : ℤ × ZMod 2) = 1 := by decide
+example : sign ((1, 1) : ℤ × ZMod 2) = (1 : ℤˣ) := by decide
 
 end Gradings
 

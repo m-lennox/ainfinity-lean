@@ -12,7 +12,7 @@ noncomputable section
 namespace AInfinityTheory
 
 universe u v w
-variable (β : Type v) [AddCommGroup β] [GradingIndex β]
+variable (β : Type v) [AddCommGroup β] [GradingType β]
 
 class AInfinityCategoryStruct
     (R : Type u) [CommRing R] (Obj : Type w)
