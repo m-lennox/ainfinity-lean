@@ -78,9 +78,8 @@ sources:
     relationship: "formalizes"
     note: >-
       Source for the KLRW algebra and KLRW category formalized in
-      `KLRW/KLRWAlgebra.lean` and `KLRW/KLRWCategory.lean`. It is not the source of
-      the braiding functor. The endorsement is from Elise LePage; Vivek Shende has
-      not been contacted about the formalization.
+      `KLRW/KLRWAlgebra.lean` and `KLRW/KLRWCategory.lean`. The endorsement is from Elise
+      LePage.
     author_endorsement: "endorsed"
 
 related_formalizations:
@@ -109,8 +108,7 @@ status:
     algebra with its R-linear KLRW category. In progress: two sign/reindexing
     lemmas behind "the composite of A∞-functors is an A∞-functor"; the computable
     additive completion and bounded cochain complexes; and the braiding functor,
-    whose definitions are still partially stubbed with `sorry`. A∞-algebras
-    (blueprint chapter 5) are not yet formalized.
+    whose definitions are still partially stubbed with `sorry`.
   # Counts come from a source scan for `sorry`. They were not checked with
   # `#print axioms`.
   sorry_count: 25
