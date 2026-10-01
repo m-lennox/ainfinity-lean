@@ -22,3 +22,13 @@ and checked in CI, so rerun that command after adding a file.
 
 The blueprint sources live in `blueprint/src/` and the API documentation is built from
 `docbuild/`.
+
+### Project metadata and license
+
+[`formalization.yaml`](formalization.yaml) records the project's sources, scope, status,
+fidelity to the literature, and how it was produced, following the
+[formalization.yaml](https://github.com/mathlib-initiative/formalization.yaml) standard.
+Please keep it up to date (e.g. the `sorry` counts and scope) when making significant
+changes; CI validates it against the schema.
+
+The code is released under the Apache 2.0 license; see [`LICENSE`](LICENSE).
