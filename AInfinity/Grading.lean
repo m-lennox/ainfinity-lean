@@ -73,20 +73,13 @@ section GradingType
 
 variable [AddCommGroup β] [GradingType β]
 
-/-- An integer degree shift is written `n • shift 1`. -/
-public lemma shift_eq_zsmul_shift_one (n : ℤ) : (shift n : β) = n • shift (1 : ℤ) := by
-  rw [← map_zsmul, smul_eq_mul, mul_one]
-
 /-- The sign of an integer degree shift is Mathlib's `Int.negOnePow`. -/
 @[simp]
 public lemma sign_shift (n : ℤ) : sign (shift n : β) = Int.negOnePow n := by
-  rw [shift_eq_zsmul_shift_one, map_zsmul, GradingType.sign_shift_one,
-    ← ofMul_zpow, Int.negOnePow_def]
+  have shift_n : (shift n : β) = n • shift (1 : ℤ) := by
+    rw [← map_zsmul, smul_eq_mul, mul_one]
+  rw [shift_n, map_zsmul, GradingType.sign_shift_one, ← ofMul_zpow, Int.negOnePow_def]
   rfl
-
-/-- The differential is odd. -/
-public lemma sign_shift_one : sign (shift (1 : ℤ) : β) = (-1 : ℤˣ) := by
-  rw [sign_shift, Int.negOnePow_one]
 
 end GradingType
 
@@ -162,11 +155,6 @@ public lemma sign_int (n : ℤ) : sign n = Int.negOnePow n := rfl
 
 /-- In the parity grading, `sign` is Mathlib's power operation on `ℤˣ` by `ZMod 2`. -/
 public lemma sign_zmod_two (p : ZMod 2) : sign p = (-1 : ℤˣ) ^ p := rfl
-
-@[simp]
-public lemma sign_intCast_zmod_two (n : ℤ) :
-    sign (n : ZMod 2) = Int.negOnePow n :=
-  sign_shift n
 
 section Prod
 
