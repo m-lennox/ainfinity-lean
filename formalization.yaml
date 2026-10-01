@@ -79,8 +79,8 @@ sources:
     note: >-
       Source for the KLRW algebra and KLRW category formalized in
       `KLRW/KLRWAlgebra.lean` and `KLRW/KLRWCategory.lean`. It is not the source of
-      the braiding functor. The endorsement is from Elise LePage only; Vivek Shende
-      has not endorsed this formalization.
+      the braiding functor. The endorsement is from Elise LePage; Vivek Shende has
+      not been contacted about the formalization.
     author_endorsement: "endorsed"
 
 related_formalizations:
