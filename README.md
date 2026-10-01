@@ -27,7 +27,7 @@ The blueprint sources live in `blueprint/src/` and the API documentation is buil
 
 [`formalization.yaml`](formalization.yaml) records the project's sources, scope, status,
 fidelity to the literature, and how it was produced, following the
-[formalization.yaml](https://github.com/mathlib-initiative/formalization.yaml) standard.
+[community standards](https://github.com/mathlib-initiative/formalization.yaml).
 Please keep it up to date (e.g. the `sorry` counts and scope) when making significant
 changes; CI validates it against the schema.
 
