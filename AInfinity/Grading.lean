@@ -78,7 +78,7 @@ activated locally, since both are reasonable choices on the same product type. -
 
 /-- The integers, graded by themselves: the shift is the identity and the sign of `n` is
 `(-1) ^ n`. -/
-public instance int : GradingType ℤ where
+public instance : GradingType ℤ where
   shift := AddMonoidHom.id ℤ
   sign := zmultiplesHom (Additive ℤˣ) (Additive.ofMul (-1))
   sign_shift_one := by
@@ -89,7 +89,7 @@ public lemma shift_int (n : ℤ) : shift n = n := rfl
 
 /-- The parity grading `ZMod 2`: the shift is reduction modulo `2` and the sign of a parity
 `p` is `(-1) ^ p`, using Mathlib's power operation on `ℤˣ` by `ZMod 2`. -/
-public instance zmodTwo : GradingType (ZMod 2) where
+public instance : GradingType (ZMod 2) where
   shift := Int.castAddHom (ZMod 2)
   sign := (smulAddHom (ZMod 2) (Additive ℤˣ)).flip (Additive.ofMul (-1))
   sign_shift_one := by

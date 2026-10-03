@@ -60,7 +60,7 @@ variable [AddCommGroup β] [GradingType β]
 /-- The data of an `A∞`-category: a graded `R`-linear quiver together with, for each `n ≥ 1`,
 a higher composition `mₙ` of degree `2 - n`. No relations are imposed. -/
 class AInfinityCategoryStruct extends GradedLinearQuiver β R Obj where
-  /-- The higher compositions `mₙ`, one for each arity `n ≥ 1`. -/
+  /-- The higher compositions `mₙ`. -/
   m : AInfinityComposition R Hom
 
 /-- An `A∞`-category: an `A∞`-category structure whose higher compositions satisfy the
