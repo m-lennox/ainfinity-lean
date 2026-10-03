@@ -38,21 +38,6 @@ universe u v w
 
 variable (β : Type v)
 
-/-- A graded `R`-module indexed by `β`. -/
-public abbrev GradedRModule (R : Type u) [CommRing R] :=
-  CategoryTheory.GradedObject β (ModuleCat.{u} R)
-
-/-- An `R`-linear graded quiver. -/
-public class RLinearGradedQuiver (R : Type u) [CommRing R] (Obj : Type w) where
-  /-- The graded `R`-module of morphisms from `X` to `Y`. -/
-  protected gradedHom' : Obj → Obj → GradedRModule β R
-
-/-- The graded `R`-module of morphisms between two objects. -/
-@[expose]
-public def gradedHom (R : Type u) [CommRing R]
-    {Obj : Type w} [RLinearGradedQuiver β R Obj] (X Y : Obj) : GradedRModule β R :=
-  RLinearGradedQuiver.gradedHom' X Y
-
 /-- A grading type is an abelian group of degrees `β` together with a homomorphism
 `shift : ℤ →+ β` realising integer degree shifts (the `n`-ary operation `mₙ` has degree
 `shift (2 - n)`) and a Koszul sign character `sign : β →+ Additive ℤˣ`, such that the
