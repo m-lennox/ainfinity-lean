@@ -10,15 +10,60 @@ open CategoryTheory Finset AInfinityTheory
 noncomputable section
 
 namespace AInfinityTheory
+
 namespace Examples
 
 universe u
 
-local instance : GradingIndex ℤ where
-  toAddCommGroupWithOne := inferInstance
-  parity := Int.castAddHom (ZMod 2)
-  parity_one := by
-    simp
+/-! ### Gradings
+
+The `A∞` definitions only ask for a `GradingType`, so they can be instantiated at the
+cohomological grading `ℤ`, at the parity grading `ZMod 2`, or at bigradings such as
+`ℤ × ZMod 2`. -/
+
+section Gradings
+
+/-- The integers carry their standard grading. -/
+example : GradingType ℤ := inferInstance
+
+/-- The parities carry their standard grading. -/
+example : GradingType (ZMod 2) := inferInstance
+
+/-- In the parity grading the differential is odd. -/
+example (p : ZMod 2) : operationTargetDeg (fun _ : Fin 1 => p) = p + 1 := by
+  simp [operationTargetDeg]
+
+/-- In the parity grading `m₂` preserves parity. -/
+example (p q : ZMod 2) : operationTargetDeg ![p, q] = p + q := by
+  simp [operationTargetDeg, Fin.sum_univ_two]
+
+/-- The Koszul sign of an odd parity is `-1`. -/
+example : sign (1 : ZMod 2) = (-1 : ℤˣ) := by
+  rw [sign_zmod_two, uzpow_one]
+
+/- Bigrading by a cohomological degree and a parity, with the total sign. -/
+attribute [local instance] GradingType.prodTotal
+
+/-- Integer shifts only affect the cohomological degree, so `mₙ` has degree `(2 - n, 0)`
+rather than `(2 - n, 2 - n)`. -/
+example (n : ℤ) : (shift n : ℤ × ZMod 2) = (n, 0) := rfl
+
+/-- The differential raises the cohomological degree by one and preserves the parity. -/
+example (d : ℤ) (p : ZMod 2) :
+    operationTargetDeg (fun _ : Fin 1 => ((d, p) : ℤ × ZMod 2)) = (d + 1, p) := by
+  simp [operationTargetDeg]
+
+/-- The total sign is the product of the two Koszul signs. -/
+example (d : ℤ) (p : ZMod 2) :
+    sign ((d, p) : ℤ × ZMod 2) = Int.negOnePow d * (-1 : ℤˣ) ^ p := rfl
+
+/-- A morphism of even cohomological degree and odd parity is odd. -/
+example : sign ((0, 1) : ℤ × ZMod 2) = (-1 : ℤˣ) := by decide
+
+/-- A morphism of odd cohomological degree and odd parity is even. -/
+example : sign ((1, 1) : ℤ × ZMod 2) = (1 : ℤˣ) := by decide
+
+end Gradings
 
 variable (R : Type u) [CommRing R]
 variable (S : Type u) [CommRing S] [Algebra R S]
@@ -616,16 +661,16 @@ lemma concentratedAt0CategoryData_stasheffTerm_r1_s2_eq_zero_of_not_all_zero
 
 private lemma stasheffSign_zero_deg_0_2 :
     stasheffSign (fun _ : Fin 3 => (0 : ℤ)) 0 2 (by omega) = -1 := by
-  norm_num [stasheffSign, stasheffSignParity]
+  simp [stasheffSign, stasheffSignExponent]
 private lemma stasheffSign_zero_deg_1_2 :
     stasheffSign (fun _ : Fin 3 => (0 : ℤ)) 1 2 (by omega) = 1 := by
-  norm_num [stasheffSign, stasheffSignParity]
+  simp [stasheffSign, stasheffSignExponent]
 
 
 theorem concentratedAt0CategoryData_satisfiesStasheff
     (R : Type u) [CommRing R]
     (S : Type u) [CommRing S] [Algebra R S] :
-    @AInfinityCategoryStruct.SatisfiesStasheff ℤ _ R _ (OneObj S)
+    @AInfinityCategoryStruct.SatisfiesStasheff ℤ _ _ R _ (OneObj S)
       (concentratedAt0CategoryData (R := R) (S := S)) := by
   intro n _ obj deg x
   by_cases hn : n = 3

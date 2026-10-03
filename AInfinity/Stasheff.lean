@@ -12,18 +12,18 @@ noncomputable section
 namespace AInfinityTheory
 
 universe u v w
-variable {β : Type v} [GradingIndex β]
+variable {β : Type v} [AddCommGroup β] [GradingType β]
 variable {n : ℕ}
 
 /-- Target degree of the `n`-ary operation `m`. -/
 abbrev operationTargetDeg
     (deg : Fin n → β) : β :=
-  (∑ i, deg i) + (2 - (n : ℤ))
+  (∑ i, deg i) + shift (2 - (n : ℤ))
 
 /-- Target degree of the arity-`n` Stasheff relation. -/
 abbrev stasheffTargetDeg
     (deg : Fin n → β) : β :=
-  (∑ i, deg i) + (3 - (n : ℤ))
+  (∑ i, deg i) + shift (3 - (n : ℤ))
 
 /-- Valid index pairs for an arity-`n` Stasheff summand. -/
 abbrev ValidStasheffIndices (n r s : ℕ) : Prop :=
@@ -100,23 +100,14 @@ def stasheffObjOut
     else
       obj ⟨i.val + s - 1, by omega⟩
 
-/-- Combine the two operation-degree shifts in a nested Stasheff term. -/
-private lemma shift_ofInt_combine {n s : ℕ} (hsn : s ≤ n) :
-    ((2 - (s : ℤ)) : β) + (2 - ((n + 1 - s : ℕ) : ℤ)) =
-    (3 - (n : ℤ)) := by
-  have : 3 - (n : ℤ) = 2 - (s : ℤ) + 2 - ((n + 1 - s : ℕ) : ℤ) := by
-    have hle : s ≤ n + 1 := Nat.le_succ_of_le hsn
-    rw [Nat.cast_sub hle]
-    push_cast
-    omega
-  norm_cast
-  suffices
-    Int.subNatNat 2 s + Int.subNatNat 2 (n + 1 - s) = Int.subNatNat 3 n
-  by
-    rw [this]
-  simp only [Int.subNatNat_eq_coe, Nat.cast_ofNat, this]
-  symm
-  rw [Int.add_sub_assoc]
+/-- The degree shifts of the inner `s`-ary and outer `(n + 1 - s)`-ary operations of a
+Stasheff term add up to the degree shift `3 - n` of the arity-`n` Stasheff relation. -/
+lemma GradingType.shift_inner_add_shift_outer {n s : ℕ} (hs : s ≤ n + 1) :
+    (shift (2 - (s : ℤ)) : β) + shift (2 - ((n + 1 - s : ℕ) : ℤ)) =
+      shift (3 - (n : ℤ)) := by
+  rw [← map_add]
+  congr 1
+  omega
 
 /-- The finite ranges used in the Stasheff sum produce valid index pairs. -/
 lemma validStasheffIndices_of_mem_ranges
@@ -135,7 +126,7 @@ lemma stasheffDegOut_sum_core
     (r s : ℕ)
     (hr : r + s ≤ n) :
     (∑ i : Fin (n + 1 - s), stasheffDegOut deg r s hr i) =
-    (∑ i : Fin n, deg i) + (2 - (s : ℤ)) := by
+    (∑ i : Fin n, deg i) + shift (2 - (s : ℤ)) := by
   unfold stasheffDegOut
   rw [
     show (Finset.univ : Finset (Fin (n + 1 - s))) =
@@ -173,10 +164,7 @@ lemma stasheffDegOut_sum_core
         · rw [Finset.sum_image, Finset.sum_image, Finset.sum_image] <;> norm_num
           · unfold stasheffInnerDeg
             unfold stasheffDegIn
-            unfold operationTargetDeg
-            ring_nf
-            norm_cast
-            simp only [← Int.coe_castAddHom, Int.subNatNat_eq_coe, Nat.cast_ofNat]
+            simp only [operationTargetDeg, map_sub]
             grind
           · exact fun i j h => by simpa [Fin.ext_iff] using h
           · exact fun i j h => by simpa [Fin.ext_iff] using h
@@ -241,10 +229,10 @@ lemma stasheffDegOut_sum
     (r s : ℕ)
     (hr : r + s ≤ n) :
     (∑ i : Fin (n + 1 - s), stasheffDegOut deg r s hr i) +
-      (2 - ((n + 1 - s : ℕ) : ℤ)) =
+      shift (2 - ((n + 1 - s : ℕ) : ℤ)) =
     stasheffTargetDeg deg := by
   rw [stasheffDegOut_sum_core deg r s hr, add_assoc,
-      shift_ofInt_combine (by omega : s ≤ n)]
+    GradingType.shift_inner_add_shift_outer (by omega : s ≤ n + 1)]
 
 /-- Transporting zero across an equality of `ModuleCat` objects still gives zero. -/
 lemma cast_zero_of_module_eq
@@ -321,6 +309,7 @@ def indexedStasheffXIn
     ∀ i : Fin s, ComposableHomType Hom (stasheffObjIn obj r s hr) (stasheffDegIn deg r s hr) i :=
   fun i => x ⟨r + i.val, by omega⟩
 
+omit [AddCommGroup β] [GradingType β] in
 /-- Evaluating the inner input tuple just picks out the corresponding original input. -/
 lemma indexedStasheffXIn_apply
     {R : Type u}
@@ -839,22 +828,22 @@ lemma indexedStasheffTerm_eq_zero_of_inner_map_eq_zero
     (indexedStasheffTerm_eq_zero_iff_outer_eq_zero Hom m obj deg x r s hs hr).2
       (indexedStasheffOuter_eq_zero_of_inner_eq_zero Hom m obj deg x r s hs hr hinner)
 
-/-- The sign parity for the `(r,s)` Stasheff term:
-    `sign(deg(r+s)) + ⋯ + sign(deg(n-1)) - (n-r-s)` in `ZMod 2`. -/
-def stasheffSignParity
+/-- The exponent for the `(r,s)` Stasheff sign:
+    `deg(r+s) + ⋯ + deg(n-1) - (n-r-s)` in the grading group. -/
+def stasheffSignExponent
     (deg : Fin n → β)
     (r s : ℕ)
-    (hr : r + s ≤ n) : ZMod 2 :=
-  (∑ i : Fin (n - r - s), parity (deg ⟨r + s + i.val, by omega⟩)) -
-    ((n - r - s : ℕ) : ZMod 2)
+    (hr : r + s ≤ n) : β :=
+  (∑ i : Fin (n - r - s), deg ⟨r + s + i.val, by omega⟩) -
+    shift ((n - r - s : ℕ) : ℤ)
 
-/-- The sign `(-1)^(|a_{r+s+1}| + ⋯ + |a_n| - t)` as an integer,
+/-- The sign `(-1)^(|a_{r+s+1}| + ⋯ + |a_n| - t)` as an integer unit,
     for a valid Stasheff index pair. -/
 def stasheffSign
     (deg : Fin n → β)
     (r s : ℕ)
-    (hr : r + s ≤ n) : ℤ :=
-  (-1) ^ (stasheffSignParity deg r s hr).val
+    (hr : r + s ≤ n) : ℤˣ :=
+  sign (stasheffSignExponent deg r s hr)
 
 /-- The full Stasheff sum in arity `n`, with Koszul signs. -/
 def indexedStasheffSum
@@ -882,7 +871,8 @@ def indexedStasheffSum
 /-- The Stasheff identities for object-indexed A∞ operations. -/
 def indexedSatisfiesStasheff
     (β : Type v)
-    [GradingIndex β]
+    [AddCommGroup β]
+    [GradingType β]
     (R : Type u)
     [CommRing R]
     {Obj : Type w}
