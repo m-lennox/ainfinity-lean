@@ -13,18 +13,18 @@ noncomputable section
 namespace AInfinityTheory
 
 universe u v w w'
-variable {β : Type v} [GradingIndex β]
+variable {β : Type v} [AddCommGroup β] [GradingType β]
 variable {n : ℕ}
 
 /-- Target degree of the `n`-ary operation `m`. -/
 abbrev operationTargetDeg
     (deg : Fin n → β) : β :=
-  (∑ i, deg i) + ((2 - (n : ℤ) : ℤ) : β)
+  (∑ i, deg i) + shift (2 - (n : ℤ))
 
 /-- Target degree of the arity-`n` Stasheff relation. -/
 abbrev stasheffTargetDeg
     (deg : Fin n → β) : β :=
-  (∑ i, deg i) + ((3 - (n : ℤ) : ℤ) : β)
+  (∑ i, deg i) + shift (3 - (n : ℤ))
 
 /-- Valid index pairs for an arity-`n` Stasheff summand. -/
 abbrev ValidStasheffIndices (n r s : ℕ) : Prop :=
@@ -52,7 +52,7 @@ composable hom spaces to the hom space from `obj 0` to `obj (Fin.last n)`. -/
 abbrev AInfinityComposition :=
   {n : ℕ} → [NeZero n] → (obj : Fin (n + 1) → Obj) →
     GradedMultilinearMap R (ComposableHomType Hom obj) (Hom (obj 0) (obj (Fin.last n)))
-      ((2 - (n : ℤ) : ℤ) : β)
+      (shift (2 - (n : ℤ)))
 
 variable (m : AInfinityComposition R Hom)
 variable (obj : Fin (n + 1) → Obj) (deg : Fin n → β)
@@ -73,7 +73,7 @@ def gradedHomCongr
   exact LinearEquiv.refl R _
 
 variable (R) in
-omit [GradingIndex β] in
+omit [AddCommGroup β] [GradingType β] in
 /-- Transport along reflexivity is the identity. -/
 @[simp]
 lemma gradedHomCongr_refl
@@ -83,7 +83,7 @@ lemma gradedHomCongr_refl
   rfl
 
 variable (R) in
-omit [GradingIndex β] in
+omit [AddCommGroup β] [GradingType β] in
 /-- The inverse of a transport is the transport along the reversed equalities. -/
 @[simp]
 lemma gradedHomCongr_symm
@@ -97,7 +97,7 @@ lemma gradedHomCongr_symm
   rfl
 
 variable (R) in
-omit [GradingIndex β] in
+omit [AddCommGroup β] [GradingType β] in
 /-- Transporting twice is transporting along the composite equalities. -/
 @[simp]
 lemma gradedHomCongr_trans
@@ -192,7 +192,7 @@ lemma stasheffDegOut_sum :
   simp only [operationTargetDeg, stasheffTargetDeg, Fin.sum_univ_add, stasheffDegOut_left,
     stasheffDegOut_middle, stasheffDegOut_right, Fin.sum_univ_one, stasheffInnerDeg,
     stasheffDegIn, ← Fin.sum_congr' deg ht]
-  rw [show (3 - (n : ℤ)) = (2 - s) + (2 - ((r + 1 + t : ℕ) : ℤ)) by omega, Int.cast_add]
+  rw [show (3 - (n : ℤ)) = (2 - s) + (2 - ((r + 1 + t : ℕ) : ℤ)) by omega, map_add]
   abel
 
 /-! From here on, `Hom`, `obj` and `deg` are inferred from the operations `m` and the inputs
@@ -220,7 +220,7 @@ def indexedStasheffXIn :
       ComposableHomType Hom (stasheffObjIn obj r s t ht) j (stasheffDegIn deg r s t ht j) :=
   fun j => x (Fin.cast ht (Fin.castAdd t (Fin.natAdd r j)))
 
-omit [GradingIndex β] [∀ X Y i, AddCommGroup (Hom X Y i)] in
+omit [AddCommGroup β] [GradingType β] [∀ X Y i, AddCommGroup (Hom X Y i)] in
 /-- Evaluating the inner input tuple just picks out the corresponding original input. -/
 lemma indexedStasheffXIn_apply
     (j : Fin s) :
@@ -453,16 +453,16 @@ lemma indexedStasheffTerm_eq_zero_of_inner_map_eq_zero
     (indexedStasheffOuter_eq_zero_of_inner_eq_zero m x r s t ht hs
       (indexedStasheffInner_eq_zero_of_map_eq_zero m x r s t ht hs hm) _ _)
 
-variable (deg) in
-/-- The sign parity for the `(r, s, t)` Stasheff term:
-    `parity(deg(r+s)) + ⋯ + parity(deg(n-1)) - t` in `ZMod 2`. -/
-def stasheffSignParity : ZMod 2 :=
-  (∑ k : Fin t, parity (deg (Fin.cast ht (Fin.natAdd (r + s) k)))) - (t : ZMod 2)
+-- variable (deg) in
+-- /-- The sign parity for the `(r, s, t)` Stasheff term:
+--     `parity(deg(r+s)) + ⋯ + parity(deg(n-1)) - t` in `ZMod 2`. -/
+-- def stasheffSignParity : ZMod 2 :=
+--   (∑ k : Fin t, parity (deg (Fin.cast ht (Fin.natAdd (r + s) k)))) - (t : ZMod 2)
 
 variable (deg) in
 /-- The sign `(-1)^(|a_{r+s+1}| + ⋯ + |a_n| - t)` as an integer. -/
-def stasheffSign : ℤ :=
-  (-1) ^ (stasheffSignParity deg r s t ht).val
+def stasheffSign : ℤˣ :=
+  (∏ k : Fin t, (Additive.toMul <| sign <| deg <| Fin.cast ht (Fin.natAdd (r + s) k)))
 
 /-- The full Stasheff sum in arity `n`, with Koszul signs, in any degree `d` equal to the
 Stasheff target degree. The term indexed by `(r, s)` has `t = n - r - s` trailing inputs. -/
@@ -470,8 +470,8 @@ def indexedStasheffSum
     (d : β)
     (hd : stasheffTargetDeg deg = d) :
     Hom (obj 0) (obj (Fin.last n)) d :=
-  ∑ r ∈ (Finset.range (n + 1)).attach,
-    ∑ s ∈ (Finset.Ico 1 (n - r.1 + 1)).attach,
+  ∑ r : Finset.range (n + 1),
+    ∑ s : Finset.Ico 1 (n - r.1 + 1),
       have h : ValidStasheffIndices n r.1 s.1 :=
         validStasheffIndices_of_mem_ranges (n := n) r.2 s.2
       have ht : r.1 + s.1 + (n - r.1 - s.1) = n := by
