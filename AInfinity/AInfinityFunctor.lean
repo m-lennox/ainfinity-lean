@@ -13,16 +13,16 @@ noncomputable section
 namespace AInfinityTheory
 
 universe u v w x y
-variable (β_A : Type v) [GradingIndex β_A]
-variable (β_B : Type w) [GradingIndex β_B]
+variable (β_A : Type v) [AddCommGroup β_A]
+variable (β_B : Type w) [AddCommGroup β_B] [GradingType β_B]
 
 /-- Target degree of `φ_n` applied to inputs of the given degrees.
     `φ_n` has degree `1 − n`, so the output lives in
-    `∑ i, deg_trans(deg i) + ofInt(1 − n)` in `β_B`. -/
+    `∑ i, deg_trans(deg i) + shift (1 − n)` in `β_B`. -/
 abbrev functorTargetDeg
     (deg_trans : β_A →+ β_B)
     {n : ℕ} (deg : Fin n → β_A) : β_B :=
-  (∑ i, deg_trans (deg i)) + (1 - (n : ℤ))
+  (∑ i, deg_trans (deg i)) + shift (1 - (n : ℤ))
 
 /-- Target module of `φ_n` for a chain of objects and input degrees. -/
 abbrev functorTargetType
@@ -38,6 +38,7 @@ abbrev functorTargetType
   (BHom (objMap (obj 0)) (objMap (obj (Fin.last n))))
     (functorTargetDeg β_A β_B deg_trans deg)
 
+variable [GradingType β_A] in
 /-- Raw data for an A∞ functor between graded `R`-linear quivers. -/
 structure AInfinityFunctorData
     (R : Type u) [CommRing R]
@@ -48,10 +49,10 @@ structure AInfinityFunctorData
   objMap : ObjA → ObjB
   /-- Group homofunctor translating degrees from `β_A` to `β_B`. -/
   deg_trans : β_A →+ β_B
-  /-- `deg_trans` is compatible with the integer embeddings. -/
-  deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n
-  /-- `deg_trans` preserves parity. -/
-  deg_trans_sign : ∀ b : β_A, parity (deg_trans b) = parity b
+  /-- `deg_trans` is compatible with the integer degree shifts. -/
+  deg_trans_ofInt : ∀ n : ℤ, deg_trans (shift n) = shift n
+  /-- `deg_trans` preserves the Koszul sign determined by a degree. -/
+  deg_trans_sign : ∀ b : β_A, sign (deg_trans b) = sign b
 
   phi :
     {n : ℕ} → [NeZero n] →
@@ -184,11 +185,11 @@ variable {ObjA : Type x} {ObjB : Type y}
 
 /-- Target degree of the functor equation.
     Both sides of the A∞-functor equation land in
-    `∑ i, deg_trans(deg i) + ofInt(2 − n)` in `β_B`. -/
+    `∑ i, deg_trans(deg i) + shift (2 − n)` in `β_B`. -/
 abbrev functorEqTargetDeg
     (deg_trans : β_A →+ β_B)
     {n : ℕ} (deg : Fin n → β_A) : β_B :=
-  (∑ i, deg_trans (deg i)) +  (2 - (n : ℤ))
+  (∑ i, deg_trans (deg i)) + shift (2 - (n : ℤ))
 
 abbrev functorEqTargetType
     {R : Type u} [CommRing R]
@@ -203,6 +204,17 @@ abbrev functorEqTargetType
   (BHom (objMap (obj 0)) (objMap (obj (Fin.last n))))
     (functorEqTargetDeg β_A β_B deg_trans deg)
 
+/-- The target degree of the functor equation is the target degree of `φ_n` shifted by the
+degree of the differential. -/
+lemma functorEqTargetDeg_eq_functorTargetDeg_add_shift_one
+    (deg_trans : β_A →+ β_B)
+    {n : ℕ} (deg : Fin n → β_A) :
+    functorEqTargetDeg β_A β_B deg_trans deg =
+      functorTargetDeg β_A β_B deg_trans deg + shift 1 := by
+  unfold functorEqTargetDeg functorTargetDeg
+  rw [add_assoc, ← map_add]
+  congr 2
+  omega
 
 /- The LHS of the A∞-functor equation is:
   `∑_{r+s+t=n, s≥1} (-1)^† φ_{r+1+t}(a_1, …, a_r, m^A_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, a_n)`
@@ -212,39 +224,32 @@ Structurally this is the same as the Stasheff term, except the *outer* operation
 -/
 section LHS
 
+/- The left-hand side inserts `m^A` and so uses the integer shifts of the source grading. -/
+variable [GradingType β_A]
 
---helper lemma for computing the degree of the LHS term
+/-- The outer `φ` in a left-hand-side term of the functor equation lands in the target degree
+of the functor equation. -/
 lemma LHS_compatible_deg
     {n : ℕ}
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ k : ℤ, deg_trans k = k)
+    (deg_trans_ofInt : ∀ k : ℤ, deg_trans (shift k) = shift k)
     (deg : Fin n → β_A)
     (r s : ℕ)
     (hr : r + s ≤ n) :
     functorTargetDeg β_A β_B deg_trans (stasheffDegOut deg r s hr) =
     functorEqTargetDeg β_A β_B deg_trans deg := by
-      unfold functorTargetDeg functorEqTargetDeg;
-      convert congr_arg ( fun x : β_A => deg_trans x +  ( 1 - ( n + 1 - s : ℤ ) ) ) ( stasheffDegOut_sum_core deg r s hr ) using 1;
-      · simp +decide [ Nat.cast_sub ( by linarith : s ≤ n + 1 ) ];
-      · norm_cast
-        simp only [← Int.coe_castAddHom, Int.subNatNat_eq_coe, Nat.cast_add, Nat.cast_ofNat]
-        simp +decide only [map_sub, map_add, map_sum, Int.coe_castAddHom, deg_trans_ofInt]
-        norm_cast
-        simp only [← Int.coe_castAddHom, Int.subNatNat_eq_coe, Nat.cast_add, Nat.cast_ofNat]
-        conv =>
-          rhs
-          rw [add_assoc]
-          arg 2
-          rw [← map_add]
-        suffices 2 - (n : ℤ) = 2 - s + (1 - (n + 1 - s)) by rw [this]; grind
-        abel1
+  unfold functorTargetDeg functorEqTargetDeg
+  rw [← map_sum deg_trans, stasheffDegOut_sum_core deg r s hr, map_add, map_sum,
+    deg_trans_ofInt, add_assoc, ← map_add]
+  congr 2
+  omega
 
 /-- Transport from the outer LHS term target to the functor-equation target. -/
 lemma functor_lhs_target_module_eq
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (shift n) = shift n)
     {n : ℕ}
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A)
@@ -271,7 +276,7 @@ lemma functor_lhs_target_eq
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (shift n) = shift n)
     {n : ℕ}
     (obj : Fin (n + 1) → ObjA)
     (deg : Fin n → β_A)
@@ -288,7 +293,7 @@ def functorLHSTerm
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (shift n) = shift n)
     (phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjA) →
@@ -322,7 +327,7 @@ def functorLHSSum
     (BHom : ObjB → ObjB → GradedRModule (β := β_B) (R := R))
     (objMap : ObjA → ObjB)
     (deg_trans : β_A →+ β_B)
-    (deg_trans_ofInt : ∀ n : ℤ, deg_trans n = n)
+    (deg_trans_ofInt : ∀ n : ℤ, deg_trans (shift n) = shift n)
     (phi :
       {n : ℕ} → [NeZero n] →
       (obj : Fin (n + 1) → ObjA) →
@@ -409,7 +414,8 @@ def functorCompositionOuterDeg
     (c : Composition n) : Fin c.length → β_B :=
   fun l => functorTargetDeg β_A β_B deg_trans (compositionBlockDeg β_A deg c l)
 
---helper degree lemma for the RHS
+/-- The outer `m^B` in a right-hand-side term of the functor equation lands in the target
+degree of the functor equation. -/
 lemma RHS_compatible_deg
     (deg_trans : β_A →+ β_B)
     {n : ℕ}
@@ -476,18 +482,20 @@ lemma RHS_compatible_deg
     aesop
   have h_sum_target_deg :
       ∑ l : Fin c.length, functorTargetDeg β_A β_B deg_trans (compositionBlockDeg β_A deg c l) =
-        ∑ i : Fin n, deg_trans (deg i) +  (c.length - n : ℤ) := by
+        ∑ i : Fin n, deg_trans (deg i) + shift ((c.length : ℤ) - n) := by
     have h_sum_target_deg :
         ∑ l : Fin c.length, functorTargetDeg β_A β_B deg_trans (compositionBlockDeg β_A deg c l) =
           (∑ l : Fin c.length, ∑ j : Fin (c.blocksFun l), deg_trans (deg (c.embedding l j))) +
-            (∑ l : Fin c.length,  (1 - (c.blocksFun l : ℤ))) := by
+            (∑ l : Fin c.length, shift (1 - (c.blocksFun l : ℤ))) := by
       simp +decide [functorTargetDeg, compositionBlockDeg, Finset.sum_add_distrib]
     convert h_sum_target_deg using 2
     · aesop
     · rw [← h_sum_blocksFun]
-  convert congr_arg (fun x : β_B => x +  (2 - (c.length : ℤ))) h_sum_target_deg using 1
-  unfold functorEqTargetDeg
-  simp +decide only [Int.cast_natCast, Int.cast_sub, add_assoc, sub_add_sub_cancel']
+      exact map_sum shift _ _
+  unfold operationTargetDeg functorEqTargetDeg functorCompositionOuterDeg
+  rw [h_sum_target_deg, add_assoc, ← map_add]
+  congr 2
+  omega
 
 /-- Transport from the outer RHS target to the functor-equation target. -/
 lemma functor_rhs_target_module_eq
@@ -681,6 +689,7 @@ def functorRHSSum
 end RHS
 
 
+variable [GradingType β_A] in
 /-- The A∞ functor equations as a property of raw functor data between raw A∞ category
     structures. -/
 def SatisfiesFunctorEquations
@@ -705,6 +714,7 @@ def SatisfiesFunctorEquations
 
 end AInfinityFunctorData
 
+variable [GradingType β_A] in
 /-- An A∞ functor between A∞ categories is raw functor data satisfying the functor
     equations. -/
 structure AInfinityFunctor

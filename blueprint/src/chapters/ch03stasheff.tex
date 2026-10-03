@@ -6,27 +6,30 @@
 \lean{AInfinityTheory.operationTargetDeg}
 \label{AInfinityTheory.operationTargetDeg}
 \leanok
-Given input degrees $(d_0,\dots,d_{n-1})$, the output degree of the $n$-ary
-operation is
+\uses{AInfinityTheory.GradingType}
+Given input degrees $(d_0,\dots,d_{n-1})$ in a grading type $\beta$, the
+output degree of the $n$-ary operation is
 \[
-  \sum_i d_i + (2-n),
+  \sum_i d_i + \operatorname{shift}(2-n),
 \]
-where the final summand is interpreted using the grading shift
+where the final summand is the image of the integer $2-n$ under the shift
+homomorphism $\mathbb{Z} \to \beta$.
 \end{definition}
 
 \begin{definition}[Stasheff target degree]
 \lean{AInfinityTheory.stasheffTargetDeg}
 \label{AInfinityTheory.stasheffTargetDeg}
 \leanok
+\uses{AInfinityTheory.GradingType}
 The common degree of the arity-$n$ Stasheff relation is
 \[
-  \sum_i d_i + (3-n)
+  \sum_i d_i + \operatorname{shift}(3-n)
 \]
-in the grading index.
+in the grading type.
 \end{definition}
 
 \begin{definition}[Composable morphism type]
-%\lean{AInfinityTheory.ComposableHomType}
+%\lean{AInfinityTheory.composableHomType}
 \label{AInfinityTheory.ComposableHomType}
 %\leanok
 \uses{AInfinityTheory.GradedRModule}
@@ -55,24 +58,27 @@ $s$-ary operation in positions $r,\dots,r+s-1$ and then applying the outer
 operation to the collapsed string.
 \end{definition}
 
-\begin{definition}[Stasheff sign parity]
-\lean{AInfinityTheory.stasheffSignParity}
-\label{AInfinityTheory.stasheffSignParity}
+\begin{definition}[Stasheff sign exponent]
+\lean{AInfinityTheory.stasheffSignExponent}
+\label{AInfinityTheory.stasheffSignExponent}
 \leanok
-\uses{AInfinityTheory.GradingIndex}
-For a valid pair $(r,s)$, this is the parity
+\uses{AInfinityTheory.GradingType}
+For a valid pair $(r,s)$, this is the degree
 \[
-  |a_{r+s}| + \cdots + |a_{n-1}| - (n-r-s).
+  |a_{r+s}| + \cdots + |a_{n-1}| - \operatorname{shift}(n-r-s)
 \]
+in the grading type, the integer $n-r-s$ being embedded by the shift
+homomorphism.
 \end{definition}
 
 \begin{definition}[Stasheff sign]
 \lean{AInfinityTheory.stasheffSign}
 \label{AInfinityTheory.stasheffSign}
 \leanok
-\uses{AInfinityTheory.stasheffSignParity}
-The integer sign attached to $(r,s)$ is $(-1)$ raised to the parity recorded by
-\lean{AInfinityTheory.stasheffSignParity}.
+\uses{AInfinityTheory.stasheffSignExponent, AInfinityTheory.GradingType}
+The sign $\pm 1$ attached to $(r,s)$ is the Koszul sign $(-1)^e$ of the
+Stasheff sign exponent $e$, that is, the sign character of the grading type
+applied to $e$.
 \end{definition}
 
 \begin{definition}[Indexed Stasheff sum]

@@ -14,7 +14,7 @@ namespace FunctorExamples
 
 universe u v w
 
-variable (β : Type v) [GradingIndex β]
+variable (β : Type v) [AddCommGroup β] [GradingType β]
 variable (R : Type u) [CommRing R]
 variable (Obj : Type w)
 
@@ -221,8 +221,8 @@ private lemma m_heq_of_obj_deg_eq
     (X₁ : ∀ i, ComposableHomType (gradedHom β R) O₁ D₁ i)
     (X₂ : ∀ i, ComposableHomType (gradedHom β R) O₂ D₂ i)
     (hX : HEq X₁ X₂) :
-    HEq (@AInfinityCategoryStruct.m _ _ _ _ _ _ n inst₁ O₁ D₁ X₁)
-         (@AInfinityCategoryStruct.m _ _ _ _ _ _ n inst₂ O₂ D₂ X₂) := by
+    HEq (@AInfinityCategoryStruct.m _ _ _ _ _ _ _ n inst₁ O₁ D₁ X₁)
+         (@AInfinityCategoryStruct.m _ _ _ _ _ _ _ n inst₂ O₂ D₂ X₂) := by
   cases Subsingleton.elim inst₁ inst₂
   subst hO; subst hD; exact heq_of_eq (congrArg _ (eq_of_heq hX))
 
@@ -492,8 +492,8 @@ private lemma m_heq_of_arity_eq
     (X₁ : ∀ i, ComposableHomType (gradedHom β R) O₁ D₁ i)
     (X₂ : ∀ i, ComposableHomType (gradedHom β R) O₂ D₂ i)
     (hX : HEq X₁ X₂) :
-    HEq (@AInfinityCategoryStruct.m _ _ _ _ _ _ n₁ inst₁ O₁ D₁ X₁)
-         (@AInfinityCategoryStruct.m _ _ _ _ _ _ n₂ inst₂ O₂ D₂ X₂) := by
+    HEq (@AInfinityCategoryStruct.m _ _ _ _ _ _ _ n₁ inst₁ O₁ D₁ X₁)
+         (@AInfinityCategoryStruct.m _ _ _ _ _ _ _ n₂ inst₂ O₂ D₂ X₂) := by
   subst hn
   cases Subsingleton.elim inst₁ inst₂
   have hO' := eq_of_heq hO
@@ -567,18 +567,16 @@ private lemma identity_functorRHSTerm_eq_main
     intro l₁ l₂ hl
     have hl_eq : l₁.val = l₂.val :=
       (Fin.heq_ext_iff (by simp [Composition.ones_length])).mp hl
-    dsimp [AInfinityFunctorData.functorCompositionOuterDeg]
-    unfold AInfinityFunctorData.compositionBlockDeg
+    dsimp [AInfinityFunctorData.functorCompositionOuterDeg,
+      AInfinityFunctorData.compositionBlockDeg]
     dsimp [functorTargetDeg, identityDegTrans]
     have hblock : (Composition.ones n).blocksFun l₁ = 1 := Composition.ones_blocksFun n l₁
-    simp [hblock, Nat.cast_one]
+    simp only [hblock, Nat.cast_one, sub_self, map_zero, add_zero]
     haveI : Subsingleton (Fin ((Composition.ones n).blocksFun l₁)) := by
       rw [hblock]; exact inferInstance
     rw [Fintype.sum_subsingleton _ ⟨0, by rw [hblock]; exact Nat.one_pos⟩]
     have hemb := Composition.ones_embedding l₁ (by rw [hblock]; exact Nat.one_pos)
-    congr
-    simp only [hemb, ← Fin.val_eq_val]
-    exact hl_eq
+    exact heq_of_eq (congrArg deg (hemb.trans (Fin.ext hl_eq)))
   · -- phi outputs ≅ x
     apply Function.hfunext (by simp [Composition.ones_length])
     intro l₁ l₂ hl
@@ -628,7 +626,8 @@ theorem identitySatisfiesFunctorEquations :
       · have hsign : stasheffSign deg 0 n (by simp) = 1 := by
           haveI : IsEmpty (Fin (n - 0 - n)) := by
             simpa using (inferInstance : IsEmpty (Fin 0))
-          simp [stasheffSign, stasheffSignParity]
+          change Additive.toMul (sign (stasheffSignExponent deg 0 n _)) = 1
+          simp [stasheffSignExponent]
         rw [hsign, one_smul]
         exact identity_functorLHSTerm_eq_main
           β (R := R) (Obj := Obj) obj deg x
@@ -710,8 +709,8 @@ end Functor
 
 section Composition
 
-variable {β_A : Type*} [GradingIndex β_A]
-variable {β_B : Type*} [GradingIndex β_B]
+variable {β_A : Type*} [AddCommGroup β_A] [GradingType β_A]
+variable {β_B : Type*} [AddCommGroup β_B] [GradingType β_B]
 variable {ObjA : Type*} {ObjB : Type*}
 variable [AInfinityCategory β_A R ObjA]
 variable [AInfinityCategory β_B R ObjB]
@@ -838,30 +837,10 @@ private lemma compTermMultilinearMap_outer_identity_eq_zero_of_length_ne_one
   unfold AInfinityFunctorData.MultilinearMap.compComposition; simp +decide only [Function.id_comp,
     ne_eq, hlen, not_false_eq_true, identityFunctorData_phi_eq_zero_of_ne_one] ;
   apply cast_multilinearMap_zero;
-  unfold functorTargetType; simp +decide only [identityFunctorData,
-    AInfinityFunctorData.functorCompositionOuterObj, Composition.boundary_zero, id_eq,
-    Composition.boundary_last, AddMonoidHom.id_comp] ;
-  unfold functorTargetDeg; simp +decide only [AInfinityFunctorData.functorCompositionOuterDeg,
-    AddMonoidHom.id_apply] ;
-  unfold functorTargetDeg; simp +decide only [AInfinityFunctorData.compositionBlockDeg] ;
-  have h_sum : ∑ x : Fin c.length, ∑ x_1 : Fin (c.blocksFun x), F.deg_trans (deg ((c.embedding x) x_1)) = ∑ i : Fin n, F.deg_trans (deg i) := by
-    have h_sum : ∑ x : Fin c.length, ∑ x_1 : Fin (c.blocksFun x), F.deg_trans (deg ((c.embedding x) x_1)) = ∑ x ∈ Finset.univ.biUnion (fun x : Fin c.length => Finset.image (fun x_1 : Fin (c.blocksFun x) => (c.embedding x) x_1) Finset.univ), F.deg_trans (deg x) := by
-      rw [ Finset.sum_biUnion ];
-      · exact Finset.sum_congr rfl fun _ _ => by rw [ Finset.sum_image <| by simp +decide [ Function.Injective ] ] ;
-      · intro x _ y _ hxy; simp +decide only [disjoint_left, mem_image, mem_univ, true_and,
-        not_exists, forall_exists_index, forall_apply_eq_imp_iff] ;
-        grind +suggestions;
-    convert h_sum using 2;
-    ext x; simp only [mem_univ, Composition.embedding, RelEmbedding.coe_trans, Function.comp_apply,
-      Fin.natAddOrderEmb_apply, Fin.castLEOrderEmb_apply, mem_biUnion, mem_image, true_and,
-      true_iff];
-    have := c.mem_range_embedding x; aesop;
-  simp +decide only [sum_add_distrib, h_sum, sum_sub_distrib, sum_const,
-    card_univ, Fintype.card_fin];
-  simp +decide only [nsmul_one, Int.cast_natCast];
-  simp +decide only [add_assoc, sub_add_sub_cancel'];
-  norm_cast;
-  simp +decide [ Composition.blocksFun ]
+  exact
+    AInfinityFunctorData.comp_term_target_module_eq β_A β_B β_B
+      (gradedHom β_B R) F.objMap F.deg_trans id (identityDegTrans β_B)
+      (by intro k; rfl) obj deg c
 
 
 /-- Unfolding of the raw right-identity `phi`-field. -/
@@ -1032,17 +1011,12 @@ private lemma comp_identityFunctorData_phi_term_eq_main
       AInfinityFunctorData.compositionBlockDeg]
     dsimp [functorTargetDeg, identityDegTrans]
     have hblock : (Composition.ones n).blocksFun l₁ = 1 := Composition.ones_blocksFun n l₁
-    simp only [hblock, Nat.cast_one]
+    simp only [hblock, Nat.cast_one, sub_self, map_zero, add_zero]
     haveI : Subsingleton (Fin ((Composition.ones n).blocksFun l₁)) := by
       rw [hblock]; exact inferInstance
     rw [Fintype.sum_subsingleton _ ⟨0, by rw [hblock]; exact Nat.one_pos⟩]
     have hemb := Composition.ones_embedding l₁ (by rw [hblock]; exact Nat.one_pos)
-    simp
-    unfold AInfinityFunctorData.compositionBlockDeg
-    congr
-    rw [hemb]
-    simp [← Fin.val_eq_val]
-    exact hl_eq
+    exact heq_of_eq (congrArg deg (hemb.trans (Fin.ext hl_eq)))
   ·
     apply Function.hfunext (by simp [Composition.ones_length])
     intro l₁ l₂ hl
