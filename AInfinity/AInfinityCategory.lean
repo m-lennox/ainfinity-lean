@@ -43,7 +43,7 @@ variable (R : outParam (Type u)) [CommRing R]
 variable (Obj : Type w)
 
 /-- A graded `R`-linear quiver: for objects `X Y` and a degree `i`, the morphisms of degree `i`
-from `X` to `Y` form an `R`-module `Hom X Y i`. The ring `R` is determined by `β` and `Obj`. -/
+from `X` to `Y` form an `R`-module `Hom X Y i`. -/
 class GradedLinearQuiver where
   /-- The morphisms of degree `i` from `X` to `Y`. -/
   Hom : Obj → Obj → β → Type w'

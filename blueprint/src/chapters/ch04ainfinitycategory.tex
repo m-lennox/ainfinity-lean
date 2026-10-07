@@ -8,12 +8,16 @@
 \leanok
 \uses{AInfinityTheory.GradedLinearQuiver, AInfinityTheory.AInfinityComposition}
 An \Ainf{}-precategory over $R$ with object type $\mathrm{Obj}$ consists of a
-graded $R$-linear quiver together with an \Ainf{}-composition, that is, operations
+graded $R$-linear quiver
 \[
-  m_n
+  \Hom : \mathrm{Obj} \to \mathrm{Obj} \to \grMod_R^\beta
+\]
+together with an \Ainf{}-composition, that is, operations
+\[
+  m_n : \Hom(X_0, X_1) \otimes \dots \otimes \Hom(X_{n-1}, X_n) \to \Hom(X_0, X_n)
 \]
 of degree $\operatorname{shift}(2-n)$ for every positive arity $n$. No relations
-are imposed.
+are imposed on these composition maps.
 \end{definition}
 
 \section{Chains}
