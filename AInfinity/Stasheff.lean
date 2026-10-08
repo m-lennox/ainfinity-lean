@@ -482,4 +482,49 @@ def indexedSatisfiesStasheff : Prop :=
     (hd : stasheffTargetDeg deg = d),
     indexedStasheffSum m x d hd = 0
 
+/-- If `m` vanishes outside arity `2`, a Stasheff term vanishes unless both its inner and its
+outer operation are binary. -/
+lemma indexedStasheffTerm_eq_zero_of_arity_ne_two
+    (hm : ∀ (k : ℕ) [NeZero k], k ≠ 2 → ∀ obj : Fin (k + 1) → Obj, m obj = 0)
+    {n : ℕ} {obj : Fin (n + 1) → Obj} {deg : Fin n → β}
+    (x : ∀ i : Fin n, ComposableHomType Hom obj i (deg i)) (r s t : ℕ) (ht : r + s + t = n)
+    (hs : 1 ≤ s) (h2 : s ≠ 2 ∨ r + 1 + t ≠ 2) (d : β) (hd : stasheffTargetDeg deg = d) :
+    indexedStasheffTerm m x r s t ht hs d hd = 0 := by
+  rcases h2 with h2 | h2
+  · have : NeZero s := ⟨by omega⟩
+    exact indexedStasheffTerm_eq_zero_of_inner_map_eq_zero m x r s t ht hs
+      (fun d hd => by simp only [hm s h2]; rfl) d hd
+  · have : NeZero (r + 1 + t) := ⟨by omega⟩
+    exact indexedStasheffTerm_eq_zero_of_outer_map_eq_zero m x r s t ht hs
+      (fun d hd => by simp only [hm _ h2]; rfl) d hd
+
+/-- If `m` vanishes outside arity `2`, the Stasheff identities reduce to the one in arity `3`,
+`±m₂(m₂(a₁, a₂), a₃) + m₂(a₁, m₂(a₂, a₃)) = 0`. -/
+theorem indexedSatisfiesStasheff_of_arity_two
+    (hm : ∀ (k : ℕ) [NeZero k], k ≠ 2 → ∀ obj : Fin (k + 1) → Obj, m obj = 0)
+    (h3 : ∀ (obj : Fin (3 + 1) → Obj) (deg : Fin 3 → β)
+      (x : ∀ i : Fin 3, ComposableHomType Hom obj i (deg i)) (d : β)
+      (hd : stasheffTargetDeg deg = d),
+      stasheffSign deg 0 2 1 rfl • indexedStasheffTerm m x 0 2 1 rfl (by norm_num) d hd +
+        indexedStasheffTerm m x 1 2 0 rfl (by norm_num) d hd = 0) :
+    indexedSatisfiesStasheff m := by
+  intro n _ obj deg x d hd
+  have hterm := indexedStasheffTerm_eq_zero_of_arity_ne_two m hm x
+  rcases eq_or_ne n 3 with rfl | hn
+  · refine (Fintype.sum_eq_add ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp) fun r ⟨hr0, hr1⟩ =>
+      Finset.sum_eq_zero fun s _ => smul_eq_zero_of_right _ ?_).trans ?_
+    · rw [Fintype.sum_eq_single ⟨2, by simp⟩, Fintype.sum_eq_single ⟨2, by simp⟩]
+      · exact (congrArg (_ + ·) ((congrArg (· • _) (Fin.prod_univ_zero _)).trans
+          (one_smul _ _))).trans (h3 obj deg x d hd)
+      all_goals
+        exact fun s hs => smul_eq_zero_of_right _
+          (hterm _ _ _ _ _ (Or.inl fun h => hs (Subtype.ext h)) d hd)
+    · have h := validStasheffIndices_of_mem_ranges r.2 s.2
+      have : r.1 ≠ 0 := fun h => hr0 (Subtype.ext h)
+      have : r.1 ≠ 1 := fun h => hr1 (Subtype.ext h)
+      exact hterm _ _ _ _ _ (by omega) d hd
+  · refine Finset.sum_eq_zero fun r _ => Finset.sum_eq_zero fun s _ => ?_
+    have h := validStasheffIndices_of_mem_ranges r.2 s.2
+    exact smul_eq_zero_of_right _ (hterm _ _ _ _ _ (by omega) d hd)
+
 end AInfinityTheory
