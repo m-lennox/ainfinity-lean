@@ -1,7 +1,6 @@
 import AInfinity.AInfinityCategory
-import AInfinity.AInfinityFunctor
-import AInfinity.AInfinityFunctorComposition
 import AInfinity.Example
-import AInfinity.FunctorExample
+import AInfinity.GradedLinearAlgebra
+import AInfinity.GradedLinearQuiver
 import AInfinity.Grading
 import AInfinity.Stasheff
