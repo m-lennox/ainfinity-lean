@@ -211,7 +211,7 @@ alignment:
       status: "defined"
     - source: "Blueprint, Definition (Graded linear quiver)"
       lean: "AInfinityTheory.GradedLinearQuiver"
-      module: "AInfinity.AInfinityCategory"
+      module: "AInfinity.GradedLinearQuiver"
       status: "defined"
     - source: "Blueprint, Definition (A∞-composition)"
       lean: "AInfinityTheory.AInfinityComposition"

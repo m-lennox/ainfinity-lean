@@ -29,8 +29,8 @@ in the grading type.
 \end{definition}
 
 \begin{definition}[Composable morphism type]
-\lean{AInfinityTheory.ComposableHomType}
-\label{AInfinityTheory.ComposableHomType}
+\lean{AInfinityTheory.GradedLinearQuiver.ComposableHomType}
+\label{AInfinityTheory.GradedLinearQuiver.ComposableHomType}
 \leanok
 \uses{AInfinityTheory.GradedLinearQuiver}
 For a string of objects $X_0,\dots,X_n$, an index $i < n$ and a degree $b$,
@@ -42,7 +42,7 @@ composable string, in degree $b$.
 \lean{AInfinityTheory.AInfinityComposition}
 \label{AInfinityTheory.AInfinityComposition}
 \leanok
-\uses{AInfinityTheory.operationTargetDeg, AInfinityTheory.ComposableHomType, AInfinityTheory.GradedMultilinearMap}
+\uses{AInfinityTheory.operationTargetDeg, AInfinityTheory.GradedLinearQuiver.ComposableHomType, AInfinityTheory.GradedMultilinearMap}
 An \Ainf{}-composition on a graded quiver $\Hom$ assigns to every positive arity
 $n$ and every string of objects $X_0,\dots,X_n$ a graded multilinear map
 \[
@@ -57,7 +57,7 @@ target degree.
 \lean{AInfinityTheory.indexedStasheffTerm}
 \label{AInfinityTheory.indexedStasheffTerm}
 \leanok
-\uses{AInfinityTheory.ComposableHomType, AInfinityTheory.AInfinityComposition, AInfinityTheory.stasheffTargetDeg}
+\uses{AInfinityTheory.GradedLinearQuiver.ComposableHomType, AInfinityTheory.AInfinityComposition, AInfinityTheory.stasheffTargetDeg}
 Fix an \Ainf{}-composition $m$. For $r + s + t = n$ with $s \geq 1$,
 \lean{AInfinityTheory.indexedStasheffTerm} is the term obtained by first applying the inner
 $s$-ary operation in positions $r,\dots,r+s-1$ and then applying the outer

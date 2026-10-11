@@ -1,5 +1,6 @@
 import AInfinity.AInfinityCategory
 import AInfinity.Example
 import AInfinity.GradedLinearAlgebra
+import AInfinity.GradedLinearQuiver
 import AInfinity.Grading
 import AInfinity.Stasheff
