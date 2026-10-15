@@ -64,18 +64,18 @@ open GradedLinearQuiver
 
 variable {R : Type u} [CommRing R] {Obj : Type w} [GradedLinearQuiver β R Obj]
 
-variable (β Obj) in
+variable (β R Obj) in
 /-- The type of A∞ compositions on a graded linear quiver: for each arity `n ≥ 1` and each
 composable string of objects `obj`, a graded multilinear map `mₙ` of degree `2 - n` from the
 composable hom spaces to the hom space from `obj 0` to `obj (Fin.last n)`. -/
 abbrev AInfinityComposition :=
   {n : ℕ} → [NeZero n] → (obj : Fin (n + 1) → Obj) →
-    GradedMultilinearMap R (ComposableHomType (β := β) obj) (Hom (obj 0) (obj (Fin.last n)))
+    GradedMultilinearMap R (ComposableHomType R (β := β) obj) (obj 0 →ᵍ[R] obj (Fin.last n))
       (shift (2 - (n : ℤ)))
 
-variable (m : AInfinityComposition β Obj)
+variable (m : AInfinityComposition β R Obj)
 variable (obj : Fin (n + 1) → Obj) (deg : Fin n → β)
-variable (x : ∀ i : Fin n, ComposableHomType obj i (deg i))
+variable (x : ∀ i : Fin n, ComposableHomType R obj i (deg i))
 variable (r s t : ℕ) (ht : r + s + t = n)
 
 /-- Helper: degree function for the inner portion of the Stasheff composition. -/
@@ -174,11 +174,11 @@ lemma multilinearFamily_eq_of_deg_eq
     [NeZero n]
     {deg deg' : Fin n → β}
     (hdeg : deg = deg')
-    (x : ∀ i : Fin n, ComposableHomType obj i (deg i))
+    (x : ∀ i : Fin n, ComposableHomType R obj i (deg i))
     {d : β}
     (hd : operationTargetDeg deg = d)
     (hd' : operationTargetDeg deg' = d) :
-    m obj deg' d hd' (fun i => homCongr rfl rfl (congrFun hdeg i) (x i)) =
+    m obj deg' d hd' (fun i => homCongr R rfl rfl (congrFun hdeg i) (x i)) =
       m obj deg d hd x := by
   subst hdeg
   rfl
@@ -186,7 +186,7 @@ lemma multilinearFamily_eq_of_deg_eq
 /-- Helper: the input tuple for the inner operation in a Stasheff term. -/
 def indexedStasheffXIn :
     ∀ j : Fin s,
-      ComposableHomType (stasheffObjIn obj r s t ht) j (stasheffDegIn deg r s t ht j) :=
+      ComposableHomType R (stasheffObjIn obj r s t ht) j (stasheffDegIn deg r s t ht j) :=
   fun j => x (((j.natAdd r).castAdd t).cast ht)
 
 omit [AddCommGroup β] [GradingType β] in
@@ -202,7 +202,7 @@ def indexedStasheffInner
     (hs : 1 ≤ s)
     (d : β)
     (hd : stasheffInnerDeg deg r s t ht = d) :
-    Hom (stasheffObjIn obj r s t ht 0) (stasheffObjIn obj r s t ht (Fin.last s)) d :=
+    (stasheffObjIn obj r s t ht 0 →ᵍ[R] stasheffObjIn obj r s t ht (Fin.last s)) d :=
   letI : NeZero s := ⟨by omega⟩
   m (stasheffObjIn obj r s t ht) (stasheffDegIn deg r s t ht) d hd
     (indexedStasheffXIn x r s t ht)
@@ -211,37 +211,37 @@ def indexedStasheffInner
 abbrev indexedStasheffMiddleIndex : Fin (r + 1 + t) :=
   (Fin.last r).castAdd t
 
-variable (obj deg) in
+variable (R obj deg) in
 /-- Before the inserted block, the space of an original input is identified with the
 corresponding outer input space. -/
 def indexedStasheffXOutEquivLeft
     (j : Fin r) :
-    ComposableHomType obj (((j.castAdd s).castAdd t).cast ht)
+    ComposableHomType R obj (((j.castAdd s).castAdd t).cast ht)
         (deg (((j.castAdd s).castAdd t).cast ht)) ≃ₗ[R]
-      ComposableHomType (stasheffObjOut obj r s t ht) (j.castSucc.castAdd t)
+      ComposableHomType R (stasheffObjOut obj r s t ht) (j.castSucc.castAdd t)
         (stasheffDegOut deg r s t ht (j.castSucc.castAdd t)) :=
-  homCongr (stasheffObjOut_castLE obj r s t ht j.castSucc).symm
+  homCongr R (stasheffObjOut_castLE obj r s t ht j.castSucc).symm
     (stasheffObjOut_castLE obj r s t ht j.succ).symm (stasheffDegOut_left deg r s t ht j).symm
 
-variable (obj) in
+variable (R obj) in
 /-- At the inserted block, the space of the inner output is identified with the outer middle
 input space, in any degree `d`. -/
 def indexedStasheffXOutEquivMid
     (d : β) :
-    Hom (stasheffObjIn obj r s t ht 0) (stasheffObjIn obj r s t ht (Fin.last s)) d ≃ₗ[R]
-      ComposableHomType (stasheffObjOut obj r s t ht) (indexedStasheffMiddleIndex r t) d :=
-  homCongr (stasheffObjOut_castLE obj r s t ht (Fin.last r)).symm
+    (stasheffObjIn obj r s t ht 0 →ᵍ[R] stasheffObjIn obj r s t ht (Fin.last s)) d ≃ₗ[R]
+      ComposableHomType R (stasheffObjOut obj r s t ht) (indexedStasheffMiddleIndex r t) d :=
+  homCongr R (stasheffObjOut_castLE obj r s t ht (Fin.last r)).symm
     (stasheffObjOut_natAdd obj r s t ht 0).symm rfl
 
-variable (obj deg) in
+variable (R obj deg) in
 /-- After the inserted block, the space of an original input is identified with the
 corresponding outer input space. -/
 def indexedStasheffXOutEquivRight
     (k : Fin t) :
-    ComposableHomType obj ((k.natAdd (r + s)).cast ht) (deg ((k.natAdd (r + s)).cast ht)) ≃ₗ[R]
-      ComposableHomType (stasheffObjOut obj r s t ht) (k.natAdd (r + 1))
+    ComposableHomType R obj ((k.natAdd (r + s)).cast ht) (deg ((k.natAdd (r + s)).cast ht)) ≃ₗ[R]
+      ComposableHomType R (stasheffObjOut obj r s t ht) (k.natAdd (r + 1))
         (stasheffDegOut deg r s t ht (k.natAdd (r + 1))) :=
-  homCongr (stasheffObjOut_natAdd obj r s t ht k.castSucc).symm
+  homCongr R (stasheffObjOut_natAdd obj r s t ht k.castSucc).symm
     (stasheffObjOut_natAdd obj r s t ht k.succ).symm (stasheffDegOut_right deg r s t ht k).symm
 
 /-- Helper: the input tuple for the outer operation in a Stasheff term: the first `r` inputs,
@@ -249,14 +249,14 @@ then the inner output, then the last `t` inputs. -/
 def indexedStasheffXOut
     (hs : 1 ≤ s) :
     ∀ i : Fin (r + 1 + t),
-      ComposableHomType (stasheffObjOut obj r s t ht) i (stasheffDegOut deg r s t ht i) :=
+      ComposableHomType R (stasheffObjOut obj r s t ht) i (stasheffDegOut deg r s t ht i) :=
   Fin.addCases
     (Fin.snoc
-      (fun j => indexedStasheffXOutEquivLeft obj deg r s t ht j
+      (fun j => indexedStasheffXOutEquivLeft R obj deg r s t ht j
         (x (((j.castAdd s).castAdd t).cast ht)))
-      (indexedStasheffXOutEquivMid obj r s t ht _
+      (indexedStasheffXOutEquivMid R obj r s t ht _
         (indexedStasheffInner m x r s t ht hs _ (stasheffDegOut_middle deg r s t ht).symm)))
-    (fun k => indexedStasheffXOutEquivRight obj deg r s t ht k (x ((k.natAdd (r + s)).cast ht)))
+    (fun k => indexedStasheffXOutEquivRight R obj deg r s t ht k (x ((k.natAdd (r + s)).cast ht)))
 
 /-- Before the inserted block, the outer input tuple agrees with the original inputs. -/
 @[simp]
@@ -264,7 +264,8 @@ lemma indexedStasheffXOut_left
     (hs : 1 ≤ s)
     (j : Fin r) :
     indexedStasheffXOut m x r s t ht hs (j.castSucc.castAdd t) =
-      indexedStasheffXOutEquivLeft obj deg r s t ht j (x (((j.castAdd s).castAdd t).cast ht)) := by
+      indexedStasheffXOutEquivLeft R obj deg r s t ht j
+        (x (((j.castAdd s).castAdd t).cast ht)) := by
   simp [indexedStasheffXOut]
 
 /-- After the inserted block, the outer input tuple agrees with the original inputs. -/
@@ -273,14 +274,14 @@ lemma indexedStasheffXOut_right
     (hs : 1 ≤ s)
     (k : Fin t) :
     indexedStasheffXOut m x r s t ht hs (k.natAdd (r + 1)) =
-      indexedStasheffXOutEquivRight obj deg r s t ht k (x ((k.natAdd (r + s)).cast ht)) := by
+      indexedStasheffXOutEquivRight R obj deg r s t ht k (x ((k.natAdd (r + s)).cast ht)) := by
   simp [indexedStasheffXOut]
 
 /-- The middle outer input is the transported inner output. -/
 lemma indexedStasheffXOut_middle
     (hs : 1 ≤ s) :
     indexedStasheffXOut m x r s t ht hs (indexedStasheffMiddleIndex r t) =
-      indexedStasheffXOutEquivMid obj r s t ht _
+      indexedStasheffXOutEquivMid R obj r s t ht _
         (indexedStasheffInner m x r s t ht hs _ (stasheffDegOut_middle deg r s t ht).symm) := by
   simp [indexedStasheffXOut]
 
@@ -297,19 +298,21 @@ def indexedStasheffOuter
     (hs : 1 ≤ s)
     (d : β)
     (hd : operationTargetDeg (stasheffDegOut deg r s t ht) = d) :
-    Hom (stasheffObjOut obj r s t ht 0) (stasheffObjOut obj r s t ht (Fin.last (r + 1 + t))) d :=
+    (stasheffObjOut obj r s t ht 0 →ᵍ[R]
+      stasheffObjOut obj r s t ht (Fin.last (r + 1 + t))) d :=
   letI : NeZero (r + 1 + t) := ⟨by omega⟩
   m (stasheffObjOut obj r s t ht) (stasheffDegOut deg r s t ht) d hd
     (indexedStasheffXOut m x r s t ht hs)
 
-variable (obj) in
+variable (R obj) in
 /-- Helper: the identification of the outer target space with the final Stasheff target space,
 in any degree `d`. -/
 def indexedStasheffTargetEquiv
     (d : β) :
-    Hom (stasheffObjOut obj r s t ht 0) (stasheffObjOut obj r s t ht (Fin.last (r + 1 + t))) d
-      ≃ₗ[R] Hom (obj 0) (obj (Fin.last n)) d :=
-  homCongr (by simpa using stasheffObjOut_castLE obj r s t ht 0)
+    (stasheffObjOut obj r s t ht 0 →ᵍ[R]
+      stasheffObjOut obj r s t ht (Fin.last (r + 1 + t))) d
+      ≃ₗ[R] (obj 0 →ᵍ[R] obj (Fin.last n)) d :=
+  homCongr R (by simpa using stasheffObjOut_castLE obj r s t ht 0)
     ((stasheffObjOut_natAdd obj r s t ht (Fin.last t)).trans
       (congrArg obj (Fin.ext (by simp only [Fin.val_cast, Fin.val_natAdd, Fin.val_last]; omega))))
     rfl
@@ -320,8 +323,8 @@ def indexedStasheffTerm
     (hs : 1 ≤ s)
     (d : β)
     (hd : stasheffTargetDeg deg = d) :
-    Hom (obj 0) (obj (Fin.last n)) d :=
-  indexedStasheffTargetEquiv obj r s t ht d
+    (obj 0 →ᵍ[R] obj (Fin.last n)) d :=
+  indexedStasheffTargetEquiv R obj r s t ht d
     (indexedStasheffOuter m x r s t ht hs d ((stasheffDegOut_sum deg r s t ht).trans hd))
 
 /-- The inner value vanishes if the inner multilinear map itself vanishes. -/
@@ -367,7 +370,7 @@ lemma indexedStasheffTerm_eq_zero_iff_outer_eq_zero
     indexedStasheffTerm m x r s t ht hs d hd = 0 ↔
       indexedStasheffOuter m x r s t ht hs d
         ((stasheffDegOut_sum deg r s t ht).trans hd) = 0 :=
-  (indexedStasheffTargetEquiv obj r s t ht d).map_eq_zero_iff
+  (indexedStasheffTargetEquiv R obj r s t ht d).map_eq_zero_iff
 
 /-- The final Stasheff term vanishes if the outer multilinear map vanishes. -/
 lemma indexedStasheffTerm_eq_zero_of_outer_map_eq_zero
@@ -404,7 +407,7 @@ Stasheff target degree. The term indexed by `(r, s)` has `t = n - r - s` trailin
 def indexedStasheffSum
     (d : β)
     (hd : stasheffTargetDeg deg = d) :
-    Hom (obj 0) (obj (Fin.last n)) d :=
+    (obj 0 →ᵍ[R] obj (Fin.last n)) d :=
   ∑ r : Finset.range (n + 1),
     ∑ s : Finset.Ico 1 (n - r.1 + 1),
       have h : ValidStasheffIndices n r.1 s.1 :=
@@ -418,7 +421,7 @@ def indexedStasheffSum
 /-- The Stasheff identities for object-indexed A∞ operations. -/
 def indexedSatisfiesStasheff : Prop :=
   ∀ (n : ℕ) [NeZero n] (obj : Fin (n + 1) → Obj) (deg : Fin n → β)
-    (x : ∀ i : Fin n, ComposableHomType obj i (deg i)) (d : β)
+    (x : ∀ i : Fin n, ComposableHomType R obj i (deg i)) (d : β)
     (hd : stasheffTargetDeg deg = d),
     indexedStasheffSum m x d hd = 0
 
@@ -427,7 +430,7 @@ outer operation are binary. -/
 lemma indexedStasheffTerm_eq_zero_of_arity_ne_two
     (hm : ∀ (k : ℕ) [NeZero k], k ≠ 2 → ∀ obj : Fin (k + 1) → Obj, m obj = 0)
     {n : ℕ} {obj : Fin (n + 1) → Obj} {deg : Fin n → β}
-    (x : ∀ i : Fin n, ComposableHomType obj i (deg i)) (r s t : ℕ) (ht : r + s + t = n)
+    (x : ∀ i : Fin n, ComposableHomType R obj i (deg i)) (r s t : ℕ) (ht : r + s + t = n)
     (hs : 1 ≤ s) (h2 : s ≠ 2 ∨ r + 1 + t ≠ 2) (d : β) (hd : stasheffTargetDeg deg = d) :
     indexedStasheffTerm m x r s t ht hs d hd = 0 := by
   rcases h2 with h2 | h2
@@ -443,7 +446,7 @@ lemma indexedStasheffTerm_eq_zero_of_arity_ne_two
 theorem indexedSatisfiesStasheff_of_arity_two
     (hm : ∀ (k : ℕ) [NeZero k], k ≠ 2 → ∀ obj : Fin (k + 1) → Obj, m obj = 0)
     (h3 : ∀ (obj : Fin (3 + 1) → Obj) (deg : Fin 3 → β)
-      (x : ∀ i : Fin 3, ComposableHomType obj i (deg i)) (d : β)
+      (x : ∀ i : Fin 3, ComposableHomType R obj i (deg i)) (d : β)
       (hd : stasheffTargetDeg deg = d),
       stasheffSign deg 0 2 1 rfl • indexedStasheffTerm m x 0 2 1 rfl (by norm_num) d hd +
         indexedStasheffTerm m x 1 2 0 rfl (by norm_num) d hd = 0) :
