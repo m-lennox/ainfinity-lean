@@ -54,14 +54,8 @@ variable {n : ℕ}
 
 /-- The hom space containing the `i`-th morphism of a composable string of objects, in
 degree `b`. -/
-abbrev ComposableHomType
-    (obj : Fin (n + 1) → Obj)
-    (i : Fin n)
-    (b : β) : Type w' :=
-  Hom
-    (obj ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩)
-    (obj ⟨i.val + 1, by omega⟩)
-    b
+abbrev ComposableHomType (obj : Fin (n + 1) → Obj) (i : Fin n) (b : β) : Type w' :=
+  Hom (obj i.castSucc) (obj i.succ) b
 
 /-- Transport between graded hom spaces along equalities of the source, target and degree.
 This is the three-index form of `LinearEquiv.cast`. -/
