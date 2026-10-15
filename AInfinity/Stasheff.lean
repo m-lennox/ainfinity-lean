@@ -89,28 +89,23 @@ def stasheffInnerDeg : β :=
 /-- Helper: the outer degree function. It lists the degrees of the first `r` inputs, then the
 degree of the inner output, then the degrees of the last `t` inputs. -/
 def stasheffDegOut : Fin (r + 1 + t) → β :=
-  fun i =>
-    if h : i.val < r then
-      deg ⟨i.val, by omega⟩
-    else if h' : i.val = r then
-      stasheffInnerDeg deg r s t ht
-    else
-      deg ⟨i.val + s - 1, by omega⟩
+  Fin.append
+    (Fin.snoc (fun j : Fin r => deg (Fin.cast ht (Fin.castAdd t (Fin.castAdd s j))))
+      (stasheffInnerDeg deg r s t ht))
+    (fun k : Fin t => deg (Fin.cast ht (Fin.natAdd (r + s) k)))
 
 /-- On the first block, the outer degrees are the degrees of the first `r` inputs. -/
 @[simp]
 lemma stasheffDegOut_left
     (j : Fin r) :
-    stasheffDegOut deg r s t ht (Fin.castAdd t (Fin.castAdd 1 j)) =
+    stasheffDegOut deg r s t ht (Fin.castAdd t j.castSucc) =
       deg (Fin.cast ht (Fin.castAdd t (Fin.castAdd s j))) := by
   simp [stasheffDegOut]
-  rfl
 
 /-- In the middle slot, the outer degree is the degree of the inner output. -/
 @[simp]
-lemma stasheffDegOut_middle
-    (k : Fin 1) :
-    stasheffDegOut deg r s t ht (Fin.castAdd t (Fin.natAdd r k)) =
+lemma stasheffDegOut_middle :
+    stasheffDegOut deg r s t ht (Fin.castAdd t (Fin.last r)) =
       stasheffInnerDeg deg r s t ht := by
   simp [stasheffDegOut]
 
@@ -120,24 +115,34 @@ lemma stasheffDegOut_right
     (k : Fin t) :
     stasheffDegOut deg r s t ht (Fin.natAdd (r + 1) k) =
       deg (Fin.cast ht (Fin.natAdd (r + s) k)) := by
-  simp only [stasheffDegOut, Fin.val_natAdd, show ¬ r + 1 + k < r by omega,
-    show r + 1 + k ≠ r by omega, dite_false]
-  congr 1
-  ext
-  simp
-  omega
+  simp [stasheffDegOut]
 
-/-- Helper: the inner object string. -/
+/-- Helper: the inner object string `obj r, …, obj (r + s)`. -/
 def stasheffObjIn : Fin (s + 1) → Obj :=
-  fun j => obj ⟨r + j.val, by omega⟩
+  fun j => obj (Fin.castLE (by omega) (Fin.natAdd r j))
 
-/-- Helper: the outer object string obtained by collapsing the inner block. -/
+/-- Helper: the outer object string `obj 0, …, obj r, obj (r + s), …, obj n` obtained by
+collapsing the inner block. -/
 def stasheffObjOut : Fin (r + 1 + t + 1) → Obj :=
-  fun i =>
-    if h : i.val ≤ r then
-      obj ⟨i.val, by omega⟩
-    else
-      obj ⟨i.val + s - 1, by omega⟩
+  Fin.append (fun i : Fin (r + 1) => obj (Fin.castLE (by omega) i))
+      (fun k : Fin (t + 1) => obj (Fin.cast (by omega) (Fin.natAdd (r + s) k))) ∘
+    Fin.cast (Nat.add_assoc ..)
+
+/-- Up to the inner block, the outer object string agrees with the original one. -/
+@[simp]
+lemma stasheffObjOut_castLE
+    (i : Fin (r + 1)) :
+    stasheffObjOut obj r s t ht (Fin.castLE (by omega) i) = obj (Fin.castLE (by omega) i) := by
+  simp [stasheffObjOut]
+
+/-- After the inner block, the outer object string agrees with the original one, shifted by
+`s - 1`. -/
+@[simp]
+lemma stasheffObjOut_natAdd
+    (k : Fin (t + 1)) :
+    stasheffObjOut obj r s t ht (Fin.natAdd (r + 1) k) =
+      obj (Fin.cast (by omega) (Fin.natAdd (r + s) k)) := by
+  simp [stasheffObjOut]
 
 /-- The finite ranges used in the Stasheff sum produce valid index pairs. -/
 lemma validStasheffIndices_of_mem_ranges
@@ -154,7 +159,7 @@ lemma validStasheffIndices_of_mem_ranges
 lemma stasheffDegOut_sum :
     operationTargetDeg (stasheffDegOut deg r s t ht) = stasheffTargetDeg deg := by
   simp only [operationTargetDeg, stasheffTargetDeg, Fin.sum_univ_add, stasheffDegOut_left,
-    stasheffDegOut_middle, stasheffDegOut_right, Fin.sum_univ_one, stasheffInnerDeg,
+    stasheffDegOut_middle, stasheffDegOut_right, Fin.sum_univ_castSucc, stasheffInnerDeg,
     stasheffDegIn, ← Fin.sum_congr' deg ht]
   rw [show (3 - (n : ℤ)) = (2 - s) + (2 - ((r + 1 + t : ℕ) : ℤ)) by omega, map_add]
   abel
@@ -204,7 +209,7 @@ def indexedStasheffInner
 
 /-- Helper: the middle index in the outer tuple of a Stasheff term. -/
 abbrev indexedStasheffMiddleIndex : Fin (r + 1 + t) :=
-  Fin.castAdd t (Fin.natAdd r 0)
+  Fin.castAdd t (Fin.last r)
 
 variable (obj deg) in
 /-- Before the inserted block, the space of an original input is identified with the
@@ -213,21 +218,20 @@ def indexedStasheffXOutEquivLeft
     (j : Fin r) :
     ComposableHomType obj (Fin.cast ht (Fin.castAdd t (Fin.castAdd s j)))
         (deg (Fin.cast ht (Fin.castAdd t (Fin.castAdd s j)))) ≃ₗ[R]
-      ComposableHomType (stasheffObjOut obj r s t ht) (Fin.castAdd t (Fin.castAdd 1 j))
-        (stasheffDegOut deg r s t ht (Fin.castAdd t (Fin.castAdd 1 j))) :=
-  homCongr (by simp [stasheffObjOut, j.isLt.le])
-    (by simp [stasheffObjOut, Nat.succ_le_of_lt j.isLt]) (by simp)
+      ComposableHomType (stasheffObjOut obj r s t ht) (Fin.castAdd t j.castSucc)
+        (stasheffDegOut deg r s t ht (Fin.castAdd t j.castSucc)) :=
+  homCongr (stasheffObjOut_castLE obj r s t ht j.castSucc).symm
+    (stasheffObjOut_castLE obj r s t ht j.succ).symm (stasheffDegOut_left deg r s t ht j).symm
 
 variable (obj) in
 /-- At the inserted block, the space of the inner output is identified with the outer middle
 input space, in any degree `d`. -/
 def indexedStasheffXOutEquivMid
-    (k : Fin 1)
     (d : β) :
     Hom (stasheffObjIn obj r s t ht 0) (stasheffObjIn obj r s t ht (Fin.last s)) d ≃ₗ[R]
-      ComposableHomType (stasheffObjOut obj r s t ht) (Fin.castAdd t (Fin.natAdd r k)) d :=
-  homCongr (by simp [stasheffObjIn, stasheffObjOut])
-    (by simp [stasheffObjIn, stasheffObjOut]) rfl
+      ComposableHomType (stasheffObjOut obj r s t ht) (indexedStasheffMiddleIndex r t) d :=
+  homCongr (stasheffObjOut_castLE obj r s t ht (Fin.last r)).symm
+    (stasheffObjOut_natAdd obj r s t ht 0).symm rfl
 
 variable (obj deg) in
 /-- After the inserted block, the space of an original input is identified with the
@@ -238,22 +242,8 @@ def indexedStasheffXOutEquivRight
         (deg (Fin.cast ht (Fin.natAdd (r + s) k))) ≃ₗ[R]
       ComposableHomType (stasheffObjOut obj r s t ht) (Fin.natAdd (r + 1) k)
         (stasheffDegOut deg r s t ht (Fin.natAdd (r + 1) k)) :=
-  homCongr
-    (by
-      simp only [stasheffObjOut, Fin.val_natAdd, Fin.val_cast, show ¬ r + 1 + k ≤ r by omega,
-        dite_false]
-      congr 1
-      ext
-      simp only
-      omega)
-    (by
-      simp only [stasheffObjOut, Fin.val_natAdd, Fin.val_cast,
-        show ¬ r + 1 + k + 1 ≤ r by omega, dite_false]
-      congr 1
-      ext
-      simp only
-      omega)
-    (by simp)
+  homCongr (stasheffObjOut_natAdd obj r s t ht k.castSucc).symm
+    (stasheffObjOut_natAdd obj r s t ht k.succ).symm (stasheffDegOut_right deg r s t ht k).symm
 
 /-- Helper: the input tuple for the outer operation in a Stasheff term: the first `r` inputs,
 then the inner output, then the last `t` inputs. -/
@@ -264,14 +254,14 @@ def indexedStasheffXOut
   Fin.addCases
     (motive := fun i =>
       ComposableHomType (stasheffObjOut obj r s t ht) i (stasheffDegOut deg r s t ht i))
-    (Fin.addCases
-      (motive := fun i =>
+    (Fin.snoc
+      (α := fun i =>
         ComposableHomType (stasheffObjOut obj r s t ht) (Fin.castAdd t i)
           (stasheffDegOut deg r s t ht (Fin.castAdd t i)))
       (fun j => indexedStasheffXOutEquivLeft obj deg r s t ht j
         (x (Fin.cast ht (Fin.castAdd t (Fin.castAdd s j)))))
-      (fun k => indexedStasheffXOutEquivMid obj r s t ht k _
-        (indexedStasheffInner m x r s t ht hs _ (by simp))))
+      (indexedStasheffXOutEquivMid obj r s t ht _
+        (indexedStasheffInner m x r s t ht hs _ (stasheffDegOut_middle deg r s t ht).symm)))
     (fun k => indexedStasheffXOutEquivRight obj deg r s t ht k
       (x (Fin.cast ht (Fin.natAdd (r + s) k))))
 
@@ -280,7 +270,7 @@ def indexedStasheffXOut
 lemma indexedStasheffXOut_left
     (hs : 1 ≤ s)
     (j : Fin r) :
-    indexedStasheffXOut m x r s t ht hs (Fin.castAdd t (Fin.castAdd 1 j)) =
+    indexedStasheffXOut m x r s t ht hs (Fin.castAdd t j.castSucc) =
       indexedStasheffXOutEquivLeft obj deg r s t ht j
         (x (Fin.cast ht (Fin.castAdd t (Fin.castAdd s j)))) := by
   simp [indexedStasheffXOut]
@@ -299,10 +289,9 @@ lemma indexedStasheffXOut_right
 lemma indexedStasheffXOut_middle
     (hs : 1 ≤ s) :
     indexedStasheffXOut m x r s t ht hs (indexedStasheffMiddleIndex r t) =
-      indexedStasheffXOutEquivMid obj r s t ht 0 _
-        (indexedStasheffInner m x r s t ht hs _
-          (by simp [indexedStasheffMiddleIndex])) := by
-  simp [indexedStasheffXOut, indexedStasheffMiddleIndex]
+      indexedStasheffXOutEquivMid obj r s t ht _
+        (indexedStasheffInner m x r s t ht hs _ (stasheffDegOut_middle deg r s t ht).symm) := by
+  simp [indexedStasheffXOut]
 
 /-- The middle outer input vanishes whenever the inner output vanishes. -/
 lemma indexedStasheffXOut_middle_eq_zero_of_inner_eq_zero
@@ -329,13 +318,9 @@ def indexedStasheffTargetEquiv
     (d : β) :
     Hom (stasheffObjOut obj r s t ht 0) (stasheffObjOut obj r s t ht (Fin.last (r + 1 + t))) d
       ≃ₗ[R] Hom (obj 0) (obj (Fin.last n)) d :=
-  homCongr (by simp [stasheffObjOut])
-    (by
-      simp only [stasheffObjOut, Fin.val_last, show ¬ r + 1 + t ≤ r by omega, dite_false]
-      congr 1
-      ext
-      simp
-      omega)
+  homCongr (by simpa using stasheffObjOut_castLE obj r s t ht 0)
+    ((stasheffObjOut_natAdd obj r s t ht (Fin.last t)).trans
+      (congrArg obj (Fin.ext (by simp only [Fin.val_cast, Fin.val_natAdd, Fin.val_last]; omega))))
     rfl
 
 /-- A generic Stasheff term builder for object-indexed A∞ operations, in any degree `d` equal
