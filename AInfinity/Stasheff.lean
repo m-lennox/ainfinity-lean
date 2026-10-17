@@ -144,6 +144,16 @@ lemma stasheffObjOut_natAdd
       obj ((k.natAdd (r + s)).cast (by omega)) := by
   simp [stasheffObjOut]
 
+/-- The outer object string starts at the same object as the original one. -/
+lemma stasheffObjOut_zero : stasheffObjOut obj r s t ht 0 = obj 0 := by
+  simpa using stasheffObjOut_castLE obj r s t ht 0
+
+/-- The outer object string ends at the same object as the original one. -/
+lemma stasheffObjOut_last :
+    stasheffObjOut obj r s t ht (Fin.last (r + 1 + t)) = obj (Fin.last n) :=
+  (stasheffObjOut_natAdd obj r s t ht (Fin.last t)).trans
+    (congrArg obj (Fin.ext (by simp only [Fin.val_cast, Fin.val_natAdd, Fin.val_last]; omega)))
+
 /-- The finite ranges used in the Stasheff sum produce valid index pairs. -/
 lemma validStasheffIndices_of_mem_ranges
     {r s : ℕ}
@@ -312,10 +322,7 @@ def indexedStasheffTargetEquiv
     (stasheffObjOut obj r s t ht 0 →ᵍ[R]
       stasheffObjOut obj r s t ht (Fin.last (r + 1 + t))) d
       ≃ₗ[R] (obj 0 →ᵍ[R] obj (Fin.last n)) d :=
-  homCongr R (by simpa using stasheffObjOut_castLE obj r s t ht 0)
-    ((stasheffObjOut_natAdd obj r s t ht (Fin.last t)).trans
-      (congrArg obj (Fin.ext (by simp only [Fin.val_cast, Fin.val_natAdd, Fin.val_last]; omega))))
-    rfl
+  homCongr R (stasheffObjOut_zero obj r s t ht) (stasheffObjOut_last obj r s t ht) rfl
 
 /-- A generic Stasheff term builder for object-indexed A∞ operations, in any degree `d` equal
 to the Stasheff target degree. -/
