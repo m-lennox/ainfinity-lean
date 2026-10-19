@@ -62,28 +62,40 @@ variable {n : ℕ}
 section Degrees
 
 variable {β : Type*} [AddCommGroup β] [GradingType β]
+variable (deg : Fin n → β)
 
 /-- Target degree of the `n`-ary functor component `φₙ`, which has degree `1 - n`. -/
-abbrev functorTargetDeg (deg : Fin n → β) : β :=
+abbrev functorTargetDeg : β :=
   (∑ i, deg i) + shift (1 - (n : ℤ))
 
 /-- The `n`-ary operation `mₙ` has degree one more than the `n`-ary functor component `φₙ`. -/
-lemma operationTargetDeg_eq_functorTargetDeg_add_shift_one (deg : Fin n → β) :
+lemma operationTargetDeg_eq_functorTargetDeg_add_shift_one :
     operationTargetDeg deg = functorTargetDeg deg + shift 1 := by
-  sorry
+  rw [operationTargetDeg, functorTargetDeg, add_assoc, ← map_add]
+  congr 2
+  ring
 
 /-- In an `(r, s, t)` term of the left-hand side of the functor equation, the outer functor
 component lands in the degree of `mₙ`. -/
-lemma functorTargetDeg_stasheffDegOut (deg : Fin n → β) (r s t : ℕ) (ht : r + s + t = n) :
+lemma functorTargetDeg_stasheffDegOut (r s t : ℕ) (ht : r + s + t = n) :
     functorTargetDeg (stasheffDegOut deg r s t ht) = operationTargetDeg deg := by
-  sorry
+  apply add_right_cancel (b := (shift 1 : β))
+  rw [← operationTargetDeg_eq_functorTargetDeg_add_shift_one, stasheffDegOut_sum,
+    stasheffTargetDeg_eq_operationTargetDeg_add_shift_one]
 
 /-- Applying functor components to the blocks of a composition `c` of `n` and then the
 `c.length`-ary operation lands in the degree of `mₙ`. -/
-lemma operationTargetDeg_functorTargetDeg_embedding (deg : Fin n → β) (c : Composition n) :
+lemma operationTargetDeg_functorTargetDeg_embedding (c : Composition n) :
     operationTargetDeg (fun l ↦ functorTargetDeg fun j ↦ deg (c.embedding l j)) =
       operationTargetDeg deg := by
-  sorry
+  have hsum : ∑ l, ∑ j, deg (c.embedding l j) = ∑ i, deg i :=
+    (Fintype.sum_sigma _).symm.trans (c.blocksFinEquiv.sum_comp deg)
+  have hlen : ∑ l, (1 - (c.blocksFun l : ℤ)) + (2 - c.length) = 2 - n := by
+    rw [Finset.sum_sub_distrib, ← Nat.cast_sum, c.sum_blocksFun]
+    simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
+    ring
+  simp only [operationTargetDeg, functorTargetDeg, Finset.sum_add_distrib, hsum, add_assoc,
+    ← map_sum, ← map_add, hlen]
 
 end Degrees
 
@@ -103,13 +115,18 @@ def compositionBlockObj : Fin (c.blocksFun l + 1) → Obj :=
 @[simp]
 lemma compositionBlockObj_zero :
     compositionBlockObj obj c l 0 = obj (c.boundary l.castSucc) := by
-  sorry
+  unfold compositionBlockObj
+  congr 1
 
 /-- The `l`-th block of a composition ends at the `(l + 1)`-st boundary. -/
 @[simp]
 lemma compositionBlockObj_last :
     compositionBlockObj obj c l (Fin.last (c.blocksFun l)) = obj (c.boundary l.succ) := by
-  sorry
+  unfold compositionBlockObj Composition.boundary
+  congr 1
+  ext
+  simp
+  exact symm (Composition.sizeUpTo_succ' _ _)
 
 end CompositionBlock
 
@@ -147,7 +164,10 @@ variable (x : ∀ i : Fin n, ComposableHomType R obj i (deg i))
 /-- The grading homomorphism commutes with taking the degree of an operation. -/
 lemma operationTargetDeg_gradingHom {k : ℕ} (b : Fin k → β_A) :
     operationTargetDeg (fun i ↦ F.gradingHom (b i)) = F.gradingHom (operationTargetDeg b) := by
-  sorry
+  unfold operationTargetDeg
+  rw [← map_sum, map_add]
+  congr
+  exact symm (F.map_shift _)
 
 /-! ### The left-hand side of the functor equation -/
 

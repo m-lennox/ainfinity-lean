@@ -56,6 +56,14 @@ abbrev stasheffTargetDeg
     (deg : Fin n → β) : β :=
   (∑ i, deg i) + shift (3 - (n : ℤ))
 
+/-- The arity-`n` Stasheff relation has degree one more than the `n`-ary operation `m`. -/
+lemma stasheffTargetDeg_eq_operationTargetDeg_add_shift_one
+    (deg : Fin n → β) :
+    stasheffTargetDeg deg = operationTargetDeg deg + shift 1 := by
+  rw [stasheffTargetDeg, operationTargetDeg, add_assoc, ← map_add]
+  congr 2
+  ring
+
 /-- Valid index pairs for an arity-`n` Stasheff summand. -/
 abbrev ValidStasheffIndices (n r s : ℕ) : Prop :=
   1 ≤ s ∧ r + s ≤ n
