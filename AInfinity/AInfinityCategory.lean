@@ -50,7 +50,7 @@ class AInfinityCategoryStruct extends GradedLinearQuiver β R Obj where
 Stasheff identities in every arity. -/
 class AInfinityCategory extends AInfinityCategoryStruct β R Obj where
   /-- The higher compositions satisfy the Stasheff identities. -/
-  stasheff : indexedSatisfiesStasheff m
+  stasheff : IndexedSatisfiesStasheff m
 
 end
 
