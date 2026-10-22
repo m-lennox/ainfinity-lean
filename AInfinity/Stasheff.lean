@@ -83,19 +83,18 @@ structure StasheffIndex (n : ℕ) where
   one_le_s : 1 ≤ s
   deriving DecidableEq
 
-/-- An index triple is determined by `r` and `s`, which are at most `n`. -/
-instance : Finite (StasheffIndex n) :=
-  Finite.of_injective (fun i : StasheffIndex n =>
-      ((⟨i.r, by have := i.sum_eq; omega⟩, ⟨i.s, by have := i.sum_eq; omega⟩) :
-        Fin (n + 1) × Fin (n + 1)))
-    fun i j h => by
-      have := i.sum_eq
-      have := j.sum_eq
-      simp only [Prod.mk.injEq, Fin.mk.injEq] at h
-      ext <;> omega
+/-- An index triple `(r, s, t)` is determined by the endpoints `r < r + s` of the nonempty
+interval of inputs fed to the inner operation. -/
+def StasheffIndex.equivLt : StasheffIndex n ≃ {x : Fin (n + 1) × Fin (n + 1) // x.1 < x.2} where
+  toFun p := ⟨(⟨p.r, by have := p.sum_eq; omega⟩, ⟨p.r + p.s, by have := p.sum_eq; omega⟩),
+    Fin.mk_lt_mk.2 (Nat.lt_add_of_pos_right p.one_le_s)⟩
+  invFun x := ⟨x.1.1, x.1.2 - x.1.1, n - x.1.2, by have := x.1.2.isLt; omega,
+    Nat.sub_pos_of_lt x.2⟩
+  left_inv p := by have := p.sum_eq; ext <;> dsimp only <;> omega
+  right_inv x := Subtype.ext <| Prod.ext rfl <| Fin.ext <| Nat.add_sub_cancel' x.2.le
 
-noncomputable instance : Fintype (StasheffIndex n) :=
-  .ofFinite _
+instance : Fintype (StasheffIndex n) :=
+  .ofEquiv _ StasheffIndex.equivLt.symm
 
 /-- The inner operation of a Stasheff term has positive arity. -/
 instance (p : StasheffIndex n) : NeZero p.s :=
