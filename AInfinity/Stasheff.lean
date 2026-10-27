@@ -162,14 +162,13 @@ def stasheffObjIn : Fin (p.s + 1) → Obj :=
 /-- Helper: the outer object string `obj 0, …, obj r, obj (r + s), …, obj n` obtained by
 collapsing the inner block. -/
 def stasheffObjOut : Fin (p.r + 1 + p.t + 1) → Obj :=
-  Fin.append (fun j : Fin (p.r + 1) => obj (j.castLE (by have := p.sum_eq; omega)))
+  Fin.append (m := p.r + 1) (fun j : Fin (p.r + 1) => obj (j.castLE (by have := p.sum_eq; omega)))
       (fun k : Fin (p.t + 1) =>
-        obj ((k.natAdd (p.r + p.s)).cast (by have := p.sum_eq; omega))) ∘
-    Fin.cast (Nat.add_assoc ..)
+        obj ((k.natAdd (p.r + p.s)).cast (by have := p.sum_eq; omega)))
 
 /-- Up to the inner block, the outer object string agrees with the original one. -/
 @[simp]
-lemma stasheffObjOut_castLE
+lemma stasheffObjOut_left
     (j : Fin (p.r + 1)) :
     stasheffObjOut obj p (j.castLE (by omega)) =
       obj (j.castLE (by have := p.sum_eq; omega)) := by
@@ -178,7 +177,7 @@ lemma stasheffObjOut_castLE
 /-- After the inner block, the outer object string agrees with the original one, shifted by
 `s - 1`. -/
 @[simp]
-lemma stasheffObjOut_natAdd
+lemma stasheffObjOut_right
     (k : Fin (p.t + 1)) :
     stasheffObjOut obj p (k.natAdd (p.r + 1)) =
       obj ((k.natAdd (p.r + p.s)).cast (by have := p.sum_eq; omega)) := by
@@ -186,12 +185,12 @@ lemma stasheffObjOut_natAdd
 
 /-- The outer object string starts at the same object as the original one. -/
 lemma stasheffObjOut_zero : stasheffObjOut obj p 0 = obj 0 := by
-  simpa using stasheffObjOut_castLE obj p 0
+  simpa using stasheffObjOut_left obj p 0
 
 /-- The outer object string ends at the same object as the original one. -/
 lemma stasheffObjOut_last :
     stasheffObjOut obj p (Fin.last (p.r + 1 + p.t)) = obj (Fin.last n) :=
-  (stasheffObjOut_natAdd obj p (Fin.last p.t)).trans (congrArg obj (Fin.ext (by
+  (stasheffObjOut_right obj p (Fin.last p.t)).trans (congrArg obj (Fin.ext (by
     have := p.sum_eq
     simp only [Fin.val_cast, Fin.val_natAdd, Fin.val_last]
     omega)))
@@ -259,8 +258,8 @@ def indexedStasheffXOutEquivLeft
         (deg (((j.castAdd p.s).castAdd p.t).cast p.sum_eq)) ≃ₗ[R]
       ComposableHomType R (stasheffObjOut obj p) (j.castSucc.castAdd p.t)
         (stasheffDegOut deg p (j.castSucc.castAdd p.t)) :=
-  homCongr R (stasheffObjOut_castLE obj p j.castSucc).symm
-    (stasheffObjOut_castLE obj p j.succ).symm (stasheffDegOut_left deg p j).symm
+  homCongr R (stasheffObjOut_left obj p j.castSucc).symm
+    (stasheffObjOut_left obj p j.succ).symm (stasheffDegOut_left deg p j).symm
 
 variable (R obj) in
 /-- At the inserted block, the space of the inner output is identified with the outer middle
@@ -269,8 +268,8 @@ def indexedStasheffXOutEquivMid
     (d : β) :
     (stasheffObjIn obj p 0 →ᵍ[R] stasheffObjIn obj p (Fin.last p.s)) d ≃ₗ[R]
       ComposableHomType R (stasheffObjOut obj p) (indexedStasheffMiddleIndex p) d :=
-  homCongr R (stasheffObjOut_castLE obj p (Fin.last p.r)).symm
-    (stasheffObjOut_natAdd obj p 0).symm rfl
+  homCongr R (stasheffObjOut_left obj p (Fin.last p.r)).symm
+    (stasheffObjOut_right obj p 0).symm rfl
 
 variable (R obj deg) in
 /-- After the inserted block, the space of an original input is identified with the
@@ -281,8 +280,8 @@ def indexedStasheffXOutEquivRight
         (deg ((k.natAdd (p.r + p.s)).cast p.sum_eq)) ≃ₗ[R]
       ComposableHomType R (stasheffObjOut obj p) (k.natAdd (p.r + 1))
         (stasheffDegOut deg p (k.natAdd (p.r + 1))) :=
-  homCongr R (stasheffObjOut_natAdd obj p k.castSucc).symm
-    (stasheffObjOut_natAdd obj p k.succ).symm (stasheffDegOut_right deg p k).symm
+  homCongr R (stasheffObjOut_right obj p k.castSucc).symm
+    (stasheffObjOut_right obj p k.succ).symm (stasheffDegOut_right deg p k).symm
 
 /-- Helper: the input tuple for the outer operation in a Stasheff term: the first `r` inputs,
 then the inner output, then the last `t` inputs. -/
