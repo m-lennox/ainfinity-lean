@@ -208,8 +208,10 @@ public lemma ext {f g : β →+ᵍ β'} (h : ∀ b, f b = g b) : f = g :=
 
 /-- A homomorphism of grading types is determined by its underlying additive homomorphism. -/
 public lemma toAddMonoidHom_injective :
-    Function.Injective (toAddMonoidHom : (β →+ᵍ β') → β →+ β') :=
-  fun _ _ h => ext (DFunLike.congr_fun h)
+    Function.Injective (toAddMonoidHom : (β →+ᵍ β') → β →+ β') := by
+  intro f g h
+  ext b
+  rw [← coe_toAddMonoidHom f, ← coe_toAddMonoidHom g, h]
 
 /-- A homomorphism of grading types preserves the integer degree shifts. -/
 @[simp]
