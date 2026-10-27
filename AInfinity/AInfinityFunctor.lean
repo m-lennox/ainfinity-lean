@@ -74,7 +74,7 @@ lemma operationTargetDeg_eq_functorTargetDeg_add_shift_one :
     operationTargetDeg deg = functorTargetDeg deg + shift 1 := by
   rw [operationTargetDeg, functorTargetDeg, add_assoc, ← map_add]
   congr 2
-  ring
+  lia
 
 /-- In the term of the left-hand side of the functor equation indexed by `p = (r, s, t)`, the
 outer functor component lands in the degree of `mₙ`. -/
@@ -94,7 +94,7 @@ lemma operationTargetDeg_functorTargetDeg_embedding (c : Composition n) :
   have hlen : ∑ l, (1 - (c.blocksFun l : ℤ)) + (2 - c.length) = 2 - n := by
     rw [Finset.sum_sub_distrib, ← Nat.cast_sum, c.sum_blocksFun]
     simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
-    ring
+    lia
   simp only [operationTargetDeg, functorTargetDeg, Finset.sum_add_distrib, hsum, add_assoc,
     ← map_sum, ← map_add, hlen]
 
