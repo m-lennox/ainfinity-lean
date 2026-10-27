@@ -24,7 +24,8 @@ sign arises from moving it past the inputs (compare [Seidel, *Fukaya categories 
 Picard–Lefschetz theory*, (1.6)]).
 
 The source and target may be graded by different grading types `β` and `β'`; the functor then
-carries a homomorphism `β →+ β'` compatible with the integer shifts and the Koszul signs.
+carries a homomorphism of grading types `β →+ᵍ β'`, which preserves the integer shifts
+and the Koszul signs.
 
 ## Main definitions
 
@@ -155,12 +156,8 @@ structure AInfinityFunctorData (β β' : Type*) [AddCommGroup β] [GradingType �
     [GradedLinearQuiver β R Obj] [GradedLinearQuiver β' R Obj'] where
   /-- The action of the functor on objects. -/
   obj : Obj → Obj'
-  /-- The translation of degrees from the source grading to the target grading. -/
-  degMap : β →+ β'
-  /-- The grading homomorphism preserves the integer degree shifts. -/
-  degMap_shift : ∀ k : ℤ, degMap (shift k) = shift k
-  /-- The grading homomorphism preserves the Koszul signs. -/
-  degMap_sign : ∀ b : β, sign (degMap b) = sign b
+  /-- The homomorphism of grading types translating source degrees into target degrees. -/
+  degMap : β →+ᵍ β'
   /-- The action of the functor on hom spaces, i.e. the functor components `φₙ`, of degree
   `1 - n`, landing in the hom spaces of the target in the translated degrees. -/
   map : {n : ℕ} → [NeZero n] → (X : Fin (n + 1) → Obj) →
@@ -181,9 +178,7 @@ variable (x : ∀ i : Fin n, ComposableHomType R obj i (deg i))
 /-- The grading homomorphism commutes with taking the degree of an operation. -/
 lemma operationTargetDeg_degMap {k : ℕ} (b : Fin k → β) :
     operationTargetDeg (fun i ↦ F.degMap (b i)) = F.degMap (operationTargetDeg b) := by
-  simp only [operationTargetDeg, ← map_sum, map_add]
-  congr 1
-  exact (F.degMap_shift _).symm
+  simp only [operationTargetDeg, map_add, map_sum, GradingHom.map_shift]
 
 /-- Applying functor components to the blocks of a composition `c` of `n` and then the
 `c.length`-ary operation of the target lands in the image of the degree of `mₙ`. -/
