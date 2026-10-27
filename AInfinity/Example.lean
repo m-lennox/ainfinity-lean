@@ -1,6 +1,8 @@
 module
 
 public import AInfinity.AInfinityCategory
+public import Mathlib.Algebra.Module.Basic
+public import Mathlib.CategoryTheory.Linear.Basic
 
 open AInfinityTheory CategoryTheory
 

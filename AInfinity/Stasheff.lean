@@ -5,7 +5,7 @@ Authors: Annie Yao, Marco David, Zhan Shi
 -/
 module
 
-public import Mathlib
+public import Mathlib.Algebra.BigOperators.Fin
 public import AInfinity.Grading
 public import AInfinity.GradedLinearAlgebra
 public import AInfinity.GradedLinearQuiver
@@ -28,7 +28,7 @@ m_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, a_n) = 0`.
 * `AInfinityTheory.stasheffSign`: the Koszul sign of the `(r, s, t)` summand.
 * `AInfinityTheory.signedStasheffSum`: the sum of a family of `(r, s, t)` terms with these signs.
 * `AInfinityTheory.indexedStasheffSum`: the signed Stasheff sum in arity `n`.
-* `AInfinityTheory.indexedSatisfiesStasheff`: the Stasheff identities in every arity.
+* `AInfinityTheory.IndexedSatisfiesStasheff`: the Stasheff identities in every arity.
 
 ## Main results
 
@@ -37,10 +37,6 @@ m_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, a_n) = 0`.
 -/
 
 @[expose] public section
-
-open CategoryTheory Finset AInfinityTheory
-
-noncomputable section
 
 namespace AInfinityTheory
 
@@ -59,13 +55,13 @@ abbrev stasheffTargetDeg
     (deg : Fin n → β) : β :=
   (∑ i, deg i) + shift (3 - (n : ℤ))
 
-/-- The arity-`n` Stasheff relation has degree one more than the `n`-ary operation `m`. -/
-lemma stasheffTargetDeg_eq_operationTargetDeg_add_shift_one
-    (deg : Fin n → β) :
-    stasheffTargetDeg deg = operationTargetDeg deg + shift 1 := by
-  rw [stasheffTargetDeg, operationTargetDeg, add_assoc, ← map_add]
-  congr 2
-  ring
+-- /-- The arity-`n` Stasheff relation has degree one more than the `n`-ary operation `m`. -/
+-- lemma stasheffTargetDeg_eq_operationTargetDeg_add_shift_one
+--     (deg : Fin n → β) :
+--     stasheffTargetDeg deg = operationTargetDeg deg + shift 1 := by
+--   rw [stasheffTargetDeg, operationTargetDeg, add_assoc, ← map_add]
+--   congr 2
+--   ring
 
 /-- An index triple `(r, s, t)` of the arity-`n` Stasheff identity: `r + s + t = n` and
 `1 ≤ s`. -/
@@ -216,7 +212,7 @@ lemma stasheffDegOut_sum :
 variable {obj deg}
 
 /-- Rewriting the degree function and transporting each input does not change the value of `m`. -/
-lemma multilinearFamily_eq_of_deg_eq
+lemma aInfinityComposition_homCongr_deg
     [NeZero n]
     {deg deg' : Fin n → β}
     (hdeg : deg = deg')
@@ -236,6 +232,7 @@ def indexedStasheffXIn :
 
 omit [AddCommGroup β] [GradingType β] in
 /-- Evaluating the inner input tuple just picks out the corresponding original input. -/
+@[simp]
 lemma indexedStasheffXIn_apply
     (j : Fin p.s) :
     indexedStasheffXIn x p j = x (((j.natAdd p.r).castAdd p.t).cast p.sum_eq) :=
@@ -445,7 +442,7 @@ def indexedStasheffSum
   signedStasheffSum deg fun q => indexedStasheffTerm m x q d hd
 
 /-- The Stasheff identities for object-indexed A∞ operations. -/
-def indexedSatisfiesStasheff : Prop :=
+def IndexedSatisfiesStasheff : Prop :=
   ∀ (n : ℕ) [NeZero n] (obj : Fin (n + 1) → Obj) (deg : Fin n → β)
     (x : ∀ i : Fin n, ComposableHomType R obj i (deg i)) (d : β)
     (hd : stasheffTargetDeg deg = d),
@@ -475,7 +472,7 @@ theorem indexedSatisfiesStasheff_of_arity_two
       stasheffSign deg ⟨0, 2, 1, rfl, by norm_num⟩ •
           indexedStasheffTerm m x ⟨0, 2, 1, rfl, by norm_num⟩ d hd +
         indexedStasheffTerm m x ⟨1, 2, 0, rfl, by norm_num⟩ d hd = 0) :
-    indexedSatisfiesStasheff m := by
+    IndexedSatisfiesStasheff m := by
   intro n _ obj deg x d hd
   have hterm := indexedStasheffTerm_eq_zero_of_arity_ne_two m hm x
   rcases eq_or_ne n 3 with rfl | hn
