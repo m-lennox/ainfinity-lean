@@ -30,9 +30,9 @@ carries a homomorphism `β →+ β'` compatible with the integer shifts and the 
 
 * `AInfinityTheory.AInfinityFunctorData β β' R Obj Obj'`: a map on objects, a grading
   homomorphism and functor components `φₙ`, not yet subject to any relations.
-* `AInfinityTheory.AInfinityFunctorData.lhs`: the left-hand side of the arity-`n`
+* `AInfinityTheory.AInfinityFunctorData.mapCompSum`: the left-hand side of the arity-`n`
   functor equation.
-* `AInfinityTheory.AInfinityFunctorData.rhs`: the right-hand side of the arity-`n`
+* `AInfinityTheory.AInfinityFunctorData.compMapSum`: the right-hand side of the arity-`n`
   functor equation.
 * `AInfinityTheory.AInfinityFunctorData.SatisfiesFunctorEquations`: the functor equations in
   every arity.
@@ -107,6 +107,16 @@ variable {Obj : Type*} (obj : Fin (n + 1) → Obj) (c : Composition n) (l : Fin 
 /-- The `l`-th block of a composition `c` of `n` ends no later than `n`. -/
 lemma _root_.Composition.sizeUpTo_add_blocksFun_le : c.sizeUpTo l + c.blocksFun l ≤ n :=
   (c.sizeUpTo_succ' l).symm.trans_le (c.sizeUpTo_le _)
+
+/-- Every block of a composition is nonempty, so the functor component `φ_{iₗ}` applied to it
+has positive arity. -/
+instance _root_.Composition.neZero_blocksFun : NeZero (c.blocksFun l) :=
+  NeZero.of_pos (c.one_le_blocksFun l)
+
+/-- A composition of a positive integer has at least one block, so the outer operation
+`m'_k` applied to the blocks has positive arity. -/
+instance _root_.Composition.neZero_length [NeZero n] : NeZero c.length :=
+  NeZero.of_pos (c.length_pos_of_pos (NeZero.pos n))
 
 /-- The object string `obj iₗ, …, obj (iₗ + c.blocksFun l)` of the `l`-th block of a composition
 `c` of `n`, where `iₗ = c.sizeUpTo l` is the start of the block. -/
@@ -183,7 +193,7 @@ lemma operationTargetDeg_degMap_functorTargetDeg_embedding (c : Composition n) (
 /-- The term `φ_{r+1+t}(a_1, …, a_r, m_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, a_n)` of the
 left-hand side of the functor equation indexed by `p = (r, s, t)`, in degree `F.degMap d` for
 any `d` equal to the degree of `mₙ`. -/
-def lhsTerm (p : StasheffIndex n) (d : β) (hd : operationTargetDeg deg = d) :
+def mapCompTerm (p : StasheffIndex n) (d : β) (hd : operationTargetDeg deg = d) :
     (F.obj (obj 0) →ᵍ[R] F.obj (obj (Fin.last n))) (F.degMap d) :=
   homCongr R (congrArg F.obj (stasheffObjOut_zero obj p))
     (congrArg F.obj (stasheffObjOut_last obj p)) rfl
@@ -192,18 +202,17 @@ def lhsTerm (p : StasheffIndex n) (d : β) (hd : operationTargetDeg deg = d) :
 
 /-- The left-hand side of the arity-`n` functor equation, with the Koszul signs of the Stasheff
 identities, in degree `F.degMap d` for any `d` equal to the degree of `mₙ`. -/
-def lhs (d : β) (hd : operationTargetDeg deg = d) :
+def mapCompSum (d : β) (hd : operationTargetDeg deg = d) :
     (F.obj (obj 0) →ᵍ[R] F.obj (obj (Fin.last n))) (F.degMap d) :=
-  signedStasheffSum deg fun p ↦ F.lhsTerm m x p d hd
+  signedStasheffSum deg fun p ↦ F.mapCompTerm m x p d hd
 
 /-! ### The right-hand side of the functor equation -/
 
 /-- The output `φ_{iₗ}` of the `l`-th block of a composition `c = (i₁, …, iₖ)` of `n`, as the
 `l`-th input of the outer operation `m'_k`. -/
-def rhsInput (c : Composition n) (l : Fin c.length) :
+def compositionBlockMap (c : Composition n) (l : Fin c.length) :
     ComposableHomType R (fun k ↦ F.obj (obj (c.boundary k))) l
       (F.degMap (functorTargetDeg fun j ↦ deg (c.embedding l j))) :=
-  haveI : NeZero (c.blocksFun l) := NeZero.of_pos (c.one_le_blocksFun l)
   homCongr R (congrArg F.obj (compositionBlockObj_zero obj c l))
     (congrArg F.obj (compositionBlockObj_last obj c l)) rfl
     (F.map (compositionBlockObj obj c l) (fun j ↦ deg (c.embedding l j)) _ rfl
@@ -212,21 +221,20 @@ def rhsInput (c : Composition n) (l : Fin c.length) :
 /-- The term `m'_k(φ_{i₁}(a_1, …, a_{i₁}), …, φ_{iₖ}(a_{n-iₖ+1}, …, a_n))` of the right-hand
 side of the functor equation indexed by a composition `c = (i₁, …, iₖ)` of `n`, in degree
 `F.degMap d` for any `d` equal to the degree of `mₙ`. -/
-def rhsTerm [NeZero n] (c : Composition n) (d : β) (hd : operationTargetDeg deg = d) :
+def compMapTerm [NeZero n] (c : Composition n) (d : β) (hd : operationTargetDeg deg = d) :
     (F.obj (obj 0) →ᵍ[R] F.obj (obj (Fin.last n))) (F.degMap d) :=
-  haveI : NeZero c.length := NeZero.of_pos (c.length_pos_of_pos (NeZero.pos n))
   homCongr R (congrArg (fun k ↦ F.obj (obj k)) c.boundary_zero)
     (congrArg (fun k ↦ F.obj (obj k)) c.boundary_last) rfl
     (m' (fun k ↦ F.obj (obj (c.boundary k)))
       (fun l ↦ F.degMap (functorTargetDeg fun j ↦ deg (c.embedding l j))) (F.degMap d)
       (F.operationTargetDeg_degMap_functorTargetDeg_embedding c d hd)
-      (F.rhsInput x c))
+      (F.compositionBlockMap x c))
 
 /-- The right-hand side of the arity-`n` functor equation, summed over all compositions of `n`,
 in degree `F.degMap d` for any `d` equal to the degree of `mₙ`. -/
-def rhs [NeZero n] (d : β) (hd : operationTargetDeg deg = d) :
+def compMapSum [NeZero n] (d : β) (hd : operationTargetDeg deg = d) :
     (F.obj (obj 0) →ᵍ[R] F.obj (obj (Fin.last n))) (F.degMap d) :=
-  ∑ c : Composition n, F.rhsTerm m' x c d hd
+  ∑ c : Composition n, F.compMapTerm m' x c d hd
 
 /-- The `A∞`-functor equations: in every arity `n ≥ 1`, the left-hand side and the right-hand
 side of the functor equation agree on every composable string of inputs. -/
@@ -234,7 +242,7 @@ def SatisfiesFunctorEquations : Prop :=
   ∀ (n : ℕ) [NeZero n] (obj : Fin (n + 1) → Obj) (deg : Fin n → β)
     (x : ∀ i : Fin n, ComposableHomType R obj i (deg i)) (d : β)
     (hd : operationTargetDeg deg = d),
-    F.lhs m x d hd = F.rhs m' x d hd
+    F.mapCompSum m x d hd = F.compMapSum m' x d hd
 
 end AInfinityFunctorData
 
