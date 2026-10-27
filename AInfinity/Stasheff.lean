@@ -22,11 +22,11 @@ m_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, a_n) = 0`.
 
 * `AInfinityTheory.AInfinityComposition`: the type of higher compositions `mₙ` on a graded
   linear quiver.
-* `AInfinityTheory.indexedStasheffTerm`: the `(r, s, t)` summand of the Stasheff sum.
 * `AInfinityTheory.StasheffIndex`: the index triples `(r, s, t)` with `r + s + t = n` and
   `1 ≤ s`.
 * `AInfinityTheory.stasheffSign`: the Koszul sign of the `(r, s, t)` summand.
 * `AInfinityTheory.signedStasheffSum`: the sum of a family of `(r, s, t)` terms with these signs.
+* `AInfinityTheory.indexedStasheffTerm`: the `(r, s, t)` summand of the Stasheff sum.
 * `AInfinityTheory.indexedStasheffSum`: the signed Stasheff sum in arity `n`.
 * `AInfinityTheory.IndexedSatisfiesStasheff`: the Stasheff identities in every arity.
 
@@ -45,17 +45,17 @@ universe u v w
 variable {β : Type v} [AddCommGroup β] [GradingType β]
 variable {n : ℕ}
 
-/-- Target degree of the `n`-ary operation `m`. -/
+/-- Target degree of the `n`-ary operation `mₙ` on inputs of degrees `deg`. -/
 abbrev operationTargetDeg
     (deg : Fin n → β) : β :=
   (∑ i, deg i) + shift (2 - (n : ℤ))
 
-/-- Target degree of the arity-`n` Stasheff relation. -/
+/-- Target degree of the arity-`n` Stasheff identity on inputs of degrees `deg`. -/
 abbrev stasheffTargetDeg
     (deg : Fin n → β) : β :=
   (∑ i, deg i) + shift (3 - (n : ℤ))
 
-/-- The arity-`n` Stasheff relation has degree one more than the `n`-ary operation `m`. -/
+/-- The arity-`n` Stasheff identity has degree one more than the `n`-ary operation `mₙ`. -/
 lemma stasheffTargetDeg_eq_operationTargetDeg_add_shift_one
     (deg : Fin n → β) :
     stasheffTargetDeg deg = operationTargetDeg deg + shift 1 := by
@@ -89,6 +89,8 @@ def StasheffIndex.equivLt : StasheffIndex n ≃ {x : Fin (n + 1) × Fin (n + 1) 
   left_inv p := by have := p.sum_eq; ext <;> dsimp only <;> omega
   right_inv x := Subtype.ext <| Prod.ext rfl <| Fin.ext <| Nat.add_sub_cancel' x.2.le
 
+/-- The index triples of the arity-`n` Stasheff identity form a finite type, through their
+identification with pairs of endpoints. -/
 instance : Fintype (StasheffIndex n) :=
   .ofEquiv _ StasheffIndex.equivLt.symm
 
