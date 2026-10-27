@@ -183,17 +183,16 @@ lemma stasheffObjOut_right
       obj ((k.natAdd (p.r + p.s)).cast (by have := p.sum_eq; omega)) := by
   simp [stasheffObjOut]
 
-/-- The outer object string starts at the same object as the original one. -/
-lemma stasheffObjOut_zero : stasheffObjOut obj p 0 = obj 0 := by
-  simpa using stasheffObjOut_left obj p 0
+/-- The outer object string starts at `obj 0`. -/
+@[simp]
+lemma stasheffObjOut_zero : stasheffObjOut obj p 0 = obj 0 :=
+  stasheffObjOut_left obj p 0
 
-/-- The outer object string ends at the same object as the original one. -/
+/-- The outer object string ends at `obj (Fin.last n)`. -/
+@[simp]
 lemma stasheffObjOut_last :
     stasheffObjOut obj p (Fin.last (p.r + 1 + p.t)) = obj (Fin.last n) :=
-  (stasheffObjOut_right obj p (Fin.last p.t)).trans (congrArg obj (Fin.ext (by
-    have := p.sum_eq
-    simp only [Fin.val_cast, Fin.val_natAdd, Fin.val_last]
-    omega)))
+  (stasheffObjOut_right obj p (Fin.last p.t)).trans (congrArg obj (Fin.ext p.sum_eq))
 
 /-- The outer operation has the Stasheff target degree. -/
 lemma stasheffDegOut_sum :
@@ -315,6 +314,7 @@ lemma indexedStasheffXOut_right
   simp [indexedStasheffXOut]
 
 /-- The middle outer input is the transported inner output. -/
+@[simp]
 lemma indexedStasheffXOut_middle :
     indexedStasheffXOut m x p (indexedStasheffMiddleIndex p) =
       indexedStasheffXOutEquivMid R obj p _
