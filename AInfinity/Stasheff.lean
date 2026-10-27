@@ -45,7 +45,8 @@ universe u v w
 variable {β : Type v} [AddCommGroup β] [GradingType β]
 variable {n : ℕ}
 
-/-- The degree of `mₙ(a₁, …, aₙ)` for inputs of degrees `deg`, where `mₙ` has degree `2 - n`. -/
+/-- The degree of `mₙ(a₁, …, aₙ)` for inputs `aᵢ` of degrees `deg i`, where `mₙ` itself has
+degree `2 - n`. -/
 abbrev operationTargetDeg
     (deg : Fin n → β) : β :=
   (∑ i, deg i) + shift (2 - (n : ℤ))

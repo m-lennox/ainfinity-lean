@@ -88,7 +88,8 @@ section Degrees
 variable {β : Type*} [AddCommGroup β] [GradingType β]
 variable (deg : Fin n → β)
 
-/-- The degree of `φₙ(a₁, …, aₙ)` for inputs of degrees `deg`, where `φₙ` has degree `1 - n`. -/
+/-- The degree of `φₙ(a₁, …, aₙ)` for inputs `aᵢ` of degrees `deg i`, where `φₙ` itself has
+degree `1 - n`. -/
 abbrev functorTargetDeg : β :=
   (∑ i, deg i) + shift (1 - (n : ℤ))
 
