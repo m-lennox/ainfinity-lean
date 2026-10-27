@@ -60,6 +60,14 @@ open GradedLinearQuiver
 
 variable {n : ℕ}
 
+/-- Taking the product over each block of a composition `c` of `n`, and then over the blocks, is
+the same as taking the product over `Fin n`. -/
+@[to_additive /-- Summing over each block of a composition `c` of `n`, and then over the blocks,
+is the same as summing over `Fin n`. -/]
+lemma _root_.Composition.prod_prod_embedding {M : Type*} [CommMonoid M] (c : Composition n)
+    (f : Fin n → M) : ∏ l, ∏ j, f (c.embedding l j) = ∏ i, f i :=
+  (Fintype.prod_sigma _).symm.trans (c.blocksFinEquiv.prod_comp f)
+
 section Degrees
 
 variable {β : Type*} [AddCommGroup β] [GradingType β]
@@ -89,13 +97,11 @@ lemma functorTargetDeg_stasheffDegOut (p : StasheffIndex n) :
 lemma operationTargetDeg_functorTargetDeg_embedding (c : Composition n) :
     operationTargetDeg (fun l ↦ functorTargetDeg fun j ↦ deg (c.embedding l j)) =
       operationTargetDeg deg := by
-  have hsum : ∑ l, ∑ j, deg (c.embedding l j) = ∑ i, deg i :=
-    (Fintype.sum_sigma _).symm.trans (c.blocksFinEquiv.sum_comp deg)
   have hlen : ∑ l, (1 - (c.blocksFun l : ℤ)) + (2 - c.length) = 2 - n := by
     rw [Finset.sum_sub_distrib, ← Nat.cast_sum, c.sum_blocksFun]
     simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
     lia
-  simp only [operationTargetDeg, functorTargetDeg, Finset.sum_add_distrib, hsum, add_assoc,
+  simp only [operationTargetDeg, functorTargetDeg, Finset.sum_add_distrib, c.sum_sum_embedding, add_assoc,
     ← map_sum, ← map_add, hlen]
 
 end Degrees
