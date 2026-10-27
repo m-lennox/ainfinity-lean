@@ -158,7 +158,7 @@ structure AInfinityFunctorData (β β' : Type*) [AddCommGroup β] [GradingType �
   /-- The action of the functor on hom spaces, i.e. the functor components `φₙ`, of degree
   `1 - n`, landing in the hom spaces of the target in the translated degrees. -/
   map : {n : ℕ} → [NeZero n] → (X : Fin (n + 1) → Obj) →
-    GradedMultilinearMap R (ComposableHomType R (β := β) X)
+    GradedMultilinearMap R (ComposableHomType R X)
       (fun b : β ↦ (obj (X 0) →ᵍ[R] obj (X (Fin.last n))) (degMap b))
       (shift (1 - (n : ℤ)))
 
