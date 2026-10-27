@@ -15,8 +15,8 @@ public import AInfinity.GradedLinearQuiver
 Given a graded `R`-linear quiver with higher compositions
 `mₙ : Hom(X₀, X₁) ⊗ ⋯ ⊗ Hom(Xₙ₋₁, Xₙ) → Hom(X₀, Xₙ)` of degree `2 - n`, the arity-`n` Stasheff
 identity states that
-`∑_{r + s + t = n, s ≥ 1} (-1)^(‖a_{r+s+1}‖ + ⋯ + ‖a_n‖) m_{r+1+t}(a_1, …, a_r,
-m_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, a_n) = 0`.
+`∑_{r + s + t = n, s ≥ 1} (-1)^(‖a_{r+s+1}‖ + ⋯ + ‖aₙ‖) m_{r+1+t}(a₁, …, aᵣ,
+mₛ(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, aₙ) = 0`.
 
 ## Main definitions
 
@@ -410,14 +410,14 @@ lemma indexedStasheffTerm_eq_zero_of_inner_map_eq_zero
       (indexedStasheffInner_eq_zero_of_map_eq_zero m x p hm) _ _)
 
 variable (deg) in
-/-- The Koszul sign `(-1)^(‖a_{r+s+1}‖ + ⋯ + ‖a_n‖)` of the Stasheff term indexed by
+/-- The Koszul sign `(-1)^(‖a_{r+s+1}‖ + ⋯ + ‖aₙ‖)` of the Stasheff term indexed by
 `p = (r, s, t)`, where `‖a‖ = |a| - 1` is the reduced degree of an input after the inner
 operation. -/
 def stasheffSign : ℤˣ :=
   ∏ k : Fin p.t, sign (deg ((k.natAdd (p.r + p.s)).cast p.sum_eq) - shift 1)
 
 variable (deg) in
-/-- The signed sum `∑_{r + s + t = n, s ≥ 1} (-1)^(‖a_{r+s+1}‖ + ⋯ + ‖a_n‖) f (r, s, t)` over
+/-- The signed sum `∑_{r + s + t = n, s ≥ 1} (-1)^(‖a_{r+s+1}‖ + ⋯ + ‖aₙ‖) f (r, s, t)` over
 the index triples `StasheffIndex n` of the arity-`n` Stasheff identity. Both the Stasheff
 identities and the `A∞`-functor equations are sums of this form. -/
 def signedStasheffSum {M : Type*} [AddCommGroup M] (f : StasheffIndex n → M) : M :=

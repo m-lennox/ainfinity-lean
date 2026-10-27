@@ -14,9 +14,9 @@ An `A∞`-functor `F : A → B` between `A∞`-categories consists of a map on o
 for each `n ≥ 1`, a multilinear map
 `φₙ : Hom(X₀, X₁) ⊗ ⋯ ⊗ Hom(Xₙ₋₁, Xₙ) → Hom(F X₀, F Xₙ)` of degree `1 - n`, satisfying the
 `A∞`-functor equations
-`∑_{r + s + t = n, s ≥ 1} (-1)^(‖a_{r+s+1}‖ + ⋯ + ‖a_n‖)
-  φ_{r+1+t}(a_1, …, a_r, m_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, a_n)
-= ∑_{k ≥ 1} ∑_{i₁ + ⋯ + iₖ = n} m'_k(φ_{i₁}(a_1, …, a_{i₁}), …, φ_{iₖ}(a_{n-iₖ+1}, …, a_n))`.
+`∑_{r + s + t = n, s ≥ 1} (-1)^(‖a_{r+s+1}‖ + ⋯ + ‖aₙ‖)
+  φ_{r+1+t}(a₁, …, aᵣ, mₛ(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, aₙ)
+= ∑_{k ≥ 1} ∑_{i₁ + ⋯ + iₖ = n} m'ₖ(φ_{i₁}(a₁, …, a_{i₁}), …, φ_{iₖ}(a_{n-iₖ+1}, …, aₙ))`.
 
 The sign on the left is the Koszul sign `stasheffSign` of the Stasheff identities. There is no
 sign on the right: in reduced degrees `‖a‖ = |a| - 1` every `φᵢ` has degree `0`, so no Koszul
@@ -100,7 +100,7 @@ lemma operationTargetDeg_eq_functorTargetDeg_add_shift_one :
   congr 2
   lia
 
-/-- The term `φ_{r+1+t}(a₁, …, a_r, m_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, aₙ)` of the left-hand
+/-- The term `φ_{r+1+t}(a₁, …, aᵣ, mₛ(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, aₙ)` of the left-hand
 side of the functor equation, indexed by `p = (r, s, t)`, has the degree of `mₙ(a₁, …, aₙ)`. -/
 lemma functorTargetDeg_stasheffDegOut (p : StasheffIndex n) :
     functorTargetDeg (stasheffDegOut deg p) = operationTargetDeg deg := by
@@ -108,9 +108,9 @@ lemma functorTargetDeg_stasheffDegOut (p : StasheffIndex n) :
   rw [← operationTargetDeg_eq_functorTargetDeg_add_shift_one, stasheffDegOut_sum,
     stasheffTargetDeg_eq_operationTargetDeg_add_shift_one]
 
-/-- The term `m_k(φ_{i₁}(a₁, …, a_{i₁}), …, φ_{iₖ}(a_{n-iₖ+1}, …, aₙ))` of the right-hand side of
+/-- The term `mₖ(φ_{i₁}(a₁, …, a_{i₁}), …, φ_{iₖ}(a_{n-iₖ+1}, …, aₙ))` of the right-hand side of
 the functor equation, indexed by a composition `c = (i₁, …, iₖ)` of `n`, has the degree of
-`mₙ(a₁, …, aₙ)`, computed in the source grading. -/
+`mₙ(a₁, …, aₙ)`. -/
 lemma operationTargetDeg_functorTargetDeg_embedding (c : Composition n) :
     operationTargetDeg (fun l ↦ functorTargetDeg fun j ↦ deg (c.embedding l j)) =
       operationTargetDeg deg := by
@@ -128,7 +128,7 @@ section CompositionBlock
 A composition `c = (i₁, …, iₖ)` of `n` cuts a composable string of `n` inputs into `k` blocks:
 the `l`-th block has size `iₗ = c.blocksFun l` and starts at position `c.sizeUpTo l`. In the
 right-hand side of the functor equation, the functor component `φ_{iₗ}` is applied to the
-`l`-th block and the outer operation `m'_k` to the resulting `k` values, so both the sizes of
+`l`-th block and the outer operation `m'ₖ` to the resulting `k` values, so both the sizes of
 the blocks and their number must be positive. The lemmas and instances on `Composition` below
 are stated without reference to functors. -/
 
@@ -202,8 +202,9 @@ lemma operationTargetDeg_degMap {k : ℕ} (b : Fin k → β) :
     operationTargetDeg (fun i ↦ F.degMap (b i)) = F.degMap (operationTargetDeg b) := by
   simp only [operationTargetDeg, map_add, map_sum, GradingHom.map_shift]
 
-/-- The value of the `c.length`-ary operation `m'` on the functor components of the blocks of
-a composition `c` of `n` has degree `degMap d`, where `d` is the degree of `mₙ(a₁, …, aₙ)`. -/
+/-- `operationTargetDeg_functorTargetDeg_embedding` translated along `degMap`: the term
+`m'ₖ(φ_{i₁}(…), …, φ_{iₖ}(…))` of the right-hand side of the functor equation has degree
+`degMap d`, where `d` is the degree of `mₙ(a₁, …, aₙ)`. -/
 lemma operationTargetDeg_degMap_functorTargetDeg_embedding (c : Composition n) (d : β)
     (hd : operationTargetDeg deg = d) :
     operationTargetDeg (fun l ↦ F.degMap (functorTargetDeg fun j ↦ deg (c.embedding l j))) =
@@ -213,7 +214,7 @@ lemma operationTargetDeg_degMap_functorTargetDeg_embedding (c : Composition n) (
 
 /-! ### The left-hand side of the functor equation -/
 
-/-- The term `φ_{r+1+t}(a_1, …, a_r, m_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, a_n)` of the
+/-- The term `φ_{r+1+t}(a₁, …, aᵣ, mₛ(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, aₙ)` of the
 left-hand side of the functor equation indexed by `p = (r, s, t)`, in degree `F.degMap d` for
 any `d` equal to the degree of `mₙ(a₁, …, aₙ)`. -/
 def mapCompTerm (p : StasheffIndex n) (d : β) (hd : operationTargetDeg deg = d) :
@@ -232,7 +233,7 @@ def mapCompSum (d : β) (hd : operationTargetDeg deg = d) :
 /-! ### The right-hand side of the functor equation -/
 
 /-- The value of the functor component `φ_{iₗ}` on the `l`-th block of a composition
-`c = (i₁, …, iₖ)` of `n`, as the `l`-th input of the outer operation `m'_k`. -/
+`c = (i₁, …, iₖ)` of `n`, as the `l`-th input of the outer operation `m'ₖ`. -/
 def compositionBlockMap (c : Composition n) (l : Fin c.length) :
     ComposableHomType R (fun k ↦ F.obj (obj (c.boundary k))) l
       (F.degMap (functorTargetDeg fun j ↦ deg (c.embedding l j))) :=
@@ -241,7 +242,7 @@ def compositionBlockMap (c : Composition n) (l : Fin c.length) :
     (F.map (compositionBlockObj obj c l) (fun j ↦ deg (c.embedding l j)) _ rfl
       fun j ↦ x (c.embedding l j))
 
-/-- The term `m'_k(φ_{i₁}(a_1, …, a_{i₁}), …, φ_{iₖ}(a_{n-iₖ+1}, …, a_n))` of the right-hand
+/-- The term `m'ₖ(φ_{i₁}(a₁, …, a_{i₁}), …, φ_{iₖ}(a_{n-iₖ+1}, …, aₙ))` of the right-hand
 side of the functor equation indexed by a composition `c = (i₁, …, iₖ)` of `n`, in degree
 `F.degMap d` for any `d` equal to the degree of `mₙ(a₁, …, aₙ)`. -/
 def compMapTerm [NeZero n] (c : Composition n) (d : β) (hd : operationTargetDeg deg = d) :
