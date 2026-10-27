@@ -146,9 +146,8 @@ instance _root_.Composition.neZero_blocksFun : NeZero (c.blocksFun l) :=
 instance _root_.Composition.neZero_length [NeZero n] : NeZero c.length :=
   NeZero.of_pos (c.length_pos_of_pos (NeZero.pos n))
 
-/-- The object string of the `l`-th block of a composition `c` of `n`: the objects from
-`obj (c.boundary l.castSucc)` at the `l`-th boundary to `obj (c.boundary l.succ)` at the
-`(l + 1)`-st boundary. -/
+/-- The object string of the `l`-th block of a composition `c` of `n`: its `i`-th object is
+`obj (c.sizeUpTo l + i)`, for `i ≤ c.blocksFun l`. -/
 def compositionBlockObj : Fin (c.blocksFun l + 1) → Obj :=
   fun i ↦ obj ((i.natAdd (c.sizeUpTo l)).castLE (Nat.succ_le_succ (c.sizeUpTo_add_blocksFun_le l)))
 
