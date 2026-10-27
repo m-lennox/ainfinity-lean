@@ -45,7 +45,7 @@ universe u v w
 variable {β : Type v} [AddCommGroup β] [GradingType β]
 variable {n : ℕ}
 
-/-- Target degree of the `n`-ary operation `mₙ` on inputs of degrees `deg`. -/
+/-- The degree of `mₙ(a₁, …, aₙ)` for inputs of degrees `deg`, where `mₙ` has degree `2 - n`. -/
 abbrev operationTargetDeg
     (deg : Fin n → β) : β :=
   (∑ i, deg i) + shift (2 - (n : ℤ))
