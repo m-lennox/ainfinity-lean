@@ -100,16 +100,17 @@ lemma operationTargetDeg_eq_functorTargetDeg_add_shift_one :
   congr 2
   lia
 
-/-- In the term of the left-hand side of the functor equation indexed by `p = (r, s, t)`, the
-outer functor component has the degree of `mₙ(a₁, …, aₙ)`. -/
+/-- The term `φ_{r+1+t}(a₁, …, a_r, m_s(a_{r+1}, …, a_{r+s}), a_{r+s+1}, …, aₙ)` of the left-hand
+side of the functor equation, indexed by `p = (r, s, t)`, has the degree of `mₙ(a₁, …, aₙ)`. -/
 lemma functorTargetDeg_stasheffDegOut (p : StasheffIndex n) :
     functorTargetDeg (stasheffDegOut deg p) = operationTargetDeg deg := by
   apply add_right_cancel (b := (shift 1 : β))
   rw [← operationTargetDeg_eq_functorTargetDeg_add_shift_one, stasheffDegOut_sum,
     stasheffTargetDeg_eq_operationTargetDeg_add_shift_one]
 
-/-- The value of the `c.length`-ary operation on the functor components of the blocks of a
-composition `c` of `n` has the degree of `mₙ(a₁, …, aₙ)`. -/
+/-- The term `m_k(φ_{i₁}(a₁, …, a_{i₁}), …, φ_{iₖ}(a_{n-iₖ+1}, …, aₙ))` of the right-hand side of
+the functor equation, indexed by a composition `c = (i₁, …, iₖ)` of `n`, has the degree of
+`mₙ(a₁, …, aₙ)`, computed in the source grading. -/
 lemma operationTargetDeg_functorTargetDeg_embedding (c : Composition n) :
     operationTargetDeg (fun l ↦ functorTargetDeg fun j ↦ deg (c.embedding l j)) =
       operationTargetDeg deg := by
@@ -145,8 +146,9 @@ instance _root_.Composition.neZero_blocksFun : NeZero (c.blocksFun l) :=
 instance _root_.Composition.neZero_length [NeZero n] : NeZero c.length :=
   NeZero.of_pos (c.length_pos_of_pos (NeZero.pos n))
 
-/-- The object string `obj (c.sizeUpTo l), …, obj (c.sizeUpTo l + c.blocksFun l)` spanned by
-the `l`-th block of a composition `c` of `n`. -/
+/-- The object string of the `l`-th block of a composition `c` of `n`: the objects from
+`obj (c.boundary l.castSucc)` at the `l`-th boundary to `obj (c.boundary l.succ)` at the
+`(l + 1)`-st boundary. -/
 def compositionBlockObj : Fin (c.blocksFun l + 1) → Obj :=
   fun i ↦ obj ((i.natAdd (c.sizeUpTo l)).castLE (Nat.succ_le_succ (c.sizeUpTo_add_blocksFun_le l)))
 
