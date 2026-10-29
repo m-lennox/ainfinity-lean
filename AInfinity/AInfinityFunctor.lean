@@ -76,13 +76,6 @@ lemma _root_.Composition.prod_prod_embedding {M : Type*} [CommMonoid M] (c : Com
     (f : Fin n → M) : ∏ l, ∏ j, f (c.embedding l j) = ∏ i, f i :=
   (Fintype.prod_sigma _).symm.trans (c.blocksFinEquiv.prod_comp f)
 
-/-- Summing `1 - bₗ` over the blocks `bₗ` of a composition `c` of `n` gives `c.length - n`, as
-integers, since the blocks have total size `n`. -/
-lemma _root_.Composition.sum_one_sub_blocksFun (c : Composition n) :
-    ∑ l, (1 - (c.blocksFun l : ℤ)) = c.length - n := by
-  rw [Finset.sum_sub_distrib, ← Nat.cast_sum, c.sum_blocksFun]
-  simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
-
 section Degrees
 
 variable {β : Type*} [AddCommGroup β] [GradingType β]
@@ -115,7 +108,8 @@ lemma operationTargetDeg_functorTargetDeg_embedding (c : Composition n) :
     operationTargetDeg (fun l ↦ functorTargetDeg fun j ↦ deg (c.embedding l j)) =
       operationTargetDeg deg := by
   simp only [operationTargetDeg, functorTargetDeg, Finset.sum_add_distrib, c.sum_sum_embedding,
-    add_assoc, ← map_sum, ← map_add, c.sum_one_sub_blocksFun]
+    add_assoc, ← map_sum, ← map_add, Finset.sum_sub_distrib, ← Nat.cast_sum, c.sum_blocksFun,
+    Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
   congr 2
   lia
 
