@@ -14,8 +14,7 @@ public import Mathlib.Data.ZMod.IntUnitsPower
 
 /-! # Gradings for A-infinity categories
 
-This file introduces graded hom spaces, `R`-linear graded quivers, and the grading data
-needed to write down A-infinity structures.
+This file introduces the grading data needed to write down A-infinity structures.
 
 The grading type `β` of an A-infinity category is an abelian group of degrees. The
 A-infinity axioms only ever use two pieces of additional structure on it:
@@ -28,15 +27,16 @@ A-infinity axioms only ever use two pieces of additional structure on it:
 They are compatible in that the differential, of degree `shift 1`, is odd.
 
 No degree is ever multiplied, so `β` is *not* required to be a ring. This is what allows
-bigradings such as `ℤ × ℤ` or `ℤ × ZMod 2`, where `mₙ` has degree `(2 - n, 0)` and the
-sign is the total parity.
+bigradings such as `ℤ ×ₜ ℤ` or `ℤ ×ₜ ZMod 2`, where `mₙ` has degree `(2 - n, 0)` and the
+sign is the total parity, or `β ×₁ γ`, where the sign is read off the first factor alone. These
+are type synonyms for `β × γ`.
 
 A homomorphism of grading types `GradingHom β β'`, written `β →+ᵍ β'`, is an additive
 homomorphism preserving the shifts and the signs. It translates degrees when an A-infinity
 functor changes the grading. Homomorphisms of grading types compose, with the identity as unit.
-The integers are the initial grading type: `GradingHom.ofInt β : ℤ →+ᵍ β` is the shift, and for
-`β = ZMod 2` it is reduction modulo `2`. The inclusion `inl` of the first factor into either
-product grading, and the projection `fst` out of `prodFst`, are homomorphisms of grading types.
+The integers are the initial grading type: `GradingHom.ofInt β : ℤ →+ᵍ β` is the shift. The
+inclusion `inl` of the first factor into either product grading, and the projection `fst` out of
+`β ×₁ γ`, are homomorphisms of grading types.
 -/
 
 namespace AInfinityTheory
@@ -79,9 +79,8 @@ namespace GradingType
 
 /-! ### Instances
 
-Global instances are provided only for the two standard gradings `ℤ` and `ZMod 2`. Product
-gradings are constructed by the named definitions `prodFst` and `prodTotal` below and must be
-activated locally, since both are reasonable choices on the same product type. -/
+Global instances are provided for the two standard gradings `ℤ` and `ZMod 2`, and below for the
+product gradings `β ×ₜ γ` and `β ×₁ γ`. -/
 
 /-- The integers, graded by themselves: the shift is the identity and the sign of `n` is
 `(-1) ^ n`. -/
@@ -106,39 +105,115 @@ public instance : GradingType (ZMod 2) where
 @[simp]
 public lemma shift_zmod_two (n : ℤ) : shift n = (n : ZMod 2) := rfl
 
+end GradingType
+
+/-! ### Product gradings
+
+A product of grading types carries two natural gradings, both with shifts in the first factor:
+`β ×ₜ γ`, with the *total* sign, and `β ×₁ γ`, with the sign of the first factor alone. Each is a
+type synonym for `β × γ`, so that both can be global instances. -/
+
 section Prod
 
-variable (β : Type*) [AddCommGroup β] (γ : Type*) [AddCommGroup γ]
+variable (β γ : Type*)
 
-/-- The product grading on `β × γ` whose shifts land in the first factor and whose sign is
-read off the first factor alone. -/
-public abbrev prodFst [GradingType β] : GradingType (β × γ) where
-  shift := (AddMonoidHom.inl β γ).comp shift
-  sign := sign.comp (AddMonoidHom.fst β γ)
-  sign_shift_one := by
-    simp only [AddMonoidHom.coe_comp, AddMonoidHom.coe_fst, Function.comp_apply,
-      AddMonoidHom.inl_apply, sign_shift_one]
+/-- A type synonym for `β × γ`, carrying the product grading whose shifts land in the first
+factor and whose sign is the product of the signs of both factors (the *total* sign). -/
+@[expose]
+public def ProdTotal := β × γ
+
+/-- A type synonym for `β × γ`, carrying the product grading whose shifts land in the first
+factor and whose sign is read off the first factor alone. -/
+@[expose]
+public def ProdFst := β × γ
+
+@[inherit_doc] infixr:35 " ×ₜ " => ProdTotal
+
+@[inherit_doc] infixr:35 " ×₁ " => ProdFst
+
+variable {β γ} [AddCommGroup β] [AddCommGroup γ]
+
+@[expose]
+public instance : AddCommGroup (β ×ₜ γ) := inferInstanceAs (AddCommGroup (β × γ))
+
+@[expose]
+public instance : AddCommGroup (β ×₁ γ) := inferInstanceAs (AddCommGroup (β × γ))
+
+/-- `toProdTotal` is the identity, viewed as an equivalence from `β × γ` to `β ×ₜ γ`. -/
+@[expose]
+public def toProdTotal : β × γ ≃+ β ×ₜ γ := AddEquiv.refl _
+
+/-- `ofProdTotal` is the identity, viewed as an equivalence from `β ×ₜ γ` to `β × γ`. -/
+@[expose]
+public def ofProdTotal : β ×ₜ γ ≃+ β × γ := AddEquiv.refl _
+
+/-- `toProdFst` is the identity, viewed as an equivalence from `β × γ` to `β ×₁ γ`. -/
+@[expose]
+public def toProdFst : β × γ ≃+ β ×₁ γ := AddEquiv.refl _
+
+/-- `ofProdFst` is the identity, viewed as an equivalence from `β ×₁ γ` to `β × γ`. -/
+@[expose]
+public def ofProdFst : β ×₁ γ ≃+ β × γ := AddEquiv.refl _
 
 @[simp]
-public lemma prodFst_shift [GradingType β] (n : ℤ) :
-    (prodFst β γ).shift n = (shift n, 0) := rfl
-
-/-- The product grading on `β × γ` whose shifts land in the first factor and whose sign is
-the product of the signs of both factors (the *total* sign). -/
-public abbrev prodTotal [GradingType β] [GradingType γ] : GradingType (β × γ) where
-  shift := (AddMonoidHom.inl β γ).comp shift
-  sign := AddMonoidHom.coprod sign sign
-  sign_shift_one := by
-    simp only [AddMonoidHom.coe_comp, Function.comp_apply, AddMonoidHom.inl_apply,
-      AddMonoidHom.coprod_apply, sign_shift_one, map_zero, add_zero]
+public lemma toProdTotal_symm_eq : (toProdTotal : β × γ ≃+ β ×ₜ γ).symm = ofProdTotal := rfl
 
 @[simp]
-public lemma prodTotal_shift [GradingType β] [GradingType γ] (n : ℤ) :
-    (prodTotal β γ).shift n = (shift n, 0) := rfl
+public lemma ofProdTotal_symm_eq : (ofProdTotal : β ×ₜ γ ≃+ β × γ).symm = toProdTotal := rfl
+
+@[simp]
+public lemma toProdTotal_ofProdTotal (d : β ×ₜ γ) : toProdTotal (ofProdTotal d) = d := rfl
+
+@[simp]
+public lemma ofProdTotal_toProdTotal (d : β × γ) : ofProdTotal (toProdTotal d) = d := rfl
+
+@[simp]
+public lemma toProdFst_symm_eq : (toProdFst : β × γ ≃+ β ×₁ γ).symm = ofProdFst := rfl
+
+@[simp]
+public lemma ofProdFst_symm_eq : (ofProdFst : β ×₁ γ ≃+ β × γ).symm = toProdFst := rfl
+
+@[simp]
+public lemma toProdFst_ofProdFst (d : β ×₁ γ) : toProdFst (ofProdFst d) = d := rfl
+
+@[simp]
+public lemma ofProdFst_toProdFst (d : β × γ) : ofProdFst (toProdFst d) = d := rfl
+
+variable [GradingType β]
+
+/-- The total product grading: shifts land in the first factor and the sign of `(b, c)` is the
+product of the signs of `b` and `c`. -/
+public instance [GradingType γ] : GradingType (β ×ₜ γ) where
+  shift := toProdTotal.toAddMonoidHom.comp ((AddMonoidHom.inl β γ).comp shift)
+  sign := (AddMonoidHom.coprod sign sign).comp ofProdTotal.toAddMonoidHom
+  sign_shift_one := by
+    change sign (shift 1 : β) + sign (0 : γ) = _
+    rw [map_zero, add_zero, GradingType.sign_shift_one]
+
+/-- The first-factor product grading: shifts land in the first factor and the sign of `(b, c)`
+is the sign of `b`. -/
+public instance : GradingType (β ×₁ γ) where
+  shift := toProdFst.toAddMonoidHom.comp ((AddMonoidHom.inl β γ).comp shift)
+  sign := sign.comp ((AddMonoidHom.fst β γ).comp ofProdFst.toAddMonoidHom)
+  sign_shift_one := by
+    change sign (shift 1 : β) = _
+    exact GradingType.sign_shift_one
+
+@[simp]
+public lemma shift_prodTotal [GradingType γ] (n : ℤ) :
+    (shift n : β ×ₜ γ) = toProdTotal (shift n, 0) := rfl
+
+@[simp]
+public lemma shift_prodFst (n : ℤ) : (shift n : β ×₁ γ) = toProdFst (shift n, 0) := rfl
+
+@[simp]
+public lemma sign_prodTotal [GradingType γ] (d : β ×ₜ γ) :
+    sign d = sign (ofProdTotal d).1 + sign (ofProdTotal d).2 := rfl
+
+@[simp]
+public lemma sign_prodFst (d : β ×₁ γ) : sign d = sign (ofProdFst d).1 := rfl
 
 end Prod
-
-end GradingType
 
 /-! ### Koszul signs in the standard gradings -/
 
@@ -148,26 +223,12 @@ public lemma sign_int (n : ℤ) : sign n = Int.negOnePow n := rfl
 /-- In the parity grading, `sign` is Mathlib's power operation on `ℤˣ` by `ZMod 2`. -/
 public lemma sign_zmod_two (p : ZMod 2) : sign p = (-1 : ℤˣ) ^ p := rfl
 
-section Prod
-
-variable (β : Type*) [AddCommGroup β] (γ : Type*) [AddCommGroup γ]
-
-@[simp]
-public lemma sign_prodFst [GradingType β] (d : β × γ) :
-    @sign (β × γ) _ (GradingType.prodFst β γ) d = sign d.1 := rfl
-
-@[simp]
-public lemma sign_prodTotal [GradingType β] [GradingType γ] (d : β × γ) :
-    @sign (β × γ) _ (GradingType.prodTotal β γ) d = sign d.1 + sign d.2 := rfl
-
-end Prod
-
 /-! ### Homomorphisms of grading types -/
 
 /-- A homomorphism of grading types is an additive homomorphism `β →+ β'` that preserves the
 integer degree shifts and the Koszul signs. It translates degrees in `β` into degrees in `β'`
 so that `mₙ` keeps degree `shift (2 - n)` and every Koszul sign is unchanged; for example,
-reduction `ℤ → ZMod 2`, or the inclusion of `β` into the product grading `prodFst β γ`. -/
+reduction `ℤ → ZMod 2`, or the inclusion of `β` into the product grading `β ×₁ γ`. -/
 public structure GradingHom (β β' : Type*) [AddCommGroup β] [GradingType β]
     [AddCommGroup β'] [GradingType β'] extends β →+ β' where
   /-- The homomorphism preserves the integer degree shifts. -/
@@ -296,68 +357,63 @@ end GradingHom
 
 /-! ### Inclusions and projections of product gradings
 
-Since the shifts of both product gradings land in the first factor, the inclusion `inl` and the
-projection `fst` are the candidates for homomorphisms of grading types; `inr` and `snd` do not
-preserve shifts. The projection `fst` preserves signs only for `prodFst`, not for `prodTotal`. -/
+The inclusion `inl` of the first factor into either product grading, and the projection `fst`
+out of `β ×₁ γ`, are homomorphisms of grading types. -/
 
 section Prod
 
 variable (β : Type*) [AddCommGroup β] [GradingType β] (γ : Type*) [AddCommGroup γ]
 
-namespace GradingHom.prodFst
+namespace ProdTotal
 
-attribute [local instance] GradingType.prodFst
+variable [GradingType γ]
 
-/-- The inclusion `b ↦ (b, 0)` of `β` into the product grading `prodFst β γ`. -/
+/-- The inclusion `b ↦ (b, 0)` of `β` into the product grading `β ×ₜ γ`. -/
 @[expose]
-public def inl : β →+ᵍ β × γ where
-  toAddMonoidHom := AddMonoidHom.inl β γ
+public def inl : β →+ᵍ β ×ₜ γ where
+  toAddMonoidHom := toProdTotal.toAddMonoidHom.comp (AddMonoidHom.inl β γ)
+  map_shift' _ := rfl
+  map_sign' b := by
+    change sign (toProdTotal (b, 0)) = sign b
+    rw [sign_prodTotal, ofProdTotal_toProdTotal, map_zero, add_zero]
+
+variable {β γ}
+
+@[simp]
+public lemma inl_apply (b : β) : inl β γ b = toProdTotal (b, 0) := rfl
+
+end ProdTotal
+
+namespace ProdFst
+
+/-- The inclusion `b ↦ (b, 0)` of `β` into the product grading `β ×₁ γ`. -/
+@[expose]
+public def inl : β →+ᵍ β ×₁ γ where
+  toAddMonoidHom := toProdFst.toAddMonoidHom.comp (AddMonoidHom.inl β γ)
   map_shift' _ := rfl
   map_sign' _ := rfl
 
-/-- The projection of the product grading `prodFst β γ` onto its first factor `β`. -/
+/-- The projection of the product grading `β ×₁ γ` onto its first factor `β`. -/
 @[expose]
-public def fst : β × γ →+ᵍ β where
-  toAddMonoidHom := AddMonoidHom.fst β γ
+public def fst : β ×₁ γ →+ᵍ β where
+  toAddMonoidHom := (AddMonoidHom.fst β γ).comp ofProdFst.toAddMonoidHom
   map_shift' _ := rfl
   map_sign' _ := rfl
 
 variable {β γ}
 
 @[simp]
-public lemma inl_apply (b : β) : inl β γ b = (b, 0) := rfl
+public lemma inl_apply (b : β) : inl β γ b = toProdFst (b, 0) := rfl
 
 @[simp]
-public lemma fst_apply (d : β × γ) : fst β γ d = d.1 := rfl
+public lemma fst_apply (d : β ×₁ γ) : fst β γ d = (ofProdFst d).1 := rfl
 
 /-- The projection onto the first factor is a retraction of the inclusion. -/
 @[simp]
 public lemma fst_comp_inl : (fst β γ).comp (inl β γ) = GradingHom.id β :=
-  ext fun _ => rfl
+  GradingHom.ext fun _ => rfl
 
-end GradingHom.prodFst
-
-namespace GradingHom.prodTotal
-
-variable [GradingType γ]
-
-attribute [local instance] GradingType.prodTotal
-
-/-- The inclusion `b ↦ (b, 0)` of `β` into the product grading `prodTotal β γ`. -/
-@[expose]
-public def inl : β →+ᵍ β × γ where
-  toAddMonoidHom := AddMonoidHom.inl β γ
-  map_shift' _ := rfl
-  map_sign' b := by
-    simp only [AddMonoidHom.toFun_eq_coe, AddMonoidHom.inl_apply, sign_prodTotal, map_zero,
-      add_zero]
-
-variable {β γ}
-
-@[simp]
-public lemma inl_apply (b : β) : inl β γ b = (b, 0) := rfl
-
-end GradingHom.prodTotal
+end ProdFst
 
 end Prod
 
