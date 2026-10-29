@@ -67,6 +67,21 @@ $\operatorname{sign}(b,c) = (-1)^b\,(-1)^c$. Neither choice is canonical, so
 both are constructions to be activated locally rather than instances.
 \end{definition}
 
+\begin{definition}[Homomorphism of grading types]
+\lean{AInfinityTheory.GradingHom, AInfinityTheory.GradingHom.id, AInfinityTheory.GradingHom.comp}
+\label{AInfinityTheory.GradingHom}
+\leanok
+\uses{AInfinityTheory.GradingType}
+A homomorphism of grading types $f : \beta \to \beta'$ is a group homomorphism that
+preserves the integer shifts, $f(\operatorname{shift}(k)) = \operatorname{shift}(k)$,
+and the Koszul signs, $(-1)^{f(b)} = (-1)^b$. It translates degrees in $\beta$ into
+degrees in $\beta'$ so that $m_n$ keeps degree $\operatorname{shift}(2-n)$ and no
+Koszul sign changes; this is what allows an \Ainf{}-functor to change the grading.
+Examples are the reduction $\mathbb{Z} \to \mathbb{Z}/2$ and the inclusion of
+$\beta$ into either product grading on $\beta \times \gamma$. Homomorphisms of
+grading types compose associatively, with the identity as unit.
+\end{definition}
+
 \section{Graded linear maps and quivers}
 
 The graded-linear-map and graded-quiver definitions below do not need a grading

@@ -32,7 +32,8 @@ bigradings such as `ℤ × ℤ` or `ℤ × ZMod 2`, where `mₙ` has degree `(2 
 sign is the total parity.
 
 A homomorphism of grading types `GradingHom β β'`, written `β →+ᵍ β'`, is an additive
-homomorphism preserving the shifts and the signs. It translates degrees when an A-infinity functor changes the grading.
+homomorphism preserving the shifts and the signs. It translates degrees when an A-infinity
+functor changes the grading. Homomorphisms of grading types compose, with the identity as unit.
 -/
 
 namespace AInfinityTheory
@@ -176,8 +177,8 @@ infixr:25 " →+ᵍ " => GradingHom
 
 namespace GradingHom
 
-variable {β β' β'' : Type*} [AddCommGroup β] [GradingType β] [AddCommGroup β']
-  [GradingType β'] [AddCommGroup β''] [GradingType β'']
+variable {β β' β'' β''' : Type*} [AddCommGroup β] [GradingType β] [AddCommGroup β']
+  [GradingType β'] [AddCommGroup β''] [GradingType β''] [AddCommGroup β'''] [GradingType β''']
 
 /-- A homomorphism of grading types is applied to degrees through its underlying function. -/
 @[expose]
@@ -205,6 +206,13 @@ public lemma coe_mk (f : β →+ β') (h₁ h₂) : ⇑(⟨f, h₁, h₂⟩ : β
 public lemma ext {f g : β →+ᵍ β'} (h : ∀ b, f b = g b) : f = g :=
   DFunLike.ext f g h
 
+/-- A homomorphism of grading types is determined by its underlying additive homomorphism. -/
+public lemma toAddMonoidHom_injective :
+    Function.Injective (toAddMonoidHom : (β →+ᵍ β') → β →+ β') := by
+  intro f g h
+  ext b
+  rw [← coe_toAddMonoidHom f, ← coe_toAddMonoidHom g, h]
+
 /-- A homomorphism of grading types preserves the integer degree shifts. -/
 @[simp]
 public lemma map_shift (f : β →+ᵍ β') (k : ℤ) : f (shift k) = shift k :=
@@ -226,6 +234,8 @@ public def id : β →+ᵍ β where
 @[simp]
 public lemma id_apply (b : β) : GradingHom.id β b = b := rfl
 
+public lemma coe_id : ⇑(GradingHom.id β) = _root_.id := rfl
+
 /-- The composite of two homomorphisms of grading types. -/
 @[expose]
 public def comp (g : β' →+ᵍ β'') (f : β →+ᵍ β') : β →+ᵍ β'' where
@@ -236,6 +246,24 @@ public def comp (g : β' →+ᵍ β'') (f : β →+ᵍ β') : β →+ᵍ β'' wh
 @[simp]
 public lemma comp_apply (g : β' →+ᵍ β'') (f : β →+ᵍ β') (b : β) :
     g.comp f b = g (f b) := rfl
+
+@[simp]
+public lemma coe_comp (g : β' →+ᵍ β'') (f : β →+ᵍ β') : ⇑(g.comp f) = g ∘ f := rfl
+
+/-- The identity is a right unit for composition of homomorphisms of grading types. -/
+@[simp]
+public lemma comp_id (f : β →+ᵍ β') : f.comp (GradingHom.id β) = f :=
+  ext fun _ => rfl
+
+/-- The identity is a left unit for composition of homomorphisms of grading types. -/
+@[simp]
+public lemma id_comp (f : β →+ᵍ β') : (GradingHom.id β').comp f = f :=
+  ext fun _ => rfl
+
+/-- Composition of homomorphisms of grading types is associative. -/
+public lemma comp_assoc (h : β'' →+ᵍ β''') (g : β' →+ᵍ β'') (f : β →+ᵍ β') :
+    (h.comp g).comp f = h.comp (g.comp f) :=
+  ext fun _ => rfl
 
 end GradingHom
 
