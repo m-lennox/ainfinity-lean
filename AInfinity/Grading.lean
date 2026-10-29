@@ -34,6 +34,8 @@ sign is the total parity.
 A homomorphism of grading types `GradingHom β β'`, written `β →+ᵍ β'`, is an additive
 homomorphism preserving the shifts and the signs. It translates degrees when an A-infinity
 functor changes the grading. Homomorphisms of grading types compose, with the identity as unit.
+The integers are the initial grading type: `GradingHom.ofInt β : ℤ →+ᵍ β` is the shift, and for
+`β = ZMod 2` it is reduction modulo `2`.
 -/
 
 namespace AInfinityTheory
@@ -264,6 +266,30 @@ public lemma id_comp (f : β →+ᵍ β') : (GradingHom.id β').comp f = f :=
 public lemma comp_assoc (h : β'' →+ᵍ β''') (g : β' →+ᵍ β'') (f : β →+ᵍ β') :
     (h.comp g).comp f = h.comp (g.comp f) :=
   ext fun _ => rfl
+
+variable (β) in
+/-- The integers are the initial grading type: the integer degree shift `shift : ℤ →+ β` is the
+unique homomorphism of grading types from ℤ to β. -/
+@[expose]
+public def ofInt : ℤ →+ᵍ β where
+  toAddMonoidHom := shift
+  map_shift' _ := rfl
+  map_sign' := sign_shift
+
+@[simp]
+public lemma ofInt_apply (n : ℤ) : ofInt β n = shift n := rfl
+
+/-- The homomorphism of grading types `ℤ → ZMod 2` is reduction modulo `2`. -/
+public lemma ofInt_zmod_two_apply (n : ℤ) : ofInt (ZMod 2) n = (n : ZMod 2) := rfl
+
+/-- Every homomorphism of grading types out of `ℤ` is `ofInt`, since it preserves shifts. -/
+public lemma eq_ofInt (f : ℤ →+ᵍ β) : f = ofInt β :=
+  ext f.map_shift
+
+/-- There is exactly one homomorphism of grading types out of `ℤ`. -/
+public instance : Unique (ℤ →+ᵍ β) where
+  default := ofInt β
+  uniq := eq_ofInt
 
 end GradingHom
 
