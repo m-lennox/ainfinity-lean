@@ -35,7 +35,8 @@ A homomorphism of grading types `GradingHom β β'`, written `β →+ᵍ β'`, i
 homomorphism preserving the shifts and the signs. It translates degrees when an A-infinity
 functor changes the grading. Homomorphisms of grading types compose, with the identity as unit.
 The integers are the initial grading type: `GradingHom.ofInt β : ℤ →+ᵍ β` is the shift, and for
-`β = ZMod 2` it is reduction modulo `2`.
+`β = ZMod 2` it is reduction modulo `2`. The inclusion `inl` of the first factor into either
+product grading, and the projection `fst` out of `prodFst`, are homomorphisms of grading types.
 -/
 
 namespace AInfinityTheory
@@ -292,5 +293,72 @@ public instance : Unique (ℤ →+ᵍ β) where
   uniq := eq_ofInt
 
 end GradingHom
+
+/-! ### Inclusions and projections of product gradings
+
+Since the shifts of both product gradings land in the first factor, the inclusion `inl` and the
+projection `fst` are the candidates for homomorphisms of grading types; `inr` and `snd` do not
+preserve shifts. The projection `fst` preserves signs only for `prodFst`, not for `prodTotal`. -/
+
+section Prod
+
+variable (β : Type*) [AddCommGroup β] [GradingType β] (γ : Type*) [AddCommGroup γ]
+
+namespace GradingHom.prodFst
+
+attribute [local instance] GradingType.prodFst
+
+/-- The inclusion `b ↦ (b, 0)` of `β` into the product grading `prodFst β γ`. -/
+@[expose]
+public def inl : β →+ᵍ β × γ where
+  toAddMonoidHom := AddMonoidHom.inl β γ
+  map_shift' _ := rfl
+  map_sign' _ := rfl
+
+/-- The projection of the product grading `prodFst β γ` onto its first factor `β`. -/
+@[expose]
+public def fst : β × γ →+ᵍ β where
+  toAddMonoidHom := AddMonoidHom.fst β γ
+  map_shift' _ := rfl
+  map_sign' _ := rfl
+
+variable {β γ}
+
+@[simp]
+public lemma inl_apply (b : β) : inl β γ b = (b, 0) := rfl
+
+@[simp]
+public lemma fst_apply (d : β × γ) : fst β γ d = d.1 := rfl
+
+/-- The projection onto the first factor is a retraction of the inclusion. -/
+@[simp]
+public lemma fst_comp_inl : (fst β γ).comp (inl β γ) = GradingHom.id β :=
+  ext fun _ => rfl
+
+end GradingHom.prodFst
+
+namespace GradingHom.prodTotal
+
+variable [GradingType γ]
+
+attribute [local instance] GradingType.prodTotal
+
+/-- The inclusion `b ↦ (b, 0)` of `β` into the product grading `prodTotal β γ`. -/
+@[expose]
+public def inl : β →+ᵍ β × γ where
+  toAddMonoidHom := AddMonoidHom.inl β γ
+  map_shift' _ := rfl
+  map_sign' b := by
+    simp only [AddMonoidHom.toFun_eq_coe, AddMonoidHom.inl_apply, sign_prodTotal, map_zero,
+      add_zero]
+
+variable {β γ}
+
+@[simp]
+public lemma inl_apply (b : β) : inl β γ b = (b, 0) := rfl
+
+end GradingHom.prodTotal
+
+end Prod
 
 end AInfinityTheory
