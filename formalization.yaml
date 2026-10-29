@@ -198,13 +198,14 @@ alignment:
       status: "defined"
       note: "Together with `AInfinityTheory.Grading.instZModOfNatNat` for ZMod 2."
     - source: "Blueprint, Definition (Product gradings)"
-      lean: "AInfinityTheory.instGradingProdTotal"
+      lean: "AInfinityTheory.instGradingTProd"
       module: "AInfinity.Grading"
       status: "defined"
       note: >-
-        The total sign, on the type synonym `AInfinityTheory.ProdTotal` (`β ×ₜ γ`). Together
-        with `AInfinityTheory.instGradingProdFst` on `AInfinityTheory.ProdFst` (`β ×₁ γ`) for
-        the sign of the first factor alone.
+        The total sign, on the type synonym `AInfinityTheory.TProd` (`β ×ᵗ γ`). Together
+        with `AInfinityTheory.instGradingLProd` on `AInfinityTheory.LProd` (`β ×ˡ γ`) for
+        the sign of the first factor alone, and `AInfinityTheory.instGradingRProd` on
+        `AInfinityTheory.RProd` (`β ×ʳ γ`) for shifts and sign in the second factor alone.
     - source: "Blueprint, Definition (Homomorphism of grading types)"
       lean: "AInfinityTheory.GradingHom"
       module: "AInfinity.Grading"

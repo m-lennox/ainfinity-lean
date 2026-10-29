@@ -54,21 +54,25 @@ $\operatorname{sign}(p) = (-1)^p$.
 \end{definition}
 
 \begin{definition}[Product gradings]
-\lean{AInfinityTheory.ProdTotal, AInfinityTheory.instGradingProdTotal,
-  AInfinityTheory.ProdFst, AInfinityTheory.instGradingProdFst}
+\lean{AInfinityTheory.TProd, AInfinityTheory.instGradingTProd,
+  AInfinityTheory.LProd, AInfinityTheory.instGradingLProd,
+  AInfinityTheory.RProd, AInfinityTheory.instGradingRProd}
 \label{AInfinityTheory.Grading.prod}
 \leanok
 \uses{AInfinityTheory.Grading}
 Let $\beta$ be a grading type and $\gamma$ an abelian group. The product
 $\beta \times \gamma$ is a grading type with
 $\operatorname{shift}(n) = (\operatorname{shift}(n), 0)$ in two ways. In the
-first-factor grading $\beta \times_1 \gamma$ the sign is read off the first
+left grading $\beta \times^l \gamma$ the sign is read off the first
 factor alone, $\operatorname{sign}(b,c) = (-1)^b$. When $\gamma$ is a grading
-type as well, the total grading $\beta \times_t \gamma$ carries the total sign
-$\operatorname{sign}(b,c) = (-1)^b\,(-1)^c$. Neither choice is canonical, so
-$\beta \times_1 \gamma$ and $\beta \times_t \gamma$ are separate copies of
-$\beta \times \gamma$, each carrying its grading as an instance, while the plain
-product $\beta \times \gamma$ carries neither.
+type as well, the total grading $\beta \times^t \gamma$ carries the total sign
+$\operatorname{sign}(b,c) = (-1)^b\,(-1)^c$. Symmetrically, when $\beta$ is an
+abelian group and $\gamma$ a grading type, the right grading
+$\beta \times^r \gamma$ has $\operatorname{shift}(n) = (0, \operatorname{shift}(n))$
+and $\operatorname{sign}(b,c) = (-1)^c$. None of these choices is canonical, so
+$\beta \times^l \gamma$, $\beta \times^t \gamma$ and $\beta \times^r \gamma$ are
+separate copies of $\beta \times \gamma$, each carrying its grading as an instance,
+while the plain product $\beta \times \gamma$ carries none.
 \end{definition}
 
 \begin{definition}[Homomorphism of grading types]
