@@ -108,10 +108,8 @@ lemma operationTargetDeg_functorTargetDeg_embedding (c : Composition n) :
     operationTargetDeg (fun l ↦ functorTargetDeg fun j ↦ deg (c.embedding l j)) =
       operationTargetDeg deg := by
   simp only [operationTargetDeg, functorTargetDeg, Finset.sum_add_distrib, c.sum_sum_embedding,
-    add_assoc, ← map_sum, ← map_add, Finset.sum_sub_distrib, ← Nat.cast_sum, c.sum_blocksFun,
-    Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
-  congr 2
-  lia
+    add_assoc, ← map_sum, ← map_add, Finset.sum_sub_distrib, ← Nat.cast_sum]
+  simp
 
 end Degrees
 
