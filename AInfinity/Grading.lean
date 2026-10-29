@@ -49,7 +49,7 @@ variable (β : Type v)
 `shift : ℤ →+ β` realising integer degree shifts (the `n`-ary operation `mₙ` has degree
 `shift (2 - n)`) and a Koszul sign character `sign : β →+ Additive ℤˣ`, such that the
 differential, of degree `shift 1`, is odd. -/
-public class GradingType (β : Type*) [AddCommGroup β] where
+public class Grading (β : Type*) [AddCommGroup β] where
   /-- The integer degree shifts: `mₙ` has degree `shift (2 - n)`. -/
   shift : ℤ →+ β
   /-- The Koszul sign character, written additively. -/
@@ -57,25 +57,25 @@ public class GradingType (β : Type*) [AddCommGroup β] where
   /-- The differential has odd degree. -/
   sign_shift_one : sign (shift 1) = Additive.ofMul (-1)
 
-export GradingType (shift sign)
+export Grading (shift sign)
 
 variable {β}
 
-section GradingType
+section Grading
 
-variable [AddCommGroup β] [GradingType β]
+variable [AddCommGroup β] [Grading β]
 
 /-- The sign of an integer degree shift is Mathlib's `Int.negOnePow`. -/
 @[simp]
 public lemma sign_shift (n : ℤ) : sign (shift n : β) = Int.negOnePow n := by
   have shift_n : (shift n : β) = n • shift (1 : ℤ) := by
     rw [← map_zsmul, smul_eq_mul, mul_one]
-  rw [shift_n, map_zsmul, GradingType.sign_shift_one, ← ofMul_zpow, Int.negOnePow_def]
+  rw [shift_n, map_zsmul, Grading.sign_shift_one, ← ofMul_zpow, Int.negOnePow_def]
   rfl
 
-end GradingType
+end Grading
 
-namespace GradingType
+namespace Grading
 
 /-! ### Instances
 
@@ -84,7 +84,7 @@ product gradings `β ×ₜ γ` and `β ×₁ γ`. -/
 
 /-- The integers, graded by themselves: the shift is the identity and the sign of `n` is
 `(-1) ^ n`. -/
-public instance : GradingType ℤ where
+public instance : Grading ℤ where
   shift := AddMonoidHom.id ℤ
   sign := zmultiplesHom (Additive ℤˣ) (Additive.ofMul (-1))
   sign_shift_one := by
@@ -95,7 +95,7 @@ public lemma shift_int (n : ℤ) : shift n = n := rfl
 
 /-- The parity grading `ZMod 2`: the shift is reduction modulo `2` and the sign of a parity
 `p` is `(-1) ^ p`, using Mathlib's power operation on `ℤˣ` by `ZMod 2`. -/
-public instance : GradingType (ZMod 2) where
+public instance : Grading (ZMod 2) where
   shift := Int.castAddHom (ZMod 2)
   sign := (smulAddHom (ZMod 2) (Additive ℤˣ)).flip (Additive.ofMul (-1))
   sign_shift_one := by
@@ -105,7 +105,7 @@ public instance : GradingType (ZMod 2) where
 @[simp]
 public lemma shift_zmod_two (n : ℤ) : shift n = (n : ZMod 2) := rfl
 
-end GradingType
+end Grading
 
 /-! ### Product gradings
 
@@ -179,35 +179,35 @@ public lemma toProdFst_ofProdFst (d : β ×₁ γ) : toProdFst (ofProdFst d) = d
 @[simp]
 public lemma ofProdFst_toProdFst (d : β × γ) : ofProdFst (toProdFst d) = d := rfl
 
-variable [GradingType β]
+variable [Grading β]
 
 /-- The total product grading: shifts land in the first factor and the sign of `(b, c)` is the
 product of the signs of `b` and `c`. -/
-public instance [GradingType γ] : GradingType (β ×ₜ γ) where
+public instance [Grading γ] : Grading (β ×ₜ γ) where
   shift := toProdTotal.toAddMonoidHom.comp ((AddMonoidHom.inl β γ).comp shift)
   sign := (AddMonoidHom.coprod sign sign).comp ofProdTotal.toAddMonoidHom
   sign_shift_one := by
     change sign (shift 1 : β) + sign (0 : γ) = _
-    rw [map_zero, add_zero, GradingType.sign_shift_one]
+    rw [map_zero, add_zero, Grading.sign_shift_one]
 
 /-- The first-factor product grading: shifts land in the first factor and the sign of `(b, c)`
 is the sign of `b`. -/
-public instance : GradingType (β ×₁ γ) where
+public instance : Grading (β ×₁ γ) where
   shift := toProdFst.toAddMonoidHom.comp ((AddMonoidHom.inl β γ).comp shift)
   sign := sign.comp ((AddMonoidHom.fst β γ).comp ofProdFst.toAddMonoidHom)
   sign_shift_one := by
     change sign (shift 1 : β) = _
-    exact GradingType.sign_shift_one
+    exact Grading.sign_shift_one
 
 @[simp]
-public lemma shift_prodTotal [GradingType γ] (n : ℤ) :
+public lemma shift_prodTotal [Grading γ] (n : ℤ) :
     (shift n : β ×ₜ γ) = toProdTotal (shift n, 0) := rfl
 
 @[simp]
 public lemma shift_prodFst (n : ℤ) : (shift n : β ×₁ γ) = toProdFst (shift n, 0) := rfl
 
 @[simp]
-public lemma sign_prodTotal [GradingType γ] (d : β ×ₜ γ) :
+public lemma sign_prodTotal [Grading γ] (d : β ×ₜ γ) :
     sign d = sign (ofProdTotal d).1 + sign (ofProdTotal d).2 := rfl
 
 @[simp]
@@ -229,8 +229,8 @@ public lemma sign_zmod_two (p : ZMod 2) : sign p = (-1 : ℤˣ) ^ p := rfl
 integer degree shifts and the Koszul signs. It translates degrees in `β` into degrees in `β'`
 so that `mₙ` keeps degree `shift (2 - n)` and every Koszul sign is unchanged; for example,
 reduction `ℤ → ZMod 2`, or the inclusion of `β` into the product grading `β ×₁ γ`. -/
-public structure GradingHom (β β' : Type*) [AddCommGroup β] [GradingType β]
-    [AddCommGroup β'] [GradingType β'] extends β →+ β' where
+public structure GradingHom (β β' : Type*) [AddCommGroup β] [Grading β]
+    [AddCommGroup β'] [Grading β'] extends β →+ β' where
   /-- The homomorphism preserves the integer degree shifts. -/
   map_shift' (k : ℤ) : toFun (shift k) = shift k
   /-- The homomorphism preserves the Koszul signs. -/
@@ -241,8 +241,8 @@ infixr:25 " →+ᵍ " => GradingHom
 
 namespace GradingHom
 
-variable {β β' β'' β''' : Type*} [AddCommGroup β] [GradingType β] [AddCommGroup β']
-  [GradingType β'] [AddCommGroup β''] [GradingType β''] [AddCommGroup β'''] [GradingType β''']
+variable {β β' β'' β''' : Type*} [AddCommGroup β] [Grading β] [AddCommGroup β']
+  [Grading β'] [AddCommGroup β''] [Grading β''] [AddCommGroup β'''] [Grading β''']
 
 /-- A homomorphism of grading types is applied to degrees through its underlying function. -/
 @[expose]
@@ -362,11 +362,11 @@ out of `β ×₁ γ`, are homomorphisms of grading types. -/
 
 section Prod
 
-variable (β : Type*) [AddCommGroup β] [GradingType β] (γ : Type*) [AddCommGroup γ]
+variable (β : Type*) [AddCommGroup β] [Grading β] (γ : Type*) [AddCommGroup γ]
 
 namespace ProdTotal
 
-variable [GradingType γ]
+variable [Grading γ]
 
 /-- The inclusion `b ↦ (b, 0)` of `β` into the product grading `β ×ₜ γ`. -/
 @[expose]
